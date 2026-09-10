@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10",
+    "@rolldown/binding-win32-x64-msvc": "^1.2.8",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
