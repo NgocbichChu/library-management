@@ -11,6 +11,8 @@ import { AdminLayout } from "@/layouts/admin-layout"
 import { AuthLayout } from "@/layouts/auth-layout"
 import { Component as LoginPage } from "@/features/auth/login-page"
 import { navMain } from "@/config/navigation"
+import { PublicLayout } from "@/layouts/public-layout"
+import { AboutPage, BookDetailPage, BooksPage, BorrowPage, HomePage, ProfilePage } from "@/features/library/library-pages"
 function PreviewPage() {
   const { pathname } = useLocation()
   const pages = navMain.flatMap((item) => item.items ?? [item])
@@ -31,7 +33,16 @@ export function App() {
     <BrowserRouter>
       <GlobalLoading />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/books/:id" element={<BookDetailPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route element={<RequireAuth />}>
+            <Route path="/borrow/:id" element={<BorrowPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
         <Route element={<GuestOnly />}>
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
@@ -43,7 +54,7 @@ export function App() {
             <Route path="*" element={<PreviewPage />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
