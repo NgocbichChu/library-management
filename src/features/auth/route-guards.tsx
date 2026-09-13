@@ -7,5 +7,5 @@ export function RequireAuth() {
 }
 export function GuestOnly() {
   const user = useAuthStore((state) => state.user)
-  return user ? <Navigate to="/dashboard" replace /> : <Outlet />
+  return user ? <Navigate to="/" replace /> : <Outlet />
 }

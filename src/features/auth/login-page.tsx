@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import { loginSchema, type LoginFormValues } from "@/schemas/auth"
-import { useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router"
 import { useAuthStore } from "@/stores/use-auth-store"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,7 @@ import { Spinner } from "@/components/ui/spinner"
 
 export const Component = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const login = useAuthStore((state) => state.login)
   const status = useAuthStore((state) => state.status)
   const error = useAuthStore((state) => state.error)
@@ -32,7 +33,8 @@ export const Component = () => {
   const onSubmit = async (credentials: LoginFormValues) => {
     try {
       await login(credentials)
-      navigate("/dashboard", { replace: true })
+      const from = (location.state as { from?: string } | null)?.from
+      navigate(from ?? "/", { replace: true })
     } catch {
       // The store exposes a user-facing error below the form.
     }
