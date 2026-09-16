@@ -1,11 +1,18 @@
-import { Navigate, Outlet } from "react-router"
-import { useAuthStore } from "@/stores/use-auth-store"
+import { Navigate, Outlet, useLocation } from "react-router"
+import { useAuth } from "@/hooks/use-auth"
 
 export function RequireAuth() {
-  const user = useAuthStore((state) => state.user)
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+  const { isAuthenticated, user } = useAuth()
+  const location = useLocation()
+
+  return isAuthenticated || user ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/login" state={{ from: location.pathname }} replace />
+  )
 }
+
 export function GuestOnly() {
-  const user = useAuthStore((state) => state.user)
-  return user ? <Navigate to="/" replace /> : <Outlet />
+  const { isAuthenticated, user } = useAuth()
+  return isAuthenticated || user ? <Navigate to="/" replace /> : <Outlet />
 }

@@ -1,8 +1,8 @@
 import { z } from "zod"
 
 export const loginSchema = z.object({
-  email: z.string().email("Địa chỉ email không hợp lệ"),
-  password: z.string().min(8, "Mật khẩu phải dài ít nhất 8 ký tự"),
+  username: z.string().min(3, "Tên đăng nhập phải dài ít nhất 3 ký tự"),
+  password: z.string().min(6, "Mật khẩu phải dài ít nhất 6 ký tự"),
 })
 
 export type LoginFormValues = z.infer<typeof loginSchema>

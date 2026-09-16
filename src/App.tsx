@@ -12,7 +12,14 @@ import { AuthLayout } from "@/layouts/auth-layout"
 import { Component as LoginPage } from "@/features/auth/login-page"
 import { navMain } from "@/config/navigation"
 import { PublicLayout } from "@/layouts/public-layout"
-import { AboutPage, BookDetailPage, BooksPage, BorrowPage, HomePage, ProfilePage } from "@/features/library/library-pages"
+import {
+  AboutPage,
+  BookDetailPage,
+  BooksPage,
+  BorrowPage,
+  HomePage,
+  ProfilePage,
+} from "@/features/library/library-pages"
 function PreviewPage() {
   const { pathname } = useLocation()
   const pages = navMain.flatMap((item) => item.items ?? [item])
