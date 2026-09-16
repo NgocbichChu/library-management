@@ -33,17 +33,26 @@ export const Component = () => {
 
   const onSubmit = async (credentials: LoginFormValues) => {
     try {
-      await login(credentials)
+      const user = await login(credentials)
+      const isManagerRole = user.roles?.some((r) =>
+        ["ADMIN", "LIBRARIAN", "EMPLOYEE"].includes(r.toUpperCase())
+      )
       const from = (location.state as { from?: string } | null)?.from
-      navigate(from ?? "/profile", { replace: true })
+      if (from) {
+        navigate(from, { replace: true })
+      } else if (isManagerRole) {
+        navigate("/dashboard", { replace: true })
+      } else {
+        navigate("/profile", { replace: true })
+      }
     } catch {
       // The store exposes a user-facing error message below the form.
     }
   }
 
-  const handleFillDemo = () => {
-    form.setValue("username", "admin239", { shouldValidate: true })
-    form.setValue("password", "12345678", { shouldValidate: true })
+  const handleFillAccount = (username: string, password = "12345678") => {
+    form.setValue("username", username, { shouldValidate: true })
+    form.setValue("password", password, { shouldValidate: true })
     clearError()
   }
 
@@ -154,24 +163,50 @@ export const Component = () => {
           Đăng nhập
         </Button>
 
-        <div className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f8f4] p-3 text-xs text-[#617067]">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-[#24382b]">
-              Tài khoản thử nghiệm:
-            </span>
+        <div className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f8f4] p-3.5 text-xs text-[#617067]">
+          <p className="font-medium text-[#24382b]">
+            Chọn tài khoản thử nghiệm theo vai trò:
+          </p>
+          <div className="mt-2.5 grid grid-cols-3 gap-1.5">
             <button
               type="button"
-              onClick={handleFillDemo}
-              className="font-semibold text-[#1f5a45] hover:underline"
+              onClick={() => handleFillAccount("admin239", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
             >
-              Điền nhanh
+              <span className="block font-semibold text-[#1f3b2b]">
+                Độc giả
+              </span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                admin239
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillAccount("thuthu_mai", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+            >
+              <span className="block font-semibold text-[#1f5a45]">
+                Thủ thư
+              </span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                thuthu_mai
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillAccount("admin_toan", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+            >
+              <span className="block font-semibold text-[#c27652]">Admin</span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                admin_toan
+              </span>
             </button>
           </div>
-          <div className="mt-1 flex items-center gap-2 font-mono text-[11px] text-[#4a574f]">
-            <span>admin239</span>
-            <span>/</span>
-            <span>12345678</span>
-          </div>
+          <p className="mt-2 text-[10px] text-[#8b9a8f]">
+            * Độc giả chuyển vào trang cá nhân; Thủ thư &amp; Admin vào trang
+            Quản lý.
+          </p>
         </div>
 
         <div className="pt-2 text-center">

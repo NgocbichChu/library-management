@@ -1,5 +1,7 @@
 import * as React from "react"
-import { useAuthStore } from "@/stores/use-auth-store"
+import { Library } from "lucide-react"
+import { Link } from "react-router"
+import { useAuth } from "@/hooks/use-auth"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -11,21 +13,33 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { navMain } from "@/config/navigation"
-import { MainLogo } from "@/lib/svg"
 
 export const AppSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
   if (!user) return null
   const visibleNavItems = navMain
 
   return (
     <Sidebar collapsible="icon" {...props} variant="inset">
-      <SidebarHeader>
-        <div className="flex h-13 items-center justify-center overflow-hidden whitespace-nowrap text-primary [&>svg]:size-7 [&>svg]:shrink-0 group-data-[collapsible=icon]:[&>svg]:size-7">
-          <MainLogo />
-        </div>
+      <SidebarHeader className="border-b border-border/60">
+        <Link
+          to="/"
+          className="flex items-center gap-2.5 px-1 py-1 transition-opacity hover:opacity-90"
+        >
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1f5a45] text-white shadow-sm">
+            <Library className="size-4" />
+          </span>
+          <div className="flex flex-col overflow-hidden text-left group-data-[collapsible=icon]:hidden">
+            <span className="truncate text-sm font-semibold text-[#1f3b2b]">
+              Mộc Miên Library
+            </span>
+            <span className="truncate text-[11px] text-[#718077]">
+              Cổng quản trị thư viện
+            </span>
+          </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={visibleNavItems} />

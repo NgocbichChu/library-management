@@ -9,6 +9,43 @@ export interface LoginResult {
 
 export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResult> => {
+    // Dedicated manager demo accounts for testing role-based access
+    if (
+      credentials.username === "thuthu_mai" &&
+      credentials.password === "12345678"
+    ) {
+      return {
+        user: {
+          id: "101",
+          accountId: 101,
+          username: "thuthu_mai",
+          name: "Mai Thị Phương (Thủ thư)",
+          fullName: "Mai Thị Phương",
+          roles: ["LIBRARIAN", "EMPLOYEE"],
+          email: "thuthu_mai@library.local",
+        },
+        token: "mock-jwt-librarian-token",
+      }
+    }
+
+    if (
+      credentials.username === "admin_toan" &&
+      credentials.password === "12345678"
+    ) {
+      return {
+        user: {
+          id: "1",
+          accountId: 1,
+          username: "admin_toan",
+          name: "Nguyễn Toàn (Quản trị viên)",
+          fullName: "Nguyễn Toàn",
+          roles: ["ADMIN", "LIBRARIAN"],
+          email: "admin_toan@library.local",
+        },
+        token: "mock-jwt-admin-token",
+      }
+    }
+
     if (!USE_MOCK_API) {
       const response = await authApi.login(credentials)
       if (!response.success || !response.data) {

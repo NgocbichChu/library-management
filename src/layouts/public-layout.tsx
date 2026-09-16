@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 
 export function PublicLayout() {
-  const { user } = useAuth()
+  const { user, isManager } = useAuth()
   const navigate = useNavigate()
 
   return (
@@ -54,6 +54,15 @@ export function PublicLayout() {
             >
               <Search className="size-4" />
             </Button>
+            {isManager && (
+              <Button
+                variant="outline"
+                className="hidden border-[#1f5a45] text-[#1f5a45] hover:bg-[#e7eee3] sm:inline-flex"
+                onClick={() => navigate("/dashboard")}
+              >
+                Trang quản lý
+              </Button>
+            )}
             {user ? (
               <Button
                 variant="outline"

@@ -8,6 +8,8 @@ export interface UseAuthReturn {
   isAuthenticated: boolean
   roles: string[]
   isAdmin: boolean
+  isLibrarian: boolean
+  isManager: boolean
   isReader: boolean
   hasRole: (role: string) => boolean
   error: string | null
@@ -29,8 +31,11 @@ export function useAuth(): UseAuthReturn {
 
   const isAuthenticated = Boolean(user && status === "authenticated")
   const roles = user?.roles ?? []
-  const hasRole = (role: string) => roles.includes(role)
+  const hasRole = (role: string) =>
+    roles.some((r) => r.toUpperCase() === role.toUpperCase())
   const isAdmin = hasRole("ADMIN")
+  const isLibrarian = hasRole("LIBRARIAN") || hasRole("EMPLOYEE")
+  const isManager = isAdmin || isLibrarian
   const isReader = hasRole("READER")
 
   return {
@@ -40,6 +45,8 @@ export function useAuth(): UseAuthReturn {
     isAuthenticated,
     roles,
     isAdmin,
+    isLibrarian,
+    isManager,
     isReader,
     hasRole,
     error,
