@@ -13,18 +13,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon, ShieldCheck } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router"
 import { useAuthStore } from "@/stores/use-auth-store"
+import type { AuthUser } from "@/types/auth"
 
 export function NavUser({
   user,
 }: {
-  user: {
-    name: string
-    email: string
-  }
+  user: AuthUser
 }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
@@ -40,6 +38,11 @@ export function NavUser({
     }
   }
 
+  const roleLabel =
+    user.role === "manager"
+      ? (user.position ?? "Thủ thư / Quản lý")
+      : "Độc giả thư viện"
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -52,12 +55,12 @@ export function NavUser({
             <UserAvatar email={user.email} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate text-xs text-muted-foreground">{roleLabel}</span>
             </div>
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-50"
+            className="w-56"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -66,7 +69,11 @@ export function NavUser({
               <DropdownMenuItem>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-primary">
+                    <ShieldCheck className="size-3" />
+                    <span>{roleLabel}</span>
+                  </div>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>

@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form"
 import { loginSchema, type LoginFormValues } from "@/schemas/auth"
 import { useNavigate } from "react-router"
 import { useAuthStore } from "@/stores/use-auth-store"
+import { ShieldCheck, UserCircle, BookOpen } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,11 +32,20 @@ export const Component = () => {
 
   const onSubmit = async (credentials: LoginFormValues) => {
     try {
-      await login(credentials)
-      navigate("/dashboard", { replace: true })
+      const user = await login(credentials)
+      if (user.role === "manager") {
+        navigate("/dashboard", { replace: true })
+      } else {
+        navigate("/", { replace: true })
+      }
     } catch {
       // The store exposes a user-facing error below the form.
     }
+  }
+
+  const setPresetAccount = (email: string) => {
+    form.setValue("email", email)
+    form.setValue("password", "password123")
   }
 
   return (
@@ -43,12 +53,43 @@ export const Component = () => {
       <div className="mt-4 flex flex-col gap-1">
         <p className="text-center text-xl font-semibold">Chào mừng trở lại</p>
         <p className="text-center text-sm text-muted-foreground">
-          Đăng nhập để quản lý thư viện
+          Đăng nhập hệ thống quản lý thư viện
         </p>
       </div>
+
+      <div className="mt-4 flex flex-col gap-2 rounded-lg border border-border/80 bg-muted/40 p-3 text-xs">
+        <span className="font-medium text-foreground flex items-center gap-1.5">
+          <ShieldCheck className="size-3.5 text-primary" /> Chọn nhanh tài khoản mẫu:
+        </span>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            disabled={isFormDisabled}
+            onClick={() => setPresetAccount("manager@library.com")}
+            className="flex flex-col items-start rounded border border-border bg-background p-2 text-left hover:border-primary hover:bg-accent/50 transition-colors"
+          >
+            <span className="font-semibold text-primary flex items-center gap-1">
+              <UserCircle className="size-3" /> Thủ thư / Quản lý
+            </span>
+            <span className="text-[11px] text-muted-foreground">manager@library.com</span>
+          </button>
+          <button
+            type="button"
+            disabled={isFormDisabled}
+            onClick={() => setPresetAccount("reader@library.com")}
+            className="flex flex-col items-start rounded border border-border bg-background p-2 text-left hover:border-primary hover:bg-accent/50 transition-colors"
+          >
+            <span className="font-semibold text-foreground flex items-center gap-1">
+              <BookOpen className="size-3" /> Độc giả
+            </span>
+            <span className="text-[11px] text-muted-foreground">reader@library.com</span>
+          </button>
+        </div>
+      </div>
+
       <form
         aria-busy={isFormDisabled}
-        className="mt-6 flex w-full flex-col gap-3"
+        className="mt-4 flex w-full flex-col gap-3"
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
       >
@@ -61,14 +102,14 @@ export const Component = () => {
                 data-disabled={isFormDisabled}
                 data-invalid={fieldState.invalid}
               >
-                <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                <FieldLabel htmlFor="login-email">Email / Tên đăng nhập</FieldLabel>
                 <InputGroup className="h-9 w-full">
                   <InputGroupInput
                     id="login-email"
                     aria-invalid={fieldState.invalid}
                     disabled={isFormDisabled}
                     autoComplete="username"
-                    placeholder="Email"
+                    placeholder="Email đăng nhập"
                     type="email"
                     {...field}
                   />
@@ -92,7 +133,7 @@ export const Component = () => {
                   disabled={isFormDisabled}
                   autoComplete="current-password"
                   className="h-9 w-full"
-                  placeholder="Mật khẩu"
+                  placeholder="Mật khẩu (ít nhất 8 ký tự)"
                   {...field}
                 />
                 <FieldError errors={[fieldState.error]} />

@@ -3,49 +3,55 @@ import {
   Navigate,
   Route,
   Routes,
-  useLocation,
 } from "react-router"
-import { RequireAuth, GuestOnly } from "@/features/auth/route-guards"
+import { RequireManager, GuestOnly } from "@/features/auth/route-guards"
 import { GlobalLoading } from "@/components/common/global-loading"
+import { Toaster } from "@/components/common/toaster"
 import { AdminLayout } from "@/layouts/admin-layout"
 import { AuthLayout } from "@/layouts/auth-layout"
 import { Component as LoginPage } from "@/features/auth/login-page"
-import { navMain } from "@/config/navigation"
-function PreviewPage() {
-  const { pathname } = useLocation()
-  const pages = navMain.flatMap((item) => item.items ?? [item])
-  const title =
-    pages.find((item) => item.url === pathname)?.title ?? "Không tìm thấy trang"
-  return (
-    <main className="p-6">
-      <h1 className="text-2xl font-semibold">{title}</h1>
-      <div className="mt-6 rounded-xl border border-dashed p-8 text-sm text-muted-foreground">
-        Đây là bản xem trước giao diện quản lý thư viện. Nội dung và dữ liệu sẽ
-        được bổ sung khi kết nối chức năng.
-      </div>
-    </main>
-  )
-}
+import { OverviewPage } from "@/features/manager/overview-page"
+import { BooksPage } from "@/features/manager/books-page"
+import { CategoriesPage } from "@/features/manager/categories-page"
+import { ReadersPage } from "@/features/manager/readers-page"
+import { LoansPage } from "@/features/manager/loans-page"
+import { SettingsPage } from "@/features/manager/settings-page"
+import { ReaderHomePage } from "@/features/reader/reader-home-page"
+
 export function App() {
   return (
     <BrowserRouter>
       <GlobalLoading />
+      <Toaster />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Public / Reader Home page */}
+        <Route path="/" element={<ReaderHomePage />} />
+
+        {/* Guest Only: Login */}
         <Route element={<GuestOnly />}>
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
           </Route>
         </Route>
-        <Route element={<RequireAuth />}>
+
+        {/* Protected Manager Dashboard (Require role: manager) */}
+        <Route element={<RequireManager />}>
           <Route path="/dashboard" element={<AdminLayout />}>
-            <Route index element={<PreviewPage />} />
-            <Route path="*" element={<PreviewPage />} />
+            <Route index element={<OverviewPage />} />
+            <Route path="books" element={<BooksPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="readers" element={<ReadersPage />} />
+            <Route path="loans" element={<LoansPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/login" replace />} />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   )
 }
+
 export default App
