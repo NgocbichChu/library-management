@@ -75,7 +75,6 @@ async function request<T>(
       : cleanPath
 
   const response = await fetch(`${API_BASE_URL}/${normalizedPath}`, {
-    credentials: "include",
     ...options,
     method,
     headers: requestHeaders,
