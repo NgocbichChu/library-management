@@ -13,7 +13,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, LogOutIcon, ShieldCheck } from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
@@ -42,10 +42,10 @@ export function NavUser({
     }
   }
 
-  const roleLabel =
-    user.role === "manager"
-      ? (user.position ?? "Thủ thư / Quản lý")
-      : "Độc giả thư viện"
+  // const roleLabel =
+  //   user.role === "manager"
+  //     ? (user.position ?? "Thủ thư / Quản lý")
+  //     : "Độc giả thư viện"
 
   return (
     <SidebarMenu>
