@@ -25,11 +25,11 @@ import type {
 // In-memory data store for the mock session
 let bookTitles = [...initialBookTitles]
 let bookCopies = [...initialBookCopies]
-let readers = [...initialReaders]
+const readers = [...initialReaders]
 const employees = [...initialEmployees]
-let borrowSlips = [...initialBorrowSlips]
-let borrowSlipDetails = [...initialBorrowSlipDetails]
-let fines = [...initialFines]
+const borrowSlips = [...initialBorrowSlips]
+const borrowSlipDetails = [...initialBorrowSlipDetails]
+const fines = [...initialFines]
 let categories = [...initialCategories]
 let systemPolicy = { ...initialSystemPolicy }
 

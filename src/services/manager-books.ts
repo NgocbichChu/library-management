@@ -300,34 +300,69 @@ export const managerBooksService = {
   getAll: async (): Promise<BookTitleItem[]> => {
     try {
       const response = await managerBooksApi.getAll()
-      if (
-        response.success &&
-        response.data?.data &&
-        response.data.data.length > 0
-      ) {
-        // Backend has books, map them if needed
-        return booksStore
+      const rawList =
+        (response.data as { data?: unknown[] })?.data ||
+        (Array.isArray(response.data) ? response.data : null)
+      if (response.success && Array.isArray(rawList) && rawList.length > 0) {
+        const beBooks: BookTitleItem[] = (rawList as Record<string, unknown>[]).map(
+          (item) => {
+            const rawId = item.id ?? item.bookTitleId ?? item.book_title_id
+            return {
+              id: String(rawId),
+              isbn: String(item.isbn || "978-604-1-00000-0"),
+              title: String(item.title || "Tài liệu chưa đặt tên"),
+              subtitle: item.subtitle ? String(item.subtitle) : undefined,
+              author: String(item.author || "Nhiều tác giả"),
+              publisher: String(item.publisher || "NXB Tổng hợp"),
+              publicationYear: Number(item.publicationYear || 2024),
+              languageCode: String(item.languageCode || "VIE"),
+              category: String(item.category || "Văn học"),
+              description: String(item.description || "Tài liệu lưu hành nội bộ"),
+              pageCount: Number(item.pageCount || 200),
+              coverImageUrl: item.coverImageUrl ? String(item.coverImageUrl) : undefined,
+              bookStatus: "Active",
+              totalCopies: 1,
+              availableCopies: item.available !== false ? 1 : 0,
+              borrowedCopies: item.available === false ? 1 : 0,
+              color: "#e2ead9",
+              copies: [],
+            }
+          }
+        )
+
+        // Merge backend books with mock initial books
+        const merged = [...beBooks]
+        for (const localBook of booksStore) {
+          if (
+            !merged.some(
+              (b) => b.id === localBook.id || b.title.toLowerCase() === localBook.title.toLowerCase()
+            )
+          ) {
+            merged.push(localBook)
+          }
+        }
+        return merged
       }
     } catch {
-      // Backend error / CORS / 403 fallback to rich Mộc Miên store
+      // Fallback to in-memory store
     }
     return booksStore
   },
 
   // Create new book title
   create: async (input: CreateBookTitleInput): Promise<BookTitleItem> => {
+    let createdId: string | number = `book-${Date.now()}`
     // Attempt backend API call
     try {
-      await managerBooksApi.create(input)
+      const res = await managerBooksApi.create(input)
+      if (res.success && res.data) {
+        createdId = res.data as string | number
+      }
     } catch {
-      // Continue locally for smooth frontend demonstration
+      // Continue locally for smooth demonstration
     }
 
-    const newId =
-      input.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")
-        .replace(/-+/g, "-") || `book-${Date.now()}`
+    const newId = String(createdId)
 
     const newBook: BookTitleItem = {
       id: newId,

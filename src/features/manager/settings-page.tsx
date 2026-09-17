@@ -30,6 +30,7 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     if (policy) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         policy_code: policy.policy_code,
         policy_name: policy.policy_name,

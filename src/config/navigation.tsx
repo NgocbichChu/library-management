@@ -23,7 +23,7 @@ export const navMain: NavigationItem[] = [
       { title: "Danh mục", url: "/dashboard/categories" },
     ],
   },
-  { title: "Độc giả", url: "/dashboard/readers", icon: <UsersIcon /> },
+  { title: "Người dùng & Độc giả", url: "/dashboard/users", icon: <UsersIcon /> },
   {
     title: "Mượn trả sách",
     url: "/dashboard/loans",
