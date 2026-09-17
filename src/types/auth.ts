@@ -33,4 +33,5 @@ export interface AuthUser {
   email?: string
 }
 
+
 export type AuthStatus = "unauthenticated" | "loading" | "authenticated"

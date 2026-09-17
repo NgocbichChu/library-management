@@ -3,7 +3,6 @@ import {
   Navigate,
   Route,
   Routes,
-  useLocation,
 } from "react-router"
 import {
   RequireAuth,
@@ -11,6 +10,7 @@ import {
   GuestOnly,
 } from "@/features/auth/route-guards"
 import { GlobalLoading } from "@/components/common/global-loading"
+import { Toaster } from "@/components/common/toaster"
 import { AdminLayout } from "@/layouts/admin-layout"
 import { AuthLayout } from "@/layouts/auth-layout"
 import { Component as LoginPage } from "@/features/auth/login-page"
@@ -48,6 +48,7 @@ export function App() {
   return (
     <BrowserRouter>
       <GlobalLoading />
+      <Toaster />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -76,4 +77,5 @@ export function App() {
     </BrowserRouter>
   )
 }
+
 export default App
