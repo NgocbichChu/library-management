@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AlertCircle, ArrowLeft } from "lucide-react"
 import { Controller, useForm } from "react-hook-form"
+import { Link, useLocation, useNavigate } from "react-router"
+import { useAuth } from "@/hooks/use-auth"
 import { loginSchema, type LoginFormValues } from "@/schemas/auth"
-import { useLocation, useNavigate } from "react-router"
-import { useAuthStore } from "@/stores/use-auth-store"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,67 +19,95 @@ import { Spinner } from "@/components/ui/spinner"
 export const Component = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const login = useAuthStore((state) => state.login)
-  const status = useAuthStore((state) => state.status)
-  const error = useAuthStore((state) => state.error)
+  const { login, status, error, clearError } = useAuth()
+
   const form = useForm<LoginFormValues>({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
     resolver: zodResolver(loginSchema),
   })
+
   const isFormDisabled = status === "loading" || form.formState.isSubmitting
 
   const onSubmit = async (credentials: LoginFormValues) => {
     try {
-      await login(credentials)
+      const user = await login(credentials)
+      const isManagerRole = user.roles?.some((r) =>
+        ["ADMIN", "LIBRARIAN", "EMPLOYEE"].includes(r.toUpperCase())
+      )
       const from = (location.state as { from?: string } | null)?.from
-      navigate(from ?? "/", { replace: true })
+      if (from) {
+        navigate(from, { replace: true })
+      } else if (isManagerRole) {
+        navigate("/dashboard", { replace: true })
+      } else {
+        navigate("/profile", { replace: true })
+      }
     } catch {
-      // The store exposes a user-facing error below the form.
+      // The store exposes a user-facing error message below the form.
     }
+  }
+
+  const handleFillAccount = (username: string, password = "12345678") => {
+    form.setValue("username", username, { shouldValidate: true })
+    form.setValue("password", password, { shouldValidate: true })
+    clearError()
   }
 
   return (
     <>
-      <div className="mt-4 flex flex-col gap-1">
-        <p className="text-center text-xl font-semibold">Chào mừng trở lại</p>
-        <p className="text-center text-sm text-muted-foreground">
-          Đăng nhập để quản lý thư viện
+      <div className="flex flex-col gap-1 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#1f3b2b]">
+          Đăng nhập
+        </h1>
+        <p className="text-sm text-[#718077]">
+          Nhập tài khoản để quản lý thẻ và mượn sách
         </p>
       </div>
+
       <form
         aria-busy={isFormDisabled}
-        className="mt-6 flex w-full flex-col gap-3"
+        className="mt-6 flex w-full flex-col gap-4"
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        <FieldGroup className="gap-3">
+        <FieldGroup className="gap-3.5">
           <Controller
             control={form.control}
-            name="email"
+            name="username"
             render={({ field, fieldState }) => (
               <Field
                 data-disabled={isFormDisabled}
                 data-invalid={fieldState.invalid}
               >
-                <FieldLabel htmlFor="login-email">Email</FieldLabel>
-                <InputGroup className="h-9 w-full">
+                <FieldLabel
+                  htmlFor="login-username"
+                  className="text-xs font-semibold tracking-wider text-[#56675c] uppercase"
+                >
+                  Tên đăng nhập
+                </FieldLabel>
+                <InputGroup className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45]">
                   <InputGroupInput
-                    id="login-email"
+                    id="login-username"
                     aria-invalid={fieldState.invalid}
                     disabled={isFormDisabled}
                     autoComplete="username"
-                    placeholder="Email"
-                    type="email"
+                    placeholder="Ví dụ: admin239"
+                    className="h-10"
                     {...field}
+                    onChange={(event) => {
+                      if (error) clearError()
+                      field.onChange(event)
+                    }}
                   />
                 </InputGroup>
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
           />
+
           <Controller
             control={form.control}
             name="password"
@@ -87,28 +116,43 @@ export const Component = () => {
                 data-disabled={isFormDisabled}
                 data-invalid={fieldState.invalid}
               >
-                <FieldLabel htmlFor="login-password">Mật khẩu</FieldLabel>
+                <FieldLabel
+                  htmlFor="login-password"
+                  className="text-xs font-semibold tracking-wider text-[#56675c] uppercase"
+                >
+                  Mật khẩu
+                </FieldLabel>
                 <PasswordInput
                   id="login-password"
                   aria-invalid={fieldState.invalid}
                   disabled={isFormDisabled}
                   autoComplete="current-password"
-                  className="h-9 w-full"
-                  placeholder="Mật khẩu"
+                  className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45]"
+                  placeholder="Nhập mật khẩu"
                   {...field}
+                  onChange={(event) => {
+                    if (error) clearError()
+                    field.onChange(event)
+                  }}
                 />
                 <FieldError errors={[fieldState.error]} />
               </Field>
             )}
           />
         </FieldGroup>
+
         {error ? (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-lg border border-[#f2d6d3] bg-[#fdf3f2] p-3 text-sm text-[#b43428]"
+          >
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <p className="leading-snug">{error}</p>
+          </div>
         ) : null}
+
         <Button
-          className="w-full"
+          className="mt-2 h-10 w-full bg-[#1f5a45] font-medium text-white transition-colors hover:bg-[#174735]"
           type="submit"
           size="lg"
           disabled={isFormDisabled}
@@ -118,6 +162,61 @@ export const Component = () => {
           ) : null}
           Đăng nhập
         </Button>
+
+        <div className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f8f4] p-3.5 text-xs text-[#617067]">
+          <p className="font-medium text-[#24382b]">
+            Chọn tài khoản thử nghiệm theo vai trò:
+          </p>
+          <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleFillAccount("admin239", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+            >
+              <span className="block font-semibold text-[#1f3b2b]">
+                Độc giả
+              </span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                admin239
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillAccount("thuthu_mai", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+            >
+              <span className="block font-semibold text-[#1f5a45]">
+                Thủ thư
+              </span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                thuthu_mai
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleFillAccount("admin_toan", "12345678")}
+              className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+            >
+              <span className="block font-semibold text-[#c27652]">Admin</span>
+              <span className="block font-mono text-[10px] text-[#718077]">
+                admin_toan
+              </span>
+            </button>
+          </div>
+          <p className="mt-2 text-[10px] text-[#8b9a8f]">
+            * Độc giả chuyển vào trang cá nhân; Thủ thư &amp; Admin vào trang
+            Quản lý.
+          </p>
+        </div>
+
+        <div className="pt-2 text-center">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#718077] transition-colors hover:text-[#1f5a45]"
+          >
+            <ArrowLeft className="size-3.5" /> Quay lại trang chủ
+          </Link>
+        </div>
       </form>
     </>
   )

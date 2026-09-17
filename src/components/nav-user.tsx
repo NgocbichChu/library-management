@@ -16,20 +16,22 @@ import {
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router"
-import { useAuthStore } from "@/stores/use-auth-store"
+import { useAuth } from "@/hooks/use-auth"
 
 export function NavUser({
   user,
 }: {
   user: {
     name: string
-    email: string
+    email?: string
+    username?: string
   }
 }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
-  const isLoggingOut = useAuthStore((state) => state.isLoggingOut)
-  const logout = useAuthStore((state) => state.logout)
+  const { logout, isLoggingOut } = useAuth()
+  const displayIdentifier = user.email || user.username || ""
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -49,10 +51,10 @@ export function NavUser({
               <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
             }
           >
-            <UserAvatar email={user.email} />
+            <UserAvatar email={displayIdentifier} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate text-xs">{displayIdentifier}</span>
             </div>
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
@@ -66,7 +68,7 @@ export function NavUser({
               <DropdownMenuItem>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs">{displayIdentifier}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>

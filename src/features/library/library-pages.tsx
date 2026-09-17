@@ -21,7 +21,7 @@ import {
   UserRound,
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
-import { useAuthStore } from "@/stores/use-auth-store"
+import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -264,28 +264,29 @@ export function BooksPage() {
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("Tất cả")
   const [availableOnly, setAvailableOnly] = useState(false)
-  const [sortBy, setSortBy] = useState<"featured" | "title" | "author" | "available">("featured")
+  const [sortBy, setSortBy] = useState<
+    "featured" | "title" | "author" | "available"
+  >("featured")
   const categories = ["Tất cả", ...new Set(books.map((book) => book.category))]
-  const filteredBooks = useMemo(
-    () => {
-      const result = books.filter(
-        (book) =>
-          (category === "Tất cả" || book.category === category) &&
-          (!availableOnly || book.available > 0) &&
-          `${book.title} ${book.author}`
-            .toLowerCase()
-            .includes(query.toLowerCase())
-      )
+  const filteredBooks = useMemo(() => {
+    const result = books.filter(
+      (book) =>
+        (category === "Tất cả" || book.category === category) &&
+        (!availableOnly || book.available > 0) &&
+        `${book.title} ${book.author}`
+          .toLowerCase()
+          .includes(query.toLowerCase())
+    )
 
-      return [...result].sort((first, second) => {
-        if (sortBy === "title") return first.title.localeCompare(second.title, "vi")
-        if (sortBy === "author") return first.author.localeCompare(second.author, "vi")
-        if (sortBy === "available") return second.available - first.available
-        return books.indexOf(first) - books.indexOf(second)
-      })
-    },
-    [availableOnly, category, query, sortBy]
-  )
+    return [...result].sort((first, second) => {
+      if (sortBy === "title")
+        return first.title.localeCompare(second.title, "vi")
+      if (sortBy === "author")
+        return first.author.localeCompare(second.author, "vi")
+      if (sortBy === "available") return second.available - first.available
+      return books.indexOf(first) - books.indexOf(second)
+    })
+  }, [availableOnly, category, query, sortBy])
   const activeFilterCount =
     (category !== "Tất cả" ? 1 : 0) +
     (availableOnly ? 1 : 0) +
@@ -337,32 +338,52 @@ export function BooksPage() {
             )}
             <ChevronDown className="ml-auto size-4" />
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 border-[#dfe5dc] bg-[#fffefb] p-4">
+          <PopoverContent
+            align="end"
+            className="w-80 border-[#dfe5dc] bg-[#fffefb] p-4"
+          >
             <PopoverHeader>
               <PopoverTitle className="text-base">Lọc và sắp xếp</PopoverTitle>
-              <p className="text-xs text-[#718077]">Thu hẹp danh sách theo nhu cầu của bạn.</p>
+              <p className="text-xs text-[#718077]">
+                Thu hẹp danh sách theo nhu cầu của bạn.
+              </p>
             </PopoverHeader>
             <div className="mt-4 space-y-4">
               <label className="block text-sm font-medium">
                 Thể loại
-                <Select value={category} onValueChange={(value) => setCategory(value ?? "Tất cả")}>
+                <Select
+                  value={category}
+                  onValueChange={(value) => setCategory(value ?? "Tất cả")}
+                >
                   <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((item) => (
-                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                      <SelectItem key={item} value={item}>
+                        {item}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </label>
               <label className="flex cursor-pointer items-center gap-3 text-sm">
-                <Checkbox checked={availableOnly} onCheckedChange={(checked) => setAvailableOnly(checked === true)} />
+                <Checkbox
+                  checked={availableOnly}
+                  onCheckedChange={(checked) =>
+                    setAvailableOnly(checked === true)
+                  }
+                />
                 Chỉ hiện sách đang có sẵn
               </label>
               <label className="block text-sm font-medium">
                 Sắp xếp theo
-                <Select value={sortBy} onValueChange={(value) => setSortBy((value ?? "featured") as typeof sortBy)}>
+                <Select
+                  value={sortBy}
+                  onValueChange={(value) =>
+                    setSortBy((value ?? "featured") as typeof sortBy)
+                  }
+                >
                   <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white">
                     <SelectValue />
                   </SelectTrigger>
@@ -370,14 +391,27 @@ export function BooksPage() {
                     <SelectItem value="featured">Nổi bật</SelectItem>
                     <SelectItem value="title">Tên sách A - Z</SelectItem>
                     <SelectItem value="author">Tên tác giả A - Z</SelectItem>
-                    <SelectItem value="available">Còn nhiều bản nhất</SelectItem>
+                    <SelectItem value="available">
+                      Còn nhiều bản nhất
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </label>
             </div>
             <div className="mt-5 flex items-center justify-between border-t border-[#edf0eb] pt-3">
-              <span className="text-xs text-[#718077]">{filteredBooks.length} kết quả</span>
-              <Button type="button" variant="ghost" size="sm" onClick={clearFilters} disabled={activeFilterCount === 0} className="text-[#1f5a45]">Xoá bộ lọc</Button>
+              <span className="text-xs text-[#718077]">
+                {filteredBooks.length} kết quả
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                disabled={activeFilterCount === 0}
+                className="text-[#1f5a45]"
+              >
+                Xoá bộ lọc
+              </Button>
             </div>
           </PopoverContent>
         </Popover>
@@ -416,7 +450,7 @@ export function BooksPage() {
 export function BookDetailPage() {
   const { id } = useParams()
   const book = books.find((item) => item.id === id) ?? books[0]
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
   const navigate = useNavigate()
   const borrow = () =>
     navigate(user ? `/borrow/${book.id}` : "/login", {
@@ -507,14 +541,15 @@ export function BorrowPage() {
 }
 
 export function ProfilePage() {
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [activeView, setActiveView] = useState<
     "overview" | "history" | "details" | "security"
   >("overview")
+  const displayName =
+    user?.fullName || user?.name || user?.username || "Người dùng"
   const [profile, setProfile] = useState({
-    name: user?.name ?? "Người dùng",
+    name: displayName,
     phone: "090 123 4567",
     identityNumber: "079203001234",
     studentId: "SV20240018",
@@ -536,7 +571,7 @@ export function ProfilePage() {
         Tài khoản của tôi
       </p>
       <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-        Xin chào, {profile.name}
+        Xin chào, {displayName}
       </h1>
       <p className="mt-3 max-w-2xl text-[#718077]">
         Quản lý thẻ thư viện, theo dõi những cuốn sách đang mượn và cập nhật
@@ -549,8 +584,13 @@ export function ProfilePage() {
               <UserRound />
             </div>
             <div>
-              <p className="font-semibold">{profile.name}</p>
-              <p className="text-sm text-[#718077]">Độc giả HSSV · Đang hoạt động</p>
+              <p className="font-semibold">{displayName}</p>
+              <p className="text-sm text-[#718077]">
+                {user?.roles?.includes("READER")
+                  ? "Độc giả thư viện"
+                  : (user?.roles?.[0] ?? "Thành viên")}{" "}
+                · Đang hoạt động
+              </p>
             </div>
           </div>
           <div className="mt-7 space-y-1">
@@ -587,57 +627,267 @@ export function ProfilePage() {
                 <div className="border border-[#dfe5dc] bg-white p-5">
                   <p className="text-sm text-[#718077]">Đang mượn</p>
                   <p className="mt-3 text-3xl font-semibold">0 / 5</p>
-                  <p className="mt-2 text-xs text-[#4e9661]">Còn hạn mức mượn</p>
+                  <p className="mt-2 text-xs text-[#4e9661]">
+                    Còn hạn mức mượn
+                  </p>
                 </div>
                 <div className="border border-[#dfe5dc] bg-white p-5">
                   <p className="text-sm text-[#718077]">Đã hoàn thành</p>
                   <p className="mt-3 text-3xl font-semibold">12</p>
-                  <p className="mt-2 text-xs text-[#718077]">Cuốn sách đã đọc</p>
+                  <p className="mt-2 text-xs text-[#718077]">
+                    Cuốn sách đã đọc
+                  </p>
                 </div>
                 <div className="border border-[#dfe5dc] bg-white p-5">
                   <p className="text-sm text-[#718077]">Khoản phạt</p>
                   <p className="mt-3 text-3xl font-semibold">0 đ</p>
-                  <p className="mt-2 text-xs text-[#4e9661]">Không có khoản cần thanh toán</p>
+                  <p className="mt-2 text-xs text-[#4e9661]">
+                    Không có khoản cần thanh toán
+                  </p>
                 </div>
               </div>
               <div className="border border-[#dfe5dc] bg-white p-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-semibold tracking-[0.12em] text-[#c27652] uppercase">Thẻ thư viện</p>
-                    <h2 className="mt-2 text-xl font-semibold">Thẻ độc giả điện tử</h2>
+                    <p className="text-sm font-semibold tracking-[0.12em] text-[#c27652] uppercase">
+                      Thẻ thư viện
+                    </p>
+                    <h2 className="mt-2 text-xl font-semibold">
+                      Thẻ độc giả điện tử
+                    </h2>
                   </div>
-                  <span className="flex items-center gap-1.5 rounded-full bg-[#e7eee3] px-3 py-1 text-xs font-medium text-[#4e9661]"><ShieldCheck className="size-3.5" /> Đang hoạt động</span>
+                  <span className="flex items-center gap-1.5 rounded-full bg-[#e7eee3] px-3 py-1 text-xs font-medium text-[#4e9661]">
+                    <ShieldCheck className="size-3.5" /> Đang hoạt động
+                  </span>
                 </div>
                 <div className="mt-6 grid gap-5 border-t border-[#edf0eb] pt-5 sm:grid-cols-3">
-                  <div><p className="text-xs text-[#718077]">Mã độc giả</p><p className="mt-1 font-medium">MM-{user?.id ?? "DEMO"}</p></div>
-                  <div><p className="text-xs text-[#718077]">Nhóm độc giả</p><p className="mt-1 font-medium">Học sinh - sinh viên</p></div>
-                  <div><p className="text-xs text-[#718077]">Có hiệu lực đến</p><p className="mt-1 font-medium">31/12/2026</p></div>
+                  <div>
+                    <p className="text-xs text-[#718077]">Mã độc giả</p>
+                    <p className="mt-1 font-medium">
+                      MM-
+                      {user?.accountId
+                        ? String(user.accountId).padStart(4, "0")
+                        : (user?.id ?? "0002")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#718077]">Nhóm độc giả</p>
+                    <p className="mt-1 font-medium">
+                      {user?.roles?.includes("READER")
+                        ? "Độc giả"
+                        : user?.roles?.join(", ") || "Học sinh - sinh viên"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#718077]">Có hiệu lực đến</p>
+                    <p className="mt-1 font-medium">31/12/2026</p>
+                  </div>
                 </div>
               </div>
               <div className="border border-[#dfe5dc] bg-white p-6">
-                <div className="flex items-center justify-between"><h2 className="font-semibold">Sách đang mượn</h2><button type="button" onClick={() => setActiveView("history")} className="text-sm font-medium text-[#1f5a45]">Xem lịch sử</button></div>
-                <div className="mt-6 flex flex-col items-center justify-center border-t border-dashed border-[#dfe5dc] py-10 text-center text-sm text-[#718077]"><BookOpen className="mb-3 size-6 text-[#b9cbbb]" />Bạn chưa có sách đang mượn.<Link to="/books" className="mt-3 font-medium text-[#1f5a45]">Khám phá kho sách <ArrowRight className="inline size-3" /></Link></div>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold">Sách đang mượn</h2>
+                  <button
+                    type="button"
+                    onClick={() => setActiveView("history")}
+                    className="text-sm font-medium text-[#1f5a45]"
+                  >
+                    Xem lịch sử
+                  </button>
+                </div>
+                <div className="mt-6 flex flex-col items-center justify-center border-t border-dashed border-[#dfe5dc] py-10 text-center text-sm text-[#718077]">
+                  <BookOpen className="mb-3 size-6 text-[#b9cbbb]" />
+                  Bạn chưa có sách đang mượn.
+                  <Link to="/books" className="mt-3 font-medium text-[#1f5a45]">
+                    Khám phá kho sách <ArrowRight className="inline size-3" />
+                  </Link>
+                </div>
               </div>
             </div>
           )}
           {activeView === "history" && (
             <div className="border border-[#dfe5dc] bg-white p-6">
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">Lịch sử mượn trả</h2><p className="mt-1 text-sm text-[#718077]">Theo dõi toàn bộ các giao dịch của bạn.</p></div><BookOpen className="size-5 text-[#c27652]" /></div>
-              <div className="mt-8 overflow-x-auto"><table className="w-full min-w-140 text-left text-sm"><thead className="border-y border-[#edf0eb] text-xs text-[#718077]"><tr><th className="px-3 py-3 font-medium">Sách</th><th className="px-3 py-3 font-medium">Ngày mượn</th><th className="px-3 py-3 font-medium">Ngày trả</th><th className="px-3 py-3 font-medium">Trạng thái</th></tr></thead><tbody><tr><td colSpan={4} className="px-3 py-14 text-center text-[#718077]">Chưa có giao dịch mượn trả nào.</td></tr></tbody></table></div>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold">Lịch sử mượn trả</h2>
+                  <p className="mt-1 text-sm text-[#718077]">
+                    Theo dõi toàn bộ các giao dịch của bạn.
+                  </p>
+                </div>
+                <BookOpen className="size-5 text-[#c27652]" />
+              </div>
+              <div className="mt-8 overflow-x-auto">
+                <table className="w-full min-w-140 text-left text-sm">
+                  <thead className="border-y border-[#edf0eb] text-xs text-[#718077]">
+                    <tr>
+                      <th className="px-3 py-3 font-medium">Sách</th>
+                      <th className="px-3 py-3 font-medium">Ngày mượn</th>
+                      <th className="px-3 py-3 font-medium">Ngày trả</th>
+                      <th className="px-3 py-3 font-medium">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-3 py-14 text-center text-[#718077]"
+                      >
+                        Chưa có giao dịch mượn trả nào.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
           {activeView === "details" && (
-            <form className="border border-[#dfe5dc] bg-white p-6" onSubmit={(event) => { event.preventDefault(); setProfileSaved(true) }}>
-              <div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">Thông tin cá nhân</h2><p className="mt-1 text-sm text-[#718077]">Thông tin này được dùng khi làm thủ tục tại quầy.</p></div><CreditCard className="size-5 text-[#c27652]" /></div>
-              <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                {([ ["name", "Họ và tên"], ["phone", "Số điện thoại"], ["identityNumber", "Số CCCD"], ["studentId", "Mã sinh viên / học sinh"], ["address", "Địa chỉ"] ] as const).map(([field, label]) => <label key={field} className={field === "address" ? "sm:col-span-2" : ""}><span className="mb-2 block text-sm font-medium">{label}</span><Input value={profile[field]} onChange={(event) => { setProfileSaved(false); setProfile((current) => ({ ...current, [field]: event.target.value })) }} className="border-[#cbd8ce] bg-[#fbfcfa]" /></label>)}
-                <label className="sm:col-span-2"><span className="mb-2 block text-sm font-medium">Email đăng nhập</span><Input value={user?.email ?? ""} readOnly className="border-[#cbd8ce] bg-[#eef2ea] text-[#718077]" /></label>
+            <form
+              className="border border-[#dfe5dc] bg-white p-6"
+              onSubmit={(event) => {
+                event.preventDefault()
+                setProfileSaved(true)
+              }}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold">Thông tin cá nhân</h2>
+                  <p className="mt-1 text-sm text-[#718077]">
+                    Thông tin này được dùng khi làm thủ tục tại quầy.
+                  </p>
+                </div>
+                <CreditCard className="size-5 text-[#c27652]" />
               </div>
-              <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5"><Button type="submit" className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"><Save className="size-4" /> Lưu thay đổi</Button>{profileSaved && <span className="flex items-center gap-1.5 text-sm text-[#4e9661]"><Check className="size-4" /> Đã cập nhật thông tin</span>}</div>
+              <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                {(
+                  [
+                    ["name", "Họ và tên"],
+                    ["phone", "Số điện thoại"],
+                    ["identityNumber", "Số CCCD"],
+                    ["studentId", "Mã sinh viên / học sinh"],
+                    ["address", "Địa chỉ"],
+                  ] as const
+                ).map(([field, label]) => (
+                  <label
+                    key={field}
+                    className={field === "address" ? "sm:col-span-2" : ""}
+                  >
+                    <span className="mb-2 block text-sm font-medium">
+                      {label}
+                    </span>
+                    <Input
+                      value={profile[field]}
+                      onChange={(event) => {
+                        setProfileSaved(false)
+                        setProfile((current) => ({
+                          ...current,
+                          [field]: event.target.value,
+                        }))
+                      }}
+                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                    />
+                  </label>
+                ))}
+                <label className="sm:col-span-2">
+                  <span className="mb-2 block text-sm font-medium">
+                    Tên đăng nhập / Email
+                  </span>
+                  <Input
+                    value={user?.username ?? user?.email ?? ""}
+                    readOnly
+                    className="border-[#cbd8ce] bg-[#eef2ea] text-[#718077]"
+                  />
+                </label>
+              </div>
+              <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5">
+                <Button
+                  type="submit"
+                  className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"
+                >
+                  <Save className="size-4" /> Lưu thay đổi
+                </Button>
+                {profileSaved && (
+                  <span className="flex items-center gap-1.5 text-sm text-[#4e9661]">
+                    <Check className="size-4" /> Đã cập nhật thông tin
+                  </span>
+                )}
+              </div>
             </form>
           )}
           {activeView === "security" && (
-            <div className="space-y-5"><form className="border border-[#dfe5dc] bg-white p-6" onSubmit={(event) => { event.preventDefault(); setPasswordSaved(true) }}><div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-semibold">Đổi mật khẩu</h2><p className="mt-1 text-sm text-[#718077]">Cập nhật mật khẩu định kỳ để bảo vệ tài khoản.</p></div><KeyRound className="size-5 text-[#c27652]" /></div><div className="mt-8 grid gap-5 sm:grid-cols-2"><label><span className="mb-2 block text-sm font-medium">Mật khẩu hiện tại</span><Input type="password" required className="border-[#cbd8ce] bg-[#fbfcfa]" /></label><div /><label><span className="mb-2 block text-sm font-medium">Mật khẩu mới</span><Input type="password" required minLength={6} className="border-[#cbd8ce] bg-[#fbfcfa]" /></label><label><span className="mb-2 block text-sm font-medium">Xác nhận mật khẩu mới</span><Input type="password" required minLength={6} className="border-[#cbd8ce] bg-[#fbfcfa]" /></label></div><div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5"><Button type="submit" className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"><Save className="size-4" /> Cập nhật mật khẩu</Button>{passwordSaved && <span className="flex items-center gap-1.5 text-sm text-[#4e9661]"><Check className="size-4" /> Mật khẩu đã được cập nhật</span>}</div></form><div className="flex gap-3 border border-[#ead9d1] bg-[#fffaf7] p-5 text-sm text-[#8b6657]"><AlertCircle className="mt-0.5 size-4 shrink-0" /><p>Không chia sẻ mật khẩu hoặc mã xác thực với bất kỳ ai, kể cả người tự nhận là nhân viên thư viện.</p></div></div>
+            <div className="space-y-5">
+              <form
+                className="border border-[#dfe5dc] bg-white p-6"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  setPasswordSaved(true)
+                }}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-xl font-semibold">Đổi mật khẩu</h2>
+                    <p className="mt-1 text-sm text-[#718077]">
+                      Cập nhật mật khẩu định kỳ để bảo vệ tài khoản.
+                    </p>
+                  </div>
+                  <KeyRound className="size-5 text-[#c27652]" />
+                </div>
+                <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                  <label>
+                    <span className="mb-2 block text-sm font-medium">
+                      Mật khẩu hiện tại
+                    </span>
+                    <Input
+                      type="password"
+                      required
+                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                    />
+                  </label>
+                  <div />
+                  <label>
+                    <span className="mb-2 block text-sm font-medium">
+                      Mật khẩu mới
+                    </span>
+                    <Input
+                      type="password"
+                      required
+                      minLength={6}
+                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                    />
+                  </label>
+                  <label>
+                    <span className="mb-2 block text-sm font-medium">
+                      Xác nhận mật khẩu mới
+                    </span>
+                    <Input
+                      type="password"
+                      required
+                      minLength={6}
+                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                    />
+                  </label>
+                </div>
+                <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5">
+                  <Button
+                    type="submit"
+                    className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"
+                  >
+                    <Save className="size-4" /> Cập nhật mật khẩu
+                  </Button>
+                  {passwordSaved && (
+                    <span className="flex items-center gap-1.5 text-sm text-[#4e9661]">
+                      <Check className="size-4" /> Mật khẩu đã được cập nhật
+                    </span>
+                  )}
+                </div>
+              </form>
+              <div className="flex gap-3 border border-[#ead9d1] bg-[#fffaf7] p-5 text-sm text-[#8b6657]">
+                <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                <p>
+                  Không chia sẻ mật khẩu hoặc mã xác thực với bất kỳ ai, kể cả
+                  người tự nhận là nhân viên thư viện.
+                </p>
+              </div>
+            </div>
           )}
         </section>
       </div>
