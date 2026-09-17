@@ -27,6 +27,7 @@ import {
 } from "@/features/library/library-pages"
 import { DashboardOverviewPage } from "@/features/manager/dashboard-overview-page"
 import { BooksManagementPage } from "@/features/manager/books-management-page"
+import { UsersManagementPage } from "@/features/manager/users-management-page"
 
 function PreviewPage() {
   const { pathname } = useLocation()
@@ -70,6 +71,8 @@ export function App() {
           <Route path="/dashboard" element={<AdminLayout />}>
             <Route index element={<DashboardOverviewPage />} />
             <Route path="books" element={<BooksManagementPage />} />
+            <Route path="users" element={<UsersManagementPage />} />
+            <Route path="readers" element={<Navigate to="/dashboard/users" replace />} />
             <Route path="*" element={<PreviewPage />} />
           </Route>
         </Route>
