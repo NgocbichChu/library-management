@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   ArrowRight,
   AlertCircle,
@@ -22,6 +22,10 @@ import {
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
+import {
+  publicBooksService,
+  type PublicBook,
+} from "@/services/public-books"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -40,16 +44,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-type Book = {
-  id: string
-  title: string
-  author: string
-  category: string
-  description: string
-  color: string
-  available: number
-}
-const books: Book[] = [
+const fallbackBooks: PublicBook[] = [
   {
     id: "nam-phia-sau",
     title: "Năm phía sau",
@@ -112,7 +107,35 @@ const books: Book[] = [
   },
 ]
 
-function BookCover({ book, large = false }: { book: Book; large?: boolean }) {
+function usePublicBooks() {
+  const [books, setBooks] = useState<PublicBook[]>(fallbackBooks)
+
+  useEffect(() => {
+    let cancelled = false
+    publicBooksService
+      .getAll()
+      .then((data) => {
+        if (!cancelled && data.length > 0) setBooks(data)
+      })
+      .catch(() => {
+        // Keep the sample catalogue visible when the API is unavailable.
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  return books
+}
+
+function BookCover({
+  book,
+  large = false,
+}: {
+  book: PublicBook
+  large?: boolean
+}) {
   return (
     <div
       className={`relative flex shrink-0 flex-col justify-between overflow-hidden rounded-[3px] p-5 shadow-[8px_10px_0_rgba(23,35,29,0.08)] ${large ? "h-96 w-64" : "h-64 w-44"}`}
@@ -136,7 +159,7 @@ function BookCover({ book, large = false }: { book: Book; large?: boolean }) {
   )
 }
 
-function BookCard({ book }: { book: Book }) {
+function BookCard({ book }: { book: PublicBook }) {
   const navigate = useNavigate()
   return (
     <article className="group flex flex-col items-start">
@@ -165,6 +188,8 @@ function BookCard({ book }: { book: Book }) {
 }
 
 export function HomePage() {
+  const books = usePublicBooks()
+
   return (
     <div>
       <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-16 lg:px-8 lg:py-24">
@@ -203,7 +228,7 @@ export function HomePage() {
               <BookCover book={books[0]} large />
             </div>
             <div className="absolute bottom-5 left-4 rotate-[8deg] md:left-12">
-              <BookCover book={books[1]} />
+              <BookCover book={books[1] ?? books[0]} />
             </div>
           </div>
         </div>
@@ -261,6 +286,7 @@ export function HomePage() {
 }
 
 export function BooksPage() {
+  const books = usePublicBooks()
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("Tất cả")
   const [availableOnly, setAvailableOnly] = useState(false)
@@ -286,7 +312,7 @@ export function BooksPage() {
       if (sortBy === "available") return second.available - first.available
       return books.indexOf(first) - books.indexOf(second)
     })
-  }, [availableOnly, category, query, sortBy])
+  }, [availableOnly, books, category, query, sortBy])
   const activeFilterCount =
     (category !== "Tất cả" ? 1 : 0) +
     (availableOnly ? 1 : 0) +
@@ -448,6 +474,7 @@ export function BooksPage() {
 }
 
 export function BookDetailPage() {
+  const books = usePublicBooks()
   const { id } = useParams()
   const book = books.find((item) => item.id === id) ?? books[0]
   const { user } = useAuth()
@@ -501,6 +528,7 @@ export function BookDetailPage() {
 }
 
 export function BorrowPage() {
+  const books = usePublicBooks()
   const { id } = useParams()
   const book = books.find((item) => item.id === id) ?? books[0]
   return (
