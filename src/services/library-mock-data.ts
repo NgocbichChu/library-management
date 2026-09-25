@@ -156,7 +156,8 @@ export const initialSystemPolicy: SystemPolicy = {
   effective_from: "2026-01-01",
   effective_to: null,
   policy_status: "ACTIVE",
-  description: "Quy định tiêu chuẩn áp dụng cho độc giả sinh viên, giảng viên và bạn đọc tự do.",
+  description:
+    "Quy định tiêu chuẩn áp dụng cho độc giả sinh viên, giảng viên và bạn đọc tự do.",
   created_at: "2026-01-01T00:00:00Z",
   updated_at: "2026-01-01T00:00:00Z",
 }
@@ -172,9 +173,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2021,
     language_code: "vie",
     category: "Văn học",
-    description: "Tác phẩm đưa độc giả về một làng quê nghèo miền Trung thập niên 80 với tuổi thơ trong sáng của hai anh em Thiều và Tường.",
+    description:
+      "Tác phẩm đưa độc giả về một làng quê nghèo miền Trung thập niên 80 với tuổi thơ trong sáng của hai anh em Thiều và Tường.",
     page_count: 378,
-    cover_image_url: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-01-10T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -189,9 +192,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2008,
     language_code: "eng",
     category: "Công nghệ thông tin",
-    description: "Cuốn sách kinh điển dành cho lập trình viên về các nguyên tắc, mẫu thiết kế và thực hành viết code thanh lịch, dễ bảo trì.",
+    description:
+      "Cuốn sách kinh điển dành cho lập trình viên về các nguyên tắc, mẫu thiết kế và thực hành viết code thanh lịch, dễ bảo trì.",
     page_count: 464,
-    cover_image_url: "https://images.unsplash.com/photo-1532012164546-f432f2e3777a?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1532012164546-f432f2e3777a?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-01-15T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -206,9 +211,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2016,
     language_code: "eng",
     category: "Công nghệ thông tin",
-    description: "Sách chuẩn mực về kiến trúc phần mềm hướng đối tượng, cung cấp các giải pháp đã được chứng minh cho những vấn đề thiết kế thường gặp.",
+    description:
+      "Sách chuẩn mực về kiến trúc phần mềm hướng đối tượng, cung cấp các giải pháp đã được chứng minh cho những vấn đề thiết kế thường gặp.",
     page_count: 395,
-    cover_image_url: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-02-01T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -223,9 +230,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2022,
     language_code: "vie",
     category: "Kỹ năng sống",
-    description: "Nghệ thuật thu phục lòng người, tạo dựng mối quan hệ chân thành và thành công trong giao tiếp ứng xử hàng ngày.",
+    description:
+      "Nghệ thuật thu phục lòng người, tạo dựng mối quan hệ chân thành và thành công trong giao tiếp ứng xử hàng ngày.",
     page_count: 320,
-    cover_image_url: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-02-15T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -240,9 +249,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2020,
     language_code: "vie",
     category: "Lịch sử - Khoa học",
-    description: "Một cái nhìn sâu sắc và lôi cuốn về lịch sử tiến hóa của Homo Sapiens từ cách mạng nhận thức, cách mạng nông nghiệp tới cách mạng khoa học.",
+    description:
+      "Một cái nhìn sâu sắc và lôi cuốn về lịch sử tiến hóa của Homo Sapiens từ cách mạng nhận thức, cách mạng nông nghiệp tới cách mạng khoa học.",
     page_count: 560,
-    cover_image_url: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-03-01T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -257,9 +268,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2023,
     language_code: "vie",
     category: "Văn học",
-    description: "Chuyến phiêu lưu tìm kiếm kho báu ở Kim Tự Tháp của chàng chăn cừu Santiago, bài học về lòng dũng cảm theo đuổi ước mơ.",
+    description:
+      "Chuyến phiêu lưu tìm kiếm kho báu ở Kim Tự Tháp của chàng chăn cừu Santiago, bài học về lòng dũng cảm theo đuổi ước mơ.",
     page_count: 228,
-    cover_image_url: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-03-10T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -274,9 +287,11 @@ export const initialBookTitles: BookTitle[] = [
     publication_year: 2021,
     language_code: "vie",
     category: "Kinh tế",
-    description: "Giải thích các nguyên lý kinh tế học mà không sử dụng các phương trình toán học phức tạp, gần gũi với đời sống thực tế.",
+    description:
+      "Giải thích các nguyên lý kinh tế học mà không sử dụng các phương trình toán học phức tạp, gần gũi với đời sống thực tế.",
     page_count: 720,
-    cover_image_url: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&auto=format&fit=crop&q=80",
+    cover_image_url:
+      "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&auto=format&fit=crop&q=80",
     book_status: "ACTIVE",
     created_at: "2024-04-01T08:00:00Z",
     updated_at: "2026-09-10T08:00:00Z",
@@ -548,31 +563,36 @@ export const initialCategories: CategoryItem[] = [
   {
     id: "cat-2",
     name: "Văn học",
-    description: "Tiểu thuyết, truyện ngắn, tác phẩm văn học Việt Nam và thế giới",
+    description:
+      "Tiểu thuyết, truyện ngắn, tác phẩm văn học Việt Nam và thế giới",
     bookCount: 2,
   },
   {
     id: "cat-3",
     name: "Kỹ năng sống",
-    description: "Phát triển bản thân, kỹ năng lãnh đạo, giao tiếp và tư duy tích cực",
+    description:
+      "Phát triển bản thân, kỹ năng lãnh đạo, giao tiếp và tư duy tích cực",
     bookCount: 1,
   },
   {
     id: "cat-4",
     name: "Lịch sử - Khoa học",
-    description: "Sách khảo cứu lịch sử, thiên văn học, sinh học và khoa học thường thức",
+    description:
+      "Sách khảo cứu lịch sử, thiên văn học, sinh học và khoa học thường thức",
     bookCount: 1,
   },
   {
     id: "cat-5",
     name: "Kinh tế",
-    description: "Quản trị kinh doanh, kinh tế vi mô - vĩ mô, tài chính và đầu tư",
+    description:
+      "Quản trị kinh doanh, kinh tế vi mô - vĩ mô, tài chính và đầu tư",
     bookCount: 1,
   },
   {
     id: "cat-6",
     name: "Ngoại ngữ",
-    description: "Giáo trình tiếng Anh, luyện thi IELTS, TOEIC, tiếng Nhật và tiếng Hàn",
+    description:
+      "Giáo trình tiếng Anh, luyện thi IELTS, TOEIC, tiếng Nhật và tiếng Hàn",
     bookCount: 0,
   },
   {

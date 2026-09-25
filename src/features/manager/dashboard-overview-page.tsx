@@ -26,32 +26,32 @@ export function DashboardOverviewPage() {
       value: "128",
       subtext: "1.420 bản sao trong kho",
       icon: BookOpen,
-      color: "text-[#1f5a45]",
-      bg: "bg-[#e7eee3]",
+      color: "text-[#1f5a45] dark:text-emerald-400",
+      bg: "bg-[#e7eee3] dark:bg-emerald-950/40",
     },
     {
       title: "Độc giả đang hoạt động",
       value: "856",
       subtext: "620 độc giả nhóm HSSV",
       icon: Users,
-      color: "text-[#c27652]",
-      bg: "bg-[#faeee7]",
+      color: "text-[#c27652] dark:text-orange-400",
+      bg: "bg-[#faeee7] dark:bg-orange-950/40",
     },
     {
       title: "Lượt mượn đang diễn ra",
       value: "42",
       subtext: "38 đúng hạn · 4 quá hạn",
       icon: ArrowLeftRight,
-      color: "text-[#3b6b88]",
-      bg: "bg-[#e5f0f6]",
+      color: "text-[#3b6b88] dark:text-sky-400",
+      bg: "bg-[#e5f0f6] dark:bg-sky-950/40",
     },
     {
       title: "Tiền phạt đã thu",
       value: "140.000 đ",
       subtext: "Còn nợ 40.000 đ",
       icon: DollarSign,
-      color: "text-[#8b6657]",
-      bg: "bg-[#f5ede7]",
+      color: "text-[#8b6657] dark:text-amber-400",
+      bg: "bg-[#f5ede7] dark:bg-amber-950/40",
     },
   ]
 
@@ -132,10 +132,10 @@ export function DashboardOverviewPage() {
           <p className="text-xs font-semibold tracking-[0.16em] text-[#c27652] uppercase">
             Phân hệ Quản lý Thư viện
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1f3b2b]">
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
             Xin chào, {displayName}
           </h1>
-          <p className="mt-1 text-sm text-[#718077]">
+          <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
             Theo dõi trạng thái sách, độc giả và các giao dịch mượn trả hôm nay.
           </p>
         </div>
@@ -150,7 +150,7 @@ export function DashboardOverviewPage() {
           <Button
             variant="outline"
             onClick={() => navigate("/dashboard/loans")}
-            className="border-[#cbd8ce] bg-white text-[#1f3b2b] hover:bg-[#f7f8f4]"
+            className="border-[#cbd8ce] bg-white text-[#1f3b2b] hover:bg-[#f7f8f4] dark:border-border dark:bg-card dark:text-foreground dark:hover:bg-muted"
           >
             <ArrowLeftRight className="size-4" /> Lập phiếu mượn
           </Button>
@@ -164,16 +164,18 @@ export function DashboardOverviewPage() {
           return (
             <div
               key={item.title}
-              className="flex items-start justify-between rounded-xl border border-[#dfe5dc] bg-white p-5 shadow-xs transition-shadow hover:shadow-sm"
+              className="flex items-start justify-between rounded-xl border border-[#dfe5dc] bg-white p-5 shadow-xs transition-shadow hover:shadow-sm dark:border-border dark:bg-card"
             >
               <div>
-                <p className="text-xs font-medium text-[#718077]">
+                <p className="text-xs font-medium text-[#718077] dark:text-muted-foreground">
                   {item.title}
                 </p>
-                <p className="mt-2 text-2xl font-semibold text-[#1f3b2b]">
+                <p className="mt-2 text-2xl font-semibold text-[#1f3b2b] dark:text-foreground">
                   {item.value}
                 </p>
-                <p className="mt-1 text-xs text-[#56675c]">{item.subtext}</p>
+                <p className="mt-1 text-xs text-[#56675c] dark:text-muted-foreground">
+                  {item.subtext}
+                </p>
               </div>
               <div
                 className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${item.bg} ${item.color}`}
@@ -188,19 +190,19 @@ export function DashboardOverviewPage() {
       {/* Two Column Layout: Recent Loans & Side Cards */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left 2 Cols: Recent Borrow Slips */}
-        <div className="rounded-xl border border-[#dfe5dc] bg-white p-6 shadow-xs lg:col-span-2">
+        <div className="rounded-xl border border-[#dfe5dc] bg-white p-6 shadow-xs lg:col-span-2 dark:border-border dark:bg-card">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-[#1f3b2b]">
+              <h2 className="text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
                 Giao dịch mượn trả gần nhất
               </h2>
-              <p className="text-xs text-[#718077]">
+              <p className="text-xs text-[#718077] dark:text-muted-foreground">
                 Theo dõi phiếu mượn mới tạo và xử lý trả sách quá hạn
               </p>
             </div>
             <Link
               to="/dashboard/loans"
-              className="text-xs font-semibold text-[#1f5a45] hover:underline"
+              className="text-xs font-semibold text-[#1f5a45] hover:underline dark:text-emerald-400"
             >
               Xem tất cả →
             </Link>
@@ -208,41 +210,54 @@ export function DashboardOverviewPage() {
 
           <div className="mt-6 overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-[#edf0eb] text-xs font-semibold text-[#718077]">
+              <thead className="border-b border-[#edf0eb] text-xs font-semibold text-[#718077] dark:border-border dark:text-muted-foreground">
                 <tr>
-                  <th className="pb-3">Mã phiếu</th>
-                  <th className="pb-3">Độc giả</th>
-                  <th className="pb-3">Tựa sách</th>
-                  <th className="pb-3">Hạn trả</th>
-                  <th className="pb-3">Trạng thái</th>
+                  <th className="pb-3 font-semibold tracking-wider uppercase">
+                    Mã phiếu
+                  </th>
+                  <th className="pb-3 font-semibold tracking-wider uppercase">
+                    Độc giả
+                  </th>
+                  <th className="pb-3 font-semibold tracking-wider uppercase">
+                    Tựa sách
+                  </th>
+                  <th className="pb-3 font-semibold tracking-wider uppercase">
+                    Hạn trả
+                  </th>
+                  <th className="pb-3 font-semibold tracking-wider uppercase">
+                    Trạng thái
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f3ee]">
+              <tbody className="divide-y divide-[#f0f3ee] dark:divide-border/60">
                 {recentLoans.map((loan) => (
-                  <tr key={loan.id} className="hover:bg-[#fbfcfb]">
-                    <td className="py-3.5 font-mono text-xs font-medium text-[#1f5a45]">
+                  <tr
+                    key={loan.id}
+                    className="hover:bg-[#fbfcfb] dark:hover:bg-muted/30"
+                  >
+                    <td className="py-3.5 font-mono text-xs font-medium text-[#1f5a45] dark:text-emerald-400">
                       {loan.id}
                     </td>
                     <td className="py-3.5">
-                      <p className="font-medium text-[#17231d]">
+                      <p className="font-medium text-[#17231d] dark:text-foreground">
                         {loan.reader}
                       </p>
-                      <p className="text-[11px] text-[#718077]">
+                      <p className="text-[11px] text-[#718077] dark:text-muted-foreground">
                         {loan.isStudent ? "Thẻ HSSV" : "CCCD"}:{" "}
                         {loan.readerCode}
                       </p>
                     </td>
-                    <td className="py-3.5 text-sm text-[#385145]">
+                    <td className="py-3.5 text-sm text-[#385145] dark:text-foreground/90">
                       {loan.bookTitle}
                     </td>
-                    <td className="py-3.5 text-xs text-[#56675c]">
+                    <td className="py-3.5 text-xs text-[#56675c] dark:text-muted-foreground">
                       {loan.dueDate}
                     </td>
                     <td className="py-3.5">
                       {loan.status === "Borrowing" && (
                         <Badge
                           variant="outline"
-                          className="border-[#cbd8ce] bg-[#eef4ec] text-[#2e5e3a]"
+                          className="border-[#cbd8ce] bg-[#eef4ec] text-[#2e5e3a] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
                         >
                           <Clock3 className="mr-1 size-3" /> Đang mượn
                         </Badge>
@@ -250,7 +265,7 @@ export function DashboardOverviewPage() {
                       {loan.status === "DueToday" && (
                         <Badge
                           variant="outline"
-                          className="border-[#f3d9ca] bg-[#fdf3ec] text-[#b05828]"
+                          className="border-[#f3d9ca] bg-[#fdf3ec] text-[#b05828] dark:border-orange-800/40 dark:bg-orange-950/40 dark:text-orange-300"
                         >
                           Hạn hôm nay
                         </Badge>
@@ -258,7 +273,7 @@ export function DashboardOverviewPage() {
                       {loan.status === "Overdue" && (
                         <Badge
                           variant="outline"
-                          className="border-[#f5d0cb] bg-[#fdf0ee] text-[#b83828]"
+                          className="border-[#f5d0cb] bg-[#fdf0ee] text-[#b83828] dark:border-rose-800/40 dark:bg-rose-950/40 dark:text-rose-300"
                         >
                           Quá hạn
                         </Badge>
@@ -266,9 +281,9 @@ export function DashboardOverviewPage() {
                       {loan.status === "Returned" && (
                         <Badge
                           variant="outline"
-                          className="border-[#cbd8ce] bg-white text-[#718077]"
+                          className="border-[#cbd8ce] bg-white text-[#718077] dark:border-border dark:bg-muted/40 dark:text-muted-foreground"
                         >
-                          <CheckCircle2 className="mr-1 size-3 text-[#4e9661]" />{" "}
+                          <CheckCircle2 className="mr-1 size-3 text-[#4e9661] dark:text-emerald-400" />{" "}
                           Đã trả
                         </Badge>
                       )}
@@ -283,35 +298,37 @@ export function DashboardOverviewPage() {
         {/* Right Col: Top Books & Policy Widget */}
         <div className="flex flex-col gap-6">
           {/* Top Books Card */}
-          <div className="rounded-xl border border-[#dfe5dc] bg-white p-6 shadow-xs">
+          <div className="rounded-xl border border-[#dfe5dc] bg-white p-6 shadow-xs dark:border-border dark:bg-card">
             <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-[#1f3b2b]">
+              <h2 className="text-base font-semibold text-[#1f3b2b] dark:text-foreground">
                 Top sách mượn nhiều
               </h2>
               <TrendingUp className="size-4 text-[#c27652]" />
             </div>
-            <div className="mt-4 divide-y divide-[#f0f3ee]">
+            <div className="mt-4 divide-y divide-[#f0f3ee] dark:divide-border/60">
               {topBooks.map((b, i) => (
                 <div
                   key={b.title}
                   className="flex items-center justify-between py-3"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="flex size-6 items-center justify-center rounded-full bg-[#f0f4ed] text-xs font-bold text-[#1f5a45]">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-[#f0f4ed] text-xs font-bold text-[#1f5a45] dark:bg-emerald-950/50 dark:text-emerald-300">
                       {i + 1}
                     </span>
                     <div>
-                      <p className="text-sm font-medium text-[#17231d]">
+                      <p className="text-sm font-medium text-[#17231d] dark:text-foreground">
                         {b.title}
                       </p>
-                      <p className="text-xs text-[#718077]">{b.author}</p>
+                      <p className="text-xs text-[#718077] dark:text-muted-foreground">
+                        {b.author}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-semibold text-[#1f3b2b]">
+                    <span className="text-xs font-semibold text-[#1f3b2b] dark:text-foreground">
                       {b.borrows} lượt
                     </span>
-                    <p className="text-[10px] text-[#4e9661]">
+                    <p className="text-[10px] text-[#4e9661] dark:text-emerald-400">
                       Còn {b.available} cuốn
                     </p>
                   </div>
@@ -321,25 +338,31 @@ export function DashboardOverviewPage() {
           </div>
 
           {/* System Policy Info Card */}
-          <div className="rounded-xl border border-[#dfe5dc] bg-[#f7f9f6] p-5 text-xs text-[#56675c]">
-            <div className="flex items-center gap-2 font-semibold text-[#1f5a45]">
+          <div className="rounded-xl border border-[#dfe5dc] bg-[#f7f9f6] p-5 text-xs text-[#56675c] dark:border-border dark:bg-muted/20 dark:text-muted-foreground">
+            <div className="flex items-center gap-2 font-semibold text-[#1f5a45] dark:text-emerald-400">
               <ShieldCheck className="size-4" /> Chính sách Thư viện hiện hành
             </div>
             <ul className="mt-3 space-y-2 leading-relaxed">
               <li className="flex gap-2">
-                <span className="font-bold text-[#1f5a45]">•</span>
+                <span className="font-bold text-[#1f5a45] dark:text-emerald-400">
+                  •
+                </span>
                 <span>
                   Hạn mức mượn tối đa: <strong>5 cuốn / 14 ngày</strong>
                 </span>
               </li>
               <li className="flex gap-2">
-                <span className="font-bold text-[#1f5a45]">•</span>
+                <span className="font-bold text-[#1f5a45] dark:text-emerald-400">
+                  •
+                </span>
                 <span>
                   Tiền phạt quá hạn gốc: <strong>5.000 đ / ngày</strong>
                 </span>
               </li>
               <li className="flex gap-2">
-                <span className="font-bold text-[#1f5a45]">•</span>
+                <span className="font-bold text-[#1f5a45] dark:text-emerald-400">
+                  •
+                </span>
                 <span>
                   Ưu đãi nhóm HSSV: <strong>Giảm 50% tiền phạt</strong> khi xuất
                   trình thẻ HSSV hợp lệ.

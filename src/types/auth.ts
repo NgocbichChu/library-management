@@ -31,7 +31,29 @@ export interface AuthUser {
   fullName: string | null
   roles: string[]
   email?: string
+  position?: string
+  readerCode?: string
 }
 
+export type UserRole = "ADMIN" | "EMPLOYEE" | "LIBRARIAN" | "READER"
 
 export type AuthStatus = "unauthenticated" | "loading" | "authenticated"
+
+export interface RegisterReaderInput {
+  username: string
+  password: string
+  fullName?: string | null
+  email?: string | null
+  phoneNumber?: string | null
+  dateOfBirth?: string | null
+  address?: string | null
+}
+
+export interface CreateEmployeeInput {
+  username: string
+  password: string
+  fullName?: string | null
+  email?: string | null
+  phoneNumber?: string | null
+  position?: string | null
+}

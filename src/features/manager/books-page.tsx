@@ -14,7 +14,10 @@ import { useLibraryStore } from "@/stores/use-library-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { CommonTable, type CommonTableColumn } from "@/components/common/common-table"
+import {
+  CommonTable,
+  type CommonTableColumn,
+} from "@/components/common/common-table"
 import { AppDialog } from "@/components/common/app-dialog"
 import { AppSelect } from "@/components/common/app-select"
 import { Field, FieldLabel } from "@/components/ui/field"
@@ -48,7 +51,9 @@ export const BooksPage = () => {
   // Modals state
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [editingBook, setEditingBook] = useState<BookTitle | null>(null)
-  const [viewingCopiesBook, setViewingCopiesBook] = useState<BookTitle | null>(null)
+  const [viewingCopiesBook, setViewingCopiesBook] = useState<BookTitle | null>(
+    null
+  )
   const [deletingBook, setDeletingBook] = useState<BookTitle | null>(null)
 
   // Form states for Add / Edit
@@ -67,7 +72,9 @@ export const BooksPage = () => {
   // State for adding a copy
   const [newCopyBarcode, setNewCopyBarcode] = useState("")
   const [newCopyShelf, setNewCopyShelf] = useState("KE-01")
-  const [newCopyLocation, setNewCopyLocation] = useState("Khu Tự Nhiên - Tầng 2")
+  const [newCopyLocation, setNewCopyLocation] = useState(
+    "Khu Tự Nhiên - Tầng 2"
+  )
 
   const filteredBooks = useMemo(() => {
     return books.filter((b) => {
@@ -207,7 +214,9 @@ export const BooksPage = () => {
   // Book copies for modal
   const currentBookCopies = useMemo(() => {
     if (!viewingCopiesBook) return []
-    return copies.filter((c) => c.book_title_id === viewingCopiesBook.book_title_id)
+    return copies.filter(
+      (c) => c.book_title_id === viewingCopiesBook.book_title_id
+    )
   }, [copies, viewingCopiesBook])
 
   const categoryOptions = [
@@ -233,10 +242,14 @@ export const BooksPage = () => {
             )}
           </div>
           <div>
-            <p className="font-semibold text-foreground line-clamp-1">{book.title}</p>
-            <p className="text-xs text-muted-foreground">Tác giả: {book.author}</p>
+            <p className="line-clamp-1 font-semibold text-foreground">
+              {book.title}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Tác giả: {book.author}
+            </p>
             {book.isbn ? (
-              <p className="text-[11px] font-mono text-muted-foreground/80">
+              <p className="font-mono text-[11px] text-muted-foreground/80">
                 ISBN: {book.isbn}
               </p>
             ) : null}
@@ -298,7 +311,7 @@ export const BooksPage = () => {
       cell: (book) => {
         const avail = book.available_copies_count ?? 0
         return avail > 0 ? (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+          <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
             Còn sách
           </Badge>
         ) : (
@@ -348,7 +361,8 @@ export const BooksPage = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Quản lý sách</h1>
           <p className="text-sm text-muted-foreground">
-            Quản lý các đầu sách (book_title) và từng bản sao vật lý (book_copy) trong kho thư viện.
+            Quản lý các đầu sách (book_title) và từng bản sao vật lý (book_copy)
+            trong kho thư viện.
           </p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-2">
@@ -358,8 +372,8 @@ export const BooksPage = () => {
 
       {/* Search & Filter Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
           <Input
             placeholder="Tìm theo tên sách, tác giả, ISBN..."
             value={searchQuery}
@@ -416,7 +430,9 @@ export const BooksPage = () => {
                 required
                 placeholder="VD: Cấu Trúc Dữ Liệu & Giải Thuật"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
               />
             </Field>
 
@@ -426,7 +442,9 @@ export const BooksPage = () => {
                 required
                 placeholder="VD: Robert C. Martin"
                 value={formData.author}
-                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, author: e.target.value })
+                }
               />
             </Field>
 
@@ -435,14 +453,19 @@ export const BooksPage = () => {
               <Input
                 placeholder="978-604-..."
                 value={formData.isbn}
-                onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, isbn: e.target.value })
+                }
               />
             </Field>
 
             <Field>
               <FieldLabel>Thể loại *</FieldLabel>
               <AppSelect
-                options={categories.map((c) => ({ value: c.name, label: c.name }))}
+                options={categories.map((c) => ({
+                  value: c.name,
+                  label: c.name,
+                }))}
                 value={formData.category}
                 onChange={(val) => setFormData({ ...formData, category: val })}
               />
@@ -453,7 +476,9 @@ export const BooksPage = () => {
               <Input
                 placeholder="NXB Trẻ, NXB Giáo Dục..."
                 value={formData.publisher}
-                onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, publisher: e.target.value })
+                }
               />
             </Field>
 
@@ -463,7 +488,10 @@ export const BooksPage = () => {
                 type="number"
                 value={formData.publication_year}
                 onChange={(e) =>
-                  setFormData({ ...formData, publication_year: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    publication_year: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -476,7 +504,10 @@ export const BooksPage = () => {
                 max={20}
                 value={formData.initialCopies}
                 onChange={(e) =>
-                  setFormData({ ...formData, initialCopies: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    initialCopies: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -486,13 +517,19 @@ export const BooksPage = () => {
               <Input
                 placeholder="Mô tả sơ lược về tác phẩm..."
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
               />
             </Field>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddOpen(false)}
+            >
               Hủy
             </Button>
             <Button type="submit">Lưu đầu sách</Button>
@@ -514,7 +551,9 @@ export const BooksPage = () => {
               <Input
                 required
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
               />
             </Field>
 
@@ -523,7 +562,9 @@ export const BooksPage = () => {
               <Input
                 required
                 value={formData.author}
-                onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, author: e.target.value })
+                }
               />
             </Field>
 
@@ -531,14 +572,19 @@ export const BooksPage = () => {
               <FieldLabel>Mã ISBN</FieldLabel>
               <Input
                 value={formData.isbn}
-                onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, isbn: e.target.value })
+                }
               />
             </Field>
 
             <Field>
               <FieldLabel>Thể loại</FieldLabel>
               <AppSelect
-                options={categories.map((c) => ({ value: c.name, label: c.name }))}
+                options={categories.map((c) => ({
+                  value: c.name,
+                  label: c.name,
+                }))}
                 value={formData.category}
                 onChange={(val) => setFormData({ ...formData, category: val })}
               />
@@ -548,7 +594,9 @@ export const BooksPage = () => {
               <FieldLabel>Nhà xuất bản</FieldLabel>
               <Input
                 value={formData.publisher}
-                onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, publisher: e.target.value })
+                }
               />
             </Field>
 
@@ -558,7 +606,10 @@ export const BooksPage = () => {
                 type="number"
                 value={formData.publication_year}
                 onChange={(e) =>
-                  setFormData({ ...formData, publication_year: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    publication_year: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -569,7 +620,10 @@ export const BooksPage = () => {
                 type="number"
                 value={formData.page_count}
                 onChange={(e) =>
-                  setFormData({ ...formData, page_count: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    page_count: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -578,13 +632,19 @@ export const BooksPage = () => {
               <FieldLabel>Mô tả nội dung</FieldLabel>
               <Input
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
               />
             </Field>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setEditingBook(null)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditingBook(null)}
+            >
               Hủy
             </Button>
             <Button type="submit">Cập nhật thay đổi</Button>
@@ -602,7 +662,7 @@ export const BooksPage = () => {
       >
         <div className="space-y-4">
           {/* List of copies */}
-          <div className="max-h-60 overflow-y-auto rounded-lg border divide-y text-sm">
+          <div className="max-h-60 divide-y overflow-y-auto rounded-lg border text-sm">
             {currentBookCopies.length === 0 ? (
               <p className="p-4 text-center text-muted-foreground">
                 Chưa có bản sao nào được ghi nhận.
@@ -611,7 +671,7 @@ export const BooksPage = () => {
               currentBookCopies.map((copy) => (
                 <div
                   key={copy.book_copy_id}
-                  className="p-3 flex items-center justify-between hover:bg-muted/30"
+                  className="flex items-center justify-between p-3 hover:bg-muted/30"
                 >
                   <div className="flex items-center gap-3">
                     <Barcode className="size-5 text-primary" />
@@ -627,11 +687,11 @@ export const BooksPage = () => {
                       Tình trạng: {copy.condition_status}
                     </Badge>
                     {copy.copy_status === "AVAILABLE" ? (
-                      <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                      <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
                         Sẵn sàng
                       </Badge>
                     ) : (
-                      <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                      <Badge className="border-amber-500/30 bg-amber-500/10 text-amber-600">
                         Đang mượn
                       </Badge>
                     )}
@@ -644,9 +704,9 @@ export const BooksPage = () => {
           {/* Add a copy form */}
           <form
             onSubmit={handleAddCopy}
-            className="rounded-lg border bg-muted/40 p-3 space-y-3"
+            className="space-y-3 rounded-lg border bg-muted/40 p-3"
           >
-            <p className="font-semibold text-xs uppercase tracking-wide text-foreground">
+            <p className="text-xs font-semibold tracking-wide text-foreground uppercase">
               Thêm bản sao vật lý mới
             </p>
             <div className="grid grid-cols-3 gap-2">
@@ -654,19 +714,19 @@ export const BooksPage = () => {
                 placeholder="Barcode (tùy chọn)"
                 value={newCopyBarcode}
                 onChange={(e) => setNewCopyBarcode(e.target.value)}
-                className="text-xs h-8"
+                className="h-8 text-xs"
               />
               <Input
                 placeholder="Mã kệ (VD: KE-02)"
                 value={newCopyShelf}
                 onChange={(e) => setNewCopyShelf(e.target.value)}
-                className="text-xs h-8"
+                className="h-8 text-xs"
               />
               <Input
                 placeholder="Vị trí (VD: Tầng 2)"
                 value={newCopyLocation}
                 onChange={(e) => setNewCopyLocation(e.target.value)}
-                className="text-xs h-8"
+                className="h-8 text-xs"
               />
             </div>
             <div className="flex justify-end">
@@ -676,7 +736,7 @@ export const BooksPage = () => {
             </div>
           </form>
 
-          <div className="flex justify-end pt-2 border-t">
+          <div className="flex justify-end border-t pt-2">
             <Button
               variant="outline"
               size="sm"

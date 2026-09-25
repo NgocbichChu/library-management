@@ -143,19 +143,21 @@ function BookCard({ book }: { book: Book }) {
       <Link to={`/books/${book.id}`} className="mb-4 w-full">
         <BookCover book={book} />
       </Link>
-      <p className="mb-1 text-xs font-medium tracking-[0.14em] text-[#7b8b7f] uppercase">
+      <p className="mb-1 text-xs font-medium tracking-[0.14em] text-[#7b8b7f] uppercase dark:text-muted-foreground">
         {book.category}
       </p>
       <Link
         to={`/books/${book.id}`}
-        className="font-semibold hover:text-[#1f5a45]"
+        className="font-semibold hover:text-[#1f5a45] dark:hover:text-emerald-400"
       >
         {book.title}
       </Link>
-      <p className="mt-1 text-sm text-[#718077]">{book.author}</p>
+      <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
+        {book.author}
+      </p>
       <Button
         variant="link"
-        className="mt-2 h-auto p-0 text-[#1f5a45]"
+        className="mt-2 h-auto p-0 text-[#1f5a45] dark:text-emerald-400"
         onClick={() => navigate(`/books/${book.id}`)}
       >
         Xem chi tiết <ArrowRight className="ml-1 size-3" />
@@ -167,17 +169,17 @@ function BookCard({ book }: { book: Book }) {
 export function HomePage() {
   return (
     <div>
-      <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-16 lg:px-8 lg:py-24">
+      <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-16 lg:px-8 lg:py-24 dark:border-border dark:bg-card/40">
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="mb-5 flex items-center gap-2 text-sm font-semibold tracking-[0.18em] text-[#6e826f] uppercase">
+            <p className="mb-5 flex items-center gap-2 text-sm font-semibold tracking-[0.18em] text-[#6e826f] uppercase dark:text-muted-foreground">
               <Sparkles className="size-4" /> Không gian đọc của bạn
             </p>
-            <h1 className="max-w-2xl text-5xl leading-[0.98] font-semibold tracking-[-0.04em] text-[#1f3b2b] md:text-7xl">
+            <h1 className="max-w-2xl text-5xl leading-[0.98] font-semibold tracking-[-0.04em] text-[#1f3b2b] md:text-7xl dark:text-foreground">
               Mỗi cuốn sách mở ra một{" "}
               <span className="text-[#c27652]">góc nhìn mới.</span>
             </h1>
-            <p className="mt-7 max-w-lg text-lg leading-8 text-[#617067]">
+            <p className="mt-7 max-w-lg text-lg leading-8 text-[#617067] dark:text-muted-foreground">
               Khám phá bộ sưu tập được chọn lọc, mượn sách dễ dàng và giữ lại
               những câu chuyện bạn yêu thích.
             </p>
@@ -190,15 +192,15 @@ export function HomePage() {
               </Link>
               <Link
                 to="/about"
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-[#b9cbbb] px-2.5 text-sm font-medium hover:bg-[#dce8d9]"
+                className="inline-flex h-9 items-center justify-center rounded-lg border border-[#b9cbbb] px-2.5 text-sm font-medium hover:bg-[#dce8d9] dark:border-border dark:text-foreground dark:hover:bg-muted"
               >
                 Tìm hiểu thư viện
               </Link>
             </div>
           </div>
           <div className="relative flex min-h-80 items-center justify-center">
-            <div className="absolute h-64 w-64 rounded-full border border-[#b8cdb8]" />
-            <div className="absolute h-80 w-80 rounded-full border border-[#c8d8c5]" />
+            <div className="absolute h-64 w-64 rounded-full border border-[#b8cdb8] dark:border-border/30" />
+            <div className="absolute h-80 w-80 rounded-full border border-[#c8d8c5] dark:border-border/20" />
             <div className="relative rotate-[-5deg]">
               <BookCover book={books[0]} large />
             </div>
@@ -214,13 +216,13 @@ export function HomePage() {
             <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
               Được yêu thích
             </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
               Gợi ý cho hôm nay
             </h2>
           </div>
           <Link
             to="/books"
-            className="hidden items-center gap-1 text-sm font-semibold text-[#1f5a45] sm:flex"
+            className="hidden items-center gap-1 text-sm font-semibold text-[#1f5a45] sm:flex dark:text-emerald-400"
           >
             Xem tất cả <ArrowRight className="size-4" />
           </Link>
@@ -232,25 +234,31 @@ export function HomePage() {
         </div>
       </section>
       <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
-        <div className="grid gap-6 border-y border-[#dfe5dc] py-10 sm:grid-cols-3">
+        <div className="grid gap-6 border-y border-[#dfe5dc] py-10 sm:grid-cols-3 dark:border-border">
           <div>
             <Clock3 className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold">Mượn trong 3 phút</h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077]">
+            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
+              Mượn trong 3 phút
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
               Tìm sách, đặt mượn và nhận tại quầy gần bạn.
             </p>
           </div>
           <div>
             <Library className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold">Hơn 2.000 đầu sách</h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077]">
+            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
+              Hơn 2.000 đầu sách
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
               Từ văn học, kỹ năng đến những chuyến du hành khám phá.
             </p>
           </div>
           <div>
             <MapPin className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold">Một nơi để trở về</h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077]">
+            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
+              Một nơi để trở về
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
               Không gian yên tĩnh cho việc đọc, học và kết nối.
             </p>
           </div>
@@ -302,22 +310,22 @@ export function BooksPage() {
         <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
           Thư viện trực tuyến
         </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#1f3b2b] md:text-5xl dark:text-foreground">
           Tìm cuốn sách tiếp theo
         </h1>
-        <p className="mt-4 text-[#718077]">
+        <p className="mt-4 text-[#718077] dark:text-muted-foreground">
           Tra cứu theo tên sách, tác giả hoặc chủ đề. Bạn có thể xem sách mà
           không cần đăng nhập.
         </p>
       </div>
-      <div className="mt-10 flex flex-col gap-3 border-b border-[#dfe5dc] pb-6 md:flex-row">
+      <div className="mt-10 flex flex-col gap-3 border-b border-[#dfe5dc] pb-6 md:flex-row dark:border-border">
         <div className="relative flex-1">
-          <Search className="absolute top-3 left-3 size-4 text-[#8b9a8f]" />
+          <Search className="absolute top-3 left-3 size-4 text-[#8b9a8f] dark:text-muted-foreground" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Tìm tên sách hoặc tác giả..."
-            className="h-10 border-[#cbd8ce] bg-white pl-9"
+            className="h-10 border-[#cbd8ce] bg-white pl-9 dark:border-border dark:bg-card dark:text-foreground"
           />
         </div>
         <Popover>
@@ -325,7 +333,7 @@ export function BooksPage() {
             render={
               <Button
                 variant="outline"
-                className="justify-start border-[#cbd8ce] bg-transparent md:w-48"
+                className="justify-start border-[#cbd8ce] bg-transparent md:w-48 dark:border-border dark:text-foreground"
               />
             }
           >
@@ -340,22 +348,24 @@ export function BooksPage() {
           </PopoverTrigger>
           <PopoverContent
             align="end"
-            className="w-80 border-[#dfe5dc] bg-[#fffefb] p-4"
+            className="w-80 border-[#dfe5dc] bg-[#fffefb] p-4 dark:border-border dark:bg-card"
           >
             <PopoverHeader>
-              <PopoverTitle className="text-base">Lọc và sắp xếp</PopoverTitle>
-              <p className="text-xs text-[#718077]">
+              <PopoverTitle className="text-base text-[#1f3b2b] dark:text-foreground">
+                Lọc và sắp xếp
+              </PopoverTitle>
+              <p className="text-xs text-[#718077] dark:text-muted-foreground">
                 Thu hẹp danh sách theo nhu cầu của bạn.
               </p>
             </PopoverHeader>
             <div className="mt-4 space-y-4">
-              <label className="block text-sm font-medium">
+              <label className="block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                 Thể loại
                 <Select
                   value={category}
                   onValueChange={(value) => setCategory(value ?? "Tất cả")}
                 >
-                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white">
+                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white dark:border-border dark:bg-muted/40 dark:text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -367,7 +377,7 @@ export function BooksPage() {
                   </SelectContent>
                 </Select>
               </label>
-              <label className="flex cursor-pointer items-center gap-3 text-sm">
+              <label className="flex cursor-pointer items-center gap-3 text-sm text-[#1f3b2b] dark:text-foreground">
                 <Checkbox
                   checked={availableOnly}
                   onCheckedChange={(checked) =>
@@ -376,7 +386,7 @@ export function BooksPage() {
                 />
                 Chỉ hiện sách đang có sẵn
               </label>
-              <label className="block text-sm font-medium">
+              <label className="block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                 Sắp xếp theo
                 <Select
                   value={sortBy}
@@ -384,7 +394,7 @@ export function BooksPage() {
                     setSortBy((value ?? "featured") as typeof sortBy)
                   }
                 >
-                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white">
+                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white dark:border-border dark:bg-muted/40 dark:text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -398,8 +408,8 @@ export function BooksPage() {
                 </Select>
               </label>
             </div>
-            <div className="mt-5 flex items-center justify-between border-t border-[#edf0eb] pt-3">
-              <span className="text-xs text-[#718077]">
+            <div className="mt-5 flex items-center justify-between border-t border-[#edf0eb] pt-3 dark:border-border">
+              <span className="text-xs text-[#718077] dark:text-muted-foreground">
                 {filteredBooks.length} kết quả
               </span>
               <Button
@@ -408,7 +418,7 @@ export function BooksPage() {
                 size="sm"
                 onClick={clearFilters}
                 disabled={activeFilterCount === 0}
-                className="text-[#1f5a45]"
+                className="text-[#1f5a45] dark:text-emerald-400"
               >
                 Xoá bộ lọc
               </Button>
@@ -426,7 +436,7 @@ export function BooksPage() {
             className={
               category === item
                 ? "bg-[#1f5a45] text-white hover:bg-[#174735]"
-                : "border-[#cbd8ce] bg-transparent"
+                : "border-[#cbd8ce] bg-transparent dark:border-border dark:text-foreground"
             }
           >
             {item}
@@ -439,7 +449,7 @@ export function BooksPage() {
         ))}
       </div>
       {filteredBooks.length === 0 && (
-        <p className="py-20 text-center text-[#718077]">
+        <p className="py-20 text-center text-[#718077] dark:text-muted-foreground">
           Không tìm thấy sách phù hợp.
         </p>
       )}
@@ -458,7 +468,10 @@ export function BookDetailPage() {
     })
   return (
     <div className="mx-auto max-w-5xl px-5 py-12 lg:px-8">
-      <Link to="/books" className="text-sm font-medium text-[#1f5a45]">
+      <Link
+        to="/books"
+        className="text-sm font-medium text-[#1f5a45] dark:text-emerald-400"
+      >
         ← Quay lại kho sách
       </Link>
       <div className="mt-10 grid gap-12 md:grid-cols-[280px_1fr] md:items-start">
@@ -467,14 +480,16 @@ export function BookDetailPage() {
           <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
             {book.category}
           </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#1f3b2b] md:text-5xl dark:text-foreground">
             {book.title}
           </h1>
-          <p className="mt-3 text-lg text-[#718077]">{book.author}</p>
-          <p className="mt-8 max-w-xl leading-8 text-[#56675c]">
+          <p className="mt-3 text-lg text-[#718077] dark:text-muted-foreground">
+            {book.author}
+          </p>
+          <p className="mt-8 max-w-xl leading-8 text-[#56675c] dark:text-muted-foreground">
             {book.description}
           </p>
-          <div className="mt-8 flex items-center gap-3 text-sm text-[#617067]">
+          <div className="mt-8 flex items-center gap-3 text-sm text-[#617067] dark:text-muted-foreground">
             <span
               className={`size-2 rounded-full ${book.available ? "bg-[#4e9661]" : "bg-[#c27652]"}`}
             />
@@ -491,7 +506,7 @@ export function BookDetailPage() {
             {user ? "Tiến hành mượn" : "Đăng nhập để mượn"}{" "}
             <ArrowRight className="ml-2 size-4" />
           </Button>
-          <button className="ml-4 inline-flex items-center gap-2 text-sm text-[#617067]">
+          <button className="ml-4 inline-flex items-center gap-2 text-sm text-[#617067] dark:text-muted-foreground">
             <Heart className="size-4" /> Lưu sách
           </button>
         </div>
@@ -508,15 +523,19 @@ export function BorrowPage() {
       <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
         Phiếu mượn sách
       </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+      <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
         Sẵn sàng mang sách về nhà?
       </h1>
-      <div className="mt-10 flex flex-col gap-6 border-y border-[#dfe5dc] py-8 sm:flex-row sm:items-center">
+      <div className="mt-10 flex flex-col gap-6 border-y border-[#dfe5dc] py-8 sm:flex-row sm:items-center dark:border-border">
         <BookCover book={book} />
         <div>
-          <p className="text-xl font-semibold">{book.title}</p>
-          <p className="mt-1 text-[#718077]">{book.author}</p>
-          <div className="mt-6 space-y-3 text-sm text-[#617067]">
+          <p className="text-xl font-semibold text-[#1f3b2b] dark:text-foreground">
+            {book.title}
+          </p>
+          <p className="mt-1 text-[#718077] dark:text-muted-foreground">
+            {book.author}
+          </p>
+          <div className="mt-6 space-y-3 text-sm text-[#617067] dark:text-muted-foreground">
             <p className="flex gap-2">
               <Check className="size-4 text-[#4e9661]" /> Thời hạn mượn: 14 ngày
             </p>
@@ -570,22 +589,24 @@ export function ProfilePage() {
       <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
         Tài khoản của tôi
       </p>
-      <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+      <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
         Xin chào, {displayName}
       </h1>
-      <p className="mt-3 max-w-2xl text-[#718077]">
+      <p className="mt-3 max-w-2xl text-[#718077] dark:text-muted-foreground">
         Quản lý thẻ thư viện, theo dõi những cuốn sách đang mượn và cập nhật
         thông tin cá nhân của bạn.
       </p>
       <div className="mt-10 grid gap-8 md:grid-cols-[250px_1fr]">
-        <aside className="h-fit border-y border-[#dfe5dc] py-5">
+        <aside className="h-fit border-y border-[#dfe5dc] py-5 dark:border-border">
           <div className="flex items-center gap-3">
-            <div className="flex size-12 items-center justify-center rounded-full bg-[#d9e6d1] text-[#1f5a45]">
+            <div className="flex size-12 items-center justify-center rounded-full bg-[#d9e6d1] text-[#1f5a45] dark:bg-emerald-950/50 dark:text-emerald-300">
               <UserRound />
             </div>
             <div>
-              <p className="font-semibold">{displayName}</p>
-              <p className="text-sm text-[#718077]">
+              <p className="font-semibold text-[#1f3b2b] dark:text-foreground">
+                {displayName}
+              </p>
+              <p className="text-sm text-[#718077] dark:text-muted-foreground">
                 {user?.roles?.includes("READER")
                   ? "Độc giả thư viện"
                   : (user?.roles?.[0] ?? "Thành viên")}{" "}
@@ -601,7 +622,7 @@ export function ProfilePage() {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveView(item.id)}
-                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors ${activeView === item.id ? "bg-[#e7eee3] text-[#1f5a45]" : "text-[#718077] hover:bg-[#f0f4ed] hover:text-[#1f5a45]"}`}
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors ${activeView === item.id ? "bg-[#e7eee3] text-[#1f5a45] dark:bg-emerald-950/50 dark:text-emerald-300" : "text-[#718077] hover:bg-[#f0f4ed] hover:text-[#1f5a45] dark:text-muted-foreground dark:hover:bg-muted/40 dark:hover:text-foreground"}`}
                 >
                   <Icon className="size-4" />
                   {item.label}
@@ -624,46 +645,60 @@ export function ProfilePage() {
           {activeView === "overview" && (
             <div className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="border border-[#dfe5dc] bg-white p-5">
-                  <p className="text-sm text-[#718077]">Đang mượn</p>
-                  <p className="mt-3 text-3xl font-semibold">0 / 5</p>
-                  <p className="mt-2 text-xs text-[#4e9661]">
+                <div className="border border-[#dfe5dc] bg-white p-5 dark:border-border dark:bg-card">
+                  <p className="text-sm text-[#718077] dark:text-muted-foreground">
+                    Đang mượn
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                    0 / 5
+                  </p>
+                  <p className="mt-2 text-xs text-[#4e9661] dark:text-emerald-400">
                     Còn hạn mức mượn
                   </p>
                 </div>
-                <div className="border border-[#dfe5dc] bg-white p-5">
-                  <p className="text-sm text-[#718077]">Đã hoàn thành</p>
-                  <p className="mt-3 text-3xl font-semibold">12</p>
-                  <p className="mt-2 text-xs text-[#718077]">
+                <div className="border border-[#dfe5dc] bg-white p-5 dark:border-border dark:bg-card">
+                  <p className="text-sm text-[#718077] dark:text-muted-foreground">
+                    Đã hoàn thành
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                    12
+                  </p>
+                  <p className="mt-2 text-xs text-[#718077] dark:text-muted-foreground">
                     Cuốn sách đã đọc
                   </p>
                 </div>
-                <div className="border border-[#dfe5dc] bg-white p-5">
-                  <p className="text-sm text-[#718077]">Khoản phạt</p>
-                  <p className="mt-3 text-3xl font-semibold">0 đ</p>
-                  <p className="mt-2 text-xs text-[#4e9661]">
+                <div className="border border-[#dfe5dc] bg-white p-5 dark:border-border dark:bg-card">
+                  <p className="text-sm text-[#718077] dark:text-muted-foreground">
+                    Khoản phạt
+                  </p>
+                  <p className="mt-3 text-3xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                    0 đ
+                  </p>
+                  <p className="mt-2 text-xs text-[#4e9661] dark:text-emerald-400">
                     Không có khoản cần thanh toán
                   </p>
                 </div>
               </div>
-              <div className="border border-[#dfe5dc] bg-white p-6">
+              <div className="border border-[#dfe5dc] bg-white p-6 dark:border-border dark:bg-card">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-semibold tracking-[0.12em] text-[#c27652] uppercase">
                       Thẻ thư viện
                     </p>
-                    <h2 className="mt-2 text-xl font-semibold">
+                    <h2 className="mt-2 text-xl font-semibold text-[#1f3b2b] dark:text-foreground">
                       Thẻ độc giả điện tử
                     </h2>
                   </div>
-                  <span className="flex items-center gap-1.5 rounded-full bg-[#e7eee3] px-3 py-1 text-xs font-medium text-[#4e9661]">
+                  <span className="flex items-center gap-1.5 rounded-full bg-[#e7eee3] px-3 py-1 text-xs font-medium text-[#4e9661] dark:bg-emerald-950/40 dark:text-emerald-300">
                     <ShieldCheck className="size-3.5" /> Đang hoạt động
                   </span>
                 </div>
-                <div className="mt-6 grid gap-5 border-t border-[#edf0eb] pt-5 sm:grid-cols-3">
+                <div className="mt-6 grid gap-5 border-t border-[#edf0eb] pt-5 sm:grid-cols-3 dark:border-border">
                   <div>
-                    <p className="text-xs text-[#718077]">Mã độc giả</p>
-                    <p className="mt-1 font-medium">
+                    <p className="text-xs text-[#718077] dark:text-muted-foreground">
+                      Mã độc giả
+                    </p>
+                    <p className="mt-1 font-medium text-[#1f3b2b] dark:text-foreground">
                       MM-
                       {user?.accountId
                         ? String(user.accountId).padStart(4, "0")
@@ -671,34 +706,45 @@ export function ProfilePage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#718077]">Nhóm độc giả</p>
-                    <p className="mt-1 font-medium">
+                    <p className="text-xs text-[#718077] dark:text-muted-foreground">
+                      Nhóm độc giả
+                    </p>
+                    <p className="mt-1 font-medium text-[#1f3b2b] dark:text-foreground">
                       {user?.roles?.includes("READER")
                         ? "Độc giả"
                         : user?.roles?.join(", ") || "Học sinh - sinh viên"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#718077]">Có hiệu lực đến</p>
-                    <p className="mt-1 font-medium">31/12/2026</p>
+                    <p className="text-xs text-[#718077] dark:text-muted-foreground">
+                      Có hiệu lực đến
+                    </p>
+                    <p className="mt-1 font-medium text-[#1f3b2b] dark:text-foreground">
+                      31/12/2026
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="border border-[#dfe5dc] bg-white p-6">
+              <div className="border border-[#dfe5dc] bg-white p-6 dark:border-border dark:bg-card">
                 <div className="flex items-center justify-between">
-                  <h2 className="font-semibold">Sách đang mượn</h2>
+                  <h2 className="font-semibold text-[#1f3b2b] dark:text-foreground">
+                    Sách đang mượn
+                  </h2>
                   <button
                     type="button"
                     onClick={() => setActiveView("history")}
-                    className="text-sm font-medium text-[#1f5a45]"
+                    className="text-sm font-medium text-[#1f5a45] dark:text-emerald-400"
                   >
                     Xem lịch sử
                   </button>
                 </div>
-                <div className="mt-6 flex flex-col items-center justify-center border-t border-dashed border-[#dfe5dc] py-10 text-center text-sm text-[#718077]">
-                  <BookOpen className="mb-3 size-6 text-[#b9cbbb]" />
+                <div className="mt-6 flex flex-col items-center justify-center border-t border-dashed border-[#dfe5dc] py-10 text-center text-sm text-[#718077] dark:border-border dark:text-muted-foreground">
+                  <BookOpen className="mb-3 size-6 text-[#b9cbbb] dark:text-muted-foreground" />
                   Bạn chưa có sách đang mượn.
-                  <Link to="/books" className="mt-3 font-medium text-[#1f5a45]">
+                  <Link
+                    to="/books"
+                    className="mt-3 font-medium text-[#1f5a45] dark:text-emerald-400"
+                  >
                     Khám phá kho sách <ArrowRight className="inline size-3" />
                   </Link>
                 </div>
@@ -706,11 +752,13 @@ export function ProfilePage() {
             </div>
           )}
           {activeView === "history" && (
-            <div className="border border-[#dfe5dc] bg-white p-6">
+            <div className="border border-[#dfe5dc] bg-white p-6 dark:border-border dark:bg-card">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Lịch sử mượn trả</h2>
-                  <p className="mt-1 text-sm text-[#718077]">
+                  <h2 className="text-xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                    Lịch sử mượn trả
+                  </h2>
+                  <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
                     Theo dõi toàn bộ các giao dịch của bạn.
                   </p>
                 </div>
@@ -718,7 +766,7 @@ export function ProfilePage() {
               </div>
               <div className="mt-8 overflow-x-auto">
                 <table className="w-full min-w-140 text-left text-sm">
-                  <thead className="border-y border-[#edf0eb] text-xs text-[#718077]">
+                  <thead className="border-y border-[#edf0eb] text-xs text-[#718077] dark:border-border dark:text-muted-foreground">
                     <tr>
                       <th className="px-3 py-3 font-medium">Sách</th>
                       <th className="px-3 py-3 font-medium">Ngày mượn</th>
@@ -730,7 +778,7 @@ export function ProfilePage() {
                     <tr>
                       <td
                         colSpan={4}
-                        className="px-3 py-14 text-center text-[#718077]"
+                        className="px-3 py-14 text-center text-[#718077] dark:text-muted-foreground"
                       >
                         Chưa có giao dịch mượn trả nào.
                       </td>
@@ -742,7 +790,7 @@ export function ProfilePage() {
           )}
           {activeView === "details" && (
             <form
-              className="border border-[#dfe5dc] bg-white p-6"
+              className="border border-[#dfe5dc] bg-white p-6 dark:border-border dark:bg-card"
               onSubmit={(event) => {
                 event.preventDefault()
                 setProfileSaved(true)
@@ -750,8 +798,10 @@ export function ProfilePage() {
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-semibold">Thông tin cá nhân</h2>
-                  <p className="mt-1 text-sm text-[#718077]">
+                  <h2 className="text-xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                    Thông tin cá nhân
+                  </h2>
+                  <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
                     Thông tin này được dùng khi làm thủ tục tại quầy.
                   </p>
                 </div>
@@ -771,7 +821,7 @@ export function ProfilePage() {
                     key={field}
                     className={field === "address" ? "sm:col-span-2" : ""}
                   >
-                    <span className="mb-2 block text-sm font-medium">
+                    <span className="mb-2 block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                       {label}
                     </span>
                     <Input
@@ -783,22 +833,22 @@ export function ProfilePage() {
                           [field]: event.target.value,
                         }))
                       }}
-                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                      className="border-[#cbd8ce] bg-[#fbfcfa] dark:border-border dark:bg-muted/30 dark:text-foreground"
                     />
                   </label>
                 ))}
                 <label className="sm:col-span-2">
-                  <span className="mb-2 block text-sm font-medium">
+                  <span className="mb-2 block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                     Tên đăng nhập / Email
                   </span>
                   <Input
                     value={user?.username ?? user?.email ?? ""}
                     readOnly
-                    className="border-[#cbd8ce] bg-[#eef2ea] text-[#718077]"
+                    className="border-[#cbd8ce] bg-[#eef2ea] text-[#718077] dark:border-border dark:bg-muted/50 dark:text-muted-foreground"
                   />
                 </label>
               </div>
-              <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5">
+              <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5 dark:border-border">
                 <Button
                   type="submit"
                   className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"
@@ -806,7 +856,7 @@ export function ProfilePage() {
                   <Save className="size-4" /> Lưu thay đổi
                 </Button>
                 {profileSaved && (
-                  <span className="flex items-center gap-1.5 text-sm text-[#4e9661]">
+                  <span className="flex items-center gap-1.5 text-sm text-[#4e9661] dark:text-emerald-400">
                     <Check className="size-4" /> Đã cập nhật thông tin
                   </span>
                 )}
@@ -816,7 +866,7 @@ export function ProfilePage() {
           {activeView === "security" && (
             <div className="space-y-5">
               <form
-                className="border border-[#dfe5dc] bg-white p-6"
+                className="border border-[#dfe5dc] bg-white p-6 dark:border-border dark:bg-card"
                 onSubmit={(event) => {
                   event.preventDefault()
                   setPasswordSaved(true)
@@ -824,8 +874,10 @@ export function ProfilePage() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-xl font-semibold">Đổi mật khẩu</h2>
-                    <p className="mt-1 text-sm text-[#718077]">
+                    <h2 className="text-xl font-semibold text-[#1f3b2b] dark:text-foreground">
+                      Đổi mật khẩu
+                    </h2>
+                    <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
                       Cập nhật mật khẩu định kỳ để bảo vệ tài khoản.
                     </p>
                   </div>
@@ -833,40 +885,40 @@ export function ProfilePage() {
                 </div>
                 <div className="mt-8 grid gap-5 sm:grid-cols-2">
                   <label>
-                    <span className="mb-2 block text-sm font-medium">
+                    <span className="mb-2 block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                       Mật khẩu hiện tại
                     </span>
                     <Input
                       type="password"
                       required
-                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                      className="border-[#cbd8ce] bg-[#fbfcfa] dark:border-border dark:bg-muted/30 dark:text-foreground"
                     />
                   </label>
                   <div />
                   <label>
-                    <span className="mb-2 block text-sm font-medium">
+                    <span className="mb-2 block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                       Mật khẩu mới
                     </span>
                     <Input
                       type="password"
                       required
                       minLength={6}
-                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                      className="border-[#cbd8ce] bg-[#fbfcfa] dark:border-border dark:bg-muted/30 dark:text-foreground"
                     />
                   </label>
                   <label>
-                    <span className="mb-2 block text-sm font-medium">
+                    <span className="mb-2 block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
                       Xác nhận mật khẩu mới
                     </span>
                     <Input
                       type="password"
                       required
                       minLength={6}
-                      className="border-[#cbd8ce] bg-[#fbfcfa]"
+                      className="border-[#cbd8ce] bg-[#fbfcfa] dark:border-border dark:bg-muted/30 dark:text-foreground"
                     />
                   </label>
                 </div>
-                <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5">
+                <div className="mt-8 flex items-center gap-4 border-t border-[#edf0eb] pt-5 dark:border-border">
                   <Button
                     type="submit"
                     className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]"
@@ -874,13 +926,13 @@ export function ProfilePage() {
                     <Save className="size-4" /> Cập nhật mật khẩu
                   </Button>
                   {passwordSaved && (
-                    <span className="flex items-center gap-1.5 text-sm text-[#4e9661]">
+                    <span className="flex items-center gap-1.5 text-sm text-[#4e9661] dark:text-emerald-400">
                       <Check className="size-4" /> Mật khẩu đã được cập nhật
                     </span>
                   )}
                 </div>
               </form>
-              <div className="flex gap-3 border border-[#ead9d1] bg-[#fffaf7] p-5 text-sm text-[#8b6657]">
+              <div className="flex gap-3 border border-[#ead9d1] bg-[#fffaf7] p-5 text-sm text-[#8b6657] dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300">
                 <AlertCircle className="mt-0.5 size-4 shrink-0" />
                 <p>
                   Không chia sẻ mật khẩu hoặc mã xác thực với bất kỳ ai, kể cả
@@ -901,10 +953,10 @@ export function AboutPage() {
       <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
         Về Mộc Miên
       </p>
-      <h1 className="mt-3 text-5xl font-semibold tracking-tight">
+      <h1 className="mt-3 text-5xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
         Một thư viện được xây quanh thói quen đọc.
       </h1>
-      <p className="mt-8 text-lg leading-8 text-[#617067]">
+      <p className="mt-8 text-lg leading-8 text-[#617067] dark:text-muted-foreground">
         Mộc Miên là không gian đọc dành cho mọi người. Chúng mình tin rằng việc
         tìm kiếm và mượn một cuốn sách nên nhẹ nhàng, rõ ràng và có chút niềm
         vui.

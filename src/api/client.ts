@@ -1,10 +1,13 @@
 import { API_BASE_URL } from "@/api/config"
 
-const TOKEN_KEY = "library_access_token"
+const TOKEN_KEY = "accessToken"
 
 export const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem(TOKEN_KEY)
+    return (
+      localStorage.getItem(TOKEN_KEY) ||
+      localStorage.getItem("library_access_token")
+    )
   } catch {
     return null
   }
@@ -14,8 +17,10 @@ export const setStoredToken = (token: string | null) => {
   try {
     if (token) {
       localStorage.setItem(TOKEN_KEY, token)
+      localStorage.setItem("library_access_token", token)
     } else {
       localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem("library_access_token")
     }
   } catch {
     // Ignore storage errors
@@ -54,7 +59,7 @@ async function request<T>(
   if (!requestHeaders.has("Accept"))
     requestHeaders.set("Accept", "application/json")
 
-  const token = getStoredToken()
+  const token = localStorage.getItem("accessToken") || getStoredToken()
   if (token && !requestHeaders.has("Authorization")) {
     requestHeaders.set("Authorization", `Bearer ${token}`)
   }
@@ -74,8 +79,12 @@ async function request<T>(
       ? cleanPath.slice(4)
       : cleanPath
 
+  // Omit credentials: "include" to avoid cross-origin CORS conflicts
+  const restOptions = { ...options } as Record<string, unknown>
+  delete restOptions.credentials
+
   const response = await fetch(`${API_BASE_URL}/${normalizedPath}`, {
-    ...options,
+    ...restOptions,
     method,
     headers: requestHeaders,
     body:
