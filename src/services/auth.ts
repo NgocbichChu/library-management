@@ -85,7 +85,7 @@ export const authService = {
 
     if (
       credentials.username === "thuthu" &&
-      credentials.password === "12345678"
+      (credentials.password === "123456" || credentials.password === "12345678")
     ) {
       return {
         user: {
@@ -96,6 +96,7 @@ export const authService = {
           fullName: "Mai Thị Phương",
           roles: ["LIBRARIAN", "EMPLOYEE"],
           email: "thuthu@library.local",
+          position: "Thủ thư mượn trả",
         },
         token: "mock-jwt-librarian-token",
       }

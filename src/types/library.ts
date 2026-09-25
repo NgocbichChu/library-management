@@ -3,10 +3,12 @@ export type EmployeeStatus = "ACTIVE" | "ON_LEAVE" | "RESIGNED"
 export type ReaderStatus = "ACTIVE" | "LOCKED" | "EXPIRED"
 export type ReaderType = "NORMAL" | "STUDENT" | "TEACHER"
 export type BookStatus = "ACTIVE" | "ARCHIVED"
-export type CopyStatus = "AVAILABLE" | "BORROWED" | "RESERVED" | "LOST" | "DAMAGED"
+export type CopyStatus =
+  "AVAILABLE" | "BORROWED" | "RESERVED" | "LOST" | "DAMAGED"
 export type ConditionStatus = "NEW" | "GOOD" | "FAIR" | "POOR" | "DAMAGED"
 export type SlipStatus = "BORROWING" | "RETURNED" | "OVERDUE" | "CANCELLED"
-export type DetailStatus = "BORROWING" | "RETURNED" | "OVERDUE" | "LOST" | "DAMAGED"
+export type DetailStatus =
+  "BORROWING" | "RETURNED" | "OVERDUE" | "LOST" | "DAMAGED"
 export type PolicyStatus = "ACTIVE" | "INACTIVE"
 export type FineType = "OVERDUE" | "DAMAGED" | "LOST" | "OTHER"
 

@@ -35,7 +35,6 @@ export interface AuthUser {
   readerCode?: string
 }
 
-
 export type UserRole = "ADMIN" | "EMPLOYEE" | "LIBRARIAN" | "READER"
 
 export type AuthStatus = "unauthenticated" | "loading" | "authenticated"

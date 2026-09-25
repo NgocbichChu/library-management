@@ -4,7 +4,10 @@ const TOKEN_KEY = "accessToken"
 
 export const getStoredToken = (): string | null => {
   try {
-    return localStorage.getItem(TOKEN_KEY) || localStorage.getItem("library_access_token")
+    return (
+      localStorage.getItem(TOKEN_KEY) ||
+      localStorage.getItem("library_access_token")
+    )
   } catch {
     return null
   }

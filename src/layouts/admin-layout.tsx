@@ -1,5 +1,7 @@
+import { useEffect } from "react"
 import { Outlet } from "react-router"
 import { AppSidebar } from "@/components/app-sidebar"
+import { useLibraryStore } from "@/stores/use-library-store"
 
 import {
   SidebarInset,
@@ -11,6 +13,14 @@ import { CommandPalette } from "@/components/command-palette"
 import { Separator } from "@/components/ui/separator"
 
 export const AdminLayout = () => {
+  const isInitialized = useLibraryStore((s) => s.isInitialized)
+  const fetchAll = useLibraryStore((s) => s.fetchAll)
+
+  useEffect(() => {
+    if (!isInitialized) {
+      void fetchAll()
+    }
+  }, [isInitialized, fetchAll])
   return (
     <SidebarProvider>
       <AppSidebar />

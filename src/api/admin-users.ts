@@ -11,30 +11,33 @@ export const adminUsersApi = {
   // GET /api/admin/users
   getUsers: (params?: GetUsersParams) => {
     const query = new URLSearchParams()
-    if (params?.UserType && (params.UserType === "EMPLOYEE" || params.UserType === "READER")) {
+    if (
+      params?.UserType &&
+      (params.UserType === "EMPLOYEE" || params.UserType === "READER")
+    ) {
       query.set("UserType", params.UserType)
     }
     if (params?.Status && params.Status !== "ALL")
       query.set("Status", params.Status)
-    if (params?.Role && params.Role !== "ALL")
-      query.set("Role", params.Role)
+    if (params?.Role && params.Role !== "ALL") query.set("Role", params.Role)
     if (params?.Keyword) query.set("Keyword", params.Keyword)
     if (params?.PageNumber) query.set("PageNumber", String(params.PageNumber))
     if (params?.PageSize) query.set("PageSize", String(params.PageSize))
     if (params?.SortBy) query.set("SortBy", params.SortBy)
-    if (params?.SortDirection)
-      query.set("SortDirection", params.SortDirection)
+    if (params?.SortDirection) query.set("SortDirection", params.SortDirection)
 
     const queryString = query.toString()
     const path = queryString ? `/admin/users?${queryString}` : "/admin/users"
-    return apiClient.get<ApiResponse<{ items?: Record<string, unknown>[]; totalRecords?: number }>>(
-      path
-    )
+    return apiClient.get<
+      ApiResponse<{ items?: Record<string, unknown>[]; totalRecords?: number }>
+    >(path)
   },
 
   // GET /api/admin/users/code/{code}
   getByCode: (code: string) =>
-    apiClient.get<ApiResponse<AdminUserItem>>(`/admin/users/code/${encodeURIComponent(code)}`),
+    apiClient.get<ApiResponse<AdminUserItem>>(
+      `/admin/users/code/${encodeURIComponent(code)}`
+    ),
 
   // PUT /api/admin/users/{accountId}
   updateUser: (accountId: number | string, data: UpdateUserRequest) =>
@@ -52,7 +55,9 @@ export const adminUsersApi = {
 
   // POST /api/admin/users/{employeeId}/grant-admin
   grantAdmin: (employeeId: number | string) =>
-    apiClient.post<ApiResponse<unknown>>(`/admin/users/${employeeId}/grant-admin`),
+    apiClient.post<ApiResponse<unknown>>(
+      `/admin/users/${employeeId}/grant-admin`
+    ),
 
   // POST /api/auth/create-employee
   createEmployee: (data: CreateEmployeeRequest) =>

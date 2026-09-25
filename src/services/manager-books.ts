@@ -304,38 +304,42 @@ export const managerBooksService = {
         (response.data as { data?: unknown[] })?.data ||
         (Array.isArray(response.data) ? response.data : null)
       if (response.success && Array.isArray(rawList) && rawList.length > 0) {
-        const beBooks: BookTitleItem[] = (rawList as Record<string, unknown>[]).map(
-          (item) => {
-            const rawId = item.id ?? item.bookTitleId ?? item.book_title_id
-            return {
-              id: String(rawId),
-              isbn: String(item.isbn || "978-604-1-00000-0"),
-              title: String(item.title || "Tài liệu chưa đặt tên"),
-              subtitle: item.subtitle ? String(item.subtitle) : undefined,
-              author: String(item.author || "Nhiều tác giả"),
-              publisher: String(item.publisher || "NXB Tổng hợp"),
-              publicationYear: Number(item.publicationYear || 2024),
-              languageCode: String(item.languageCode || "VIE"),
-              category: String(item.category || "Văn học"),
-              description: String(item.description || "Tài liệu lưu hành nội bộ"),
-              pageCount: Number(item.pageCount || 200),
-              coverImageUrl: item.coverImageUrl ? String(item.coverImageUrl) : undefined,
-              bookStatus: "Active",
-              totalCopies: 1,
-              availableCopies: item.available !== false ? 1 : 0,
-              borrowedCopies: item.available === false ? 1 : 0,
-              color: "#e2ead9",
-              copies: [],
-            }
+        const beBooks: BookTitleItem[] = (
+          rawList as Record<string, unknown>[]
+        ).map((item) => {
+          const rawId = item.id ?? item.bookTitleId ?? item.book_title_id
+          return {
+            id: String(rawId),
+            isbn: String(item.isbn || "978-604-1-00000-0"),
+            title: String(item.title || "Tài liệu chưa đặt tên"),
+            subtitle: item.subtitle ? String(item.subtitle) : undefined,
+            author: String(item.author || "Nhiều tác giả"),
+            publisher: String(item.publisher || "NXB Tổng hợp"),
+            publicationYear: Number(item.publicationYear || 2024),
+            languageCode: String(item.languageCode || "VIE"),
+            category: String(item.category || "Văn học"),
+            description: String(item.description || "Tài liệu lưu hành nội bộ"),
+            pageCount: Number(item.pageCount || 200),
+            coverImageUrl: item.coverImageUrl
+              ? String(item.coverImageUrl)
+              : undefined,
+            bookStatus: "Active",
+            totalCopies: 1,
+            availableCopies: item.available !== false ? 1 : 0,
+            borrowedCopies: item.available === false ? 1 : 0,
+            color: "#e2ead9",
+            copies: [],
           }
-        )
+        })
 
         // Merge backend books with mock initial books
         const merged = [...beBooks]
         for (const localBook of booksStore) {
           if (
             !merged.some(
-              (b) => b.id === localBook.id || b.title.toLowerCase() === localBook.title.toLowerCase()
+              (b) =>
+                b.id === localBook.id ||
+                b.title.toLowerCase() === localBook.title.toLowerCase()
             )
           ) {
             merged.push(localBook)

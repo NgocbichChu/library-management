@@ -272,11 +272,15 @@ export function BooksManagementPage() {
             {item.title.slice(0, 2).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-[#1f3b2b] hover:text-[#1f5a45]">
+            <p className="truncate font-semibold text-[#1f3b2b] hover:text-[#1f5a45] dark:text-foreground dark:hover:text-emerald-400">
               {item.title}
             </p>
-            <p className="truncate text-xs text-[#718077]">{item.author}</p>
-            <p className="font-mono text-[10px] text-[#8b9a8f]">{item.isbn}</p>
+            <p className="truncate text-xs text-[#718077] dark:text-muted-foreground">
+              {item.author}
+            </p>
+            <p className="font-mono text-[10px] text-[#8b9a8f] dark:text-muted-foreground/80">
+              {item.isbn}
+            </p>
           </div>
         </div>
       ),
@@ -288,11 +292,11 @@ export function BooksManagementPage() {
         <div>
           <Badge
             variant="outline"
-            className="border-[#cbd8ce] bg-[#f7f9f6] text-xs font-medium text-[#2f553a]"
+            className="border-[#cbd8ce] bg-[#f7f9f6] text-xs font-medium text-[#2f553a] dark:border-border dark:bg-muted/40 dark:text-foreground"
           >
             {item.category}
           </Badge>
-          <p className="mt-1 text-xs text-[#718077]">
+          <p className="mt-1 text-xs text-[#718077] dark:text-muted-foreground">
             {item.publisher} ({item.publicationYear}) · {item.pageCount} trang
           </p>
         </div>
@@ -304,13 +308,15 @@ export function BooksManagementPage() {
       cell: (item) => (
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#1f3b2b]">
+            <span className="font-semibold text-[#1f3b2b] dark:text-foreground">
               {item.availableCopies} / {item.totalCopies}
             </span>
-            <span className="text-xs text-[#718077]">sẵn sàng</span>
+            <span className="text-xs text-[#718077] dark:text-muted-foreground">
+              sẵn sàng
+            </span>
           </div>
           {item.borrowedCopies > 0 && (
-            <p className="text-xs font-medium text-[#c27652]">
+            <p className="text-xs font-medium text-[#c27652] dark:text-orange-400">
               Đang mượn: {item.borrowedCopies} cuốn
             </p>
           )}
@@ -324,12 +330,15 @@ export function BooksManagementPage() {
         item.bookStatus === "Active" ? (
           <Badge
             variant="outline"
-            className="border-[#cce1d2] bg-[#edf6ef] text-[#246237]"
+            className="border-[#cce1d2] bg-[#edf6ef] text-[#246237] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
           >
             <CheckCircle2 className="mr-1 size-3" /> Đang phục vụ
           </Badge>
         ) : (
-          <Badge variant="outline" className="border-[#dfe5dc] text-[#718077]">
+          <Badge
+            variant="outline"
+            className="border-[#dfe5dc] text-[#718077] dark:border-border dark:bg-muted/40 dark:text-muted-foreground"
+          >
             Ngừng lưu hành
           </Badge>
         ),
@@ -343,7 +352,7 @@ export function BooksManagementPage() {
             variant="outline"
             size="sm"
             onClick={() => handleOpenCopies(item)}
-            className="h-8 gap-1 border-[#cbd8ce] bg-white px-2.5 text-xs text-[#1f5a45] hover:bg-[#e7eee3]"
+            className="h-8 gap-1 border-[#cbd8ce] bg-white px-2.5 text-xs text-[#1f5a45] hover:bg-[#e7eee3] dark:border-border dark:bg-card dark:text-emerald-400 dark:hover:bg-muted"
             title="Quản lý bản sao"
           >
             <BookCopy className="size-3.5" /> Bản sao ({item.totalCopies})
@@ -352,7 +361,7 @@ export function BooksManagementPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleOpenEdit(item)}
-            className="size-8 p-0 text-[#718077] hover:text-[#1f5a45]"
+            className="size-8 p-0 text-[#718077] hover:text-[#1f5a45] dark:text-muted-foreground dark:hover:text-emerald-400"
             title="Chỉnh sửa thông tin"
           >
             <Pencil className="size-3.5" />
@@ -361,7 +370,7 @@ export function BooksManagementPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleDeleteBook(item)}
-            className="size-8 p-0 text-[#718077] hover:text-[#b43428]"
+            className="size-8 p-0 text-[#718077] hover:text-[#b43428] dark:text-muted-foreground dark:hover:text-rose-400"
             title="Xóa đầu sách"
           >
             <Trash2 className="size-3.5" />
@@ -379,10 +388,10 @@ export function BooksManagementPage() {
           <p className="text-xs font-semibold tracking-[0.16em] text-[#c27652] uppercase">
             Nghiệp vụ Quản lý Thư viện
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1f3b2b]">
+          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
             Quản lý Đầu sách &amp; Bản sao
           </h1>
-          <p className="mt-1 text-sm text-[#718077]">
+          <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
             Quản lý thông tin đầu sách, theo dõi mã vạch barcode và vị trí kệ
             sách trong kho.
           </p>
@@ -398,45 +407,61 @@ export function BooksManagementPage() {
 
       {/* Metrics Row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs">
-          <p className="text-xs text-[#718077]">Tổng số đầu sách</p>
-          <p className="mt-1 text-2xl font-semibold text-[#1f3b2b]">
+        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
+          <p className="text-xs text-[#718077] dark:text-muted-foreground">
+            Tổng số đầu sách
+          </p>
+          <p className="mt-1 text-2xl font-semibold text-[#1f3b2b] dark:text-foreground">
             {totalTitles}
           </p>
-          <p className="text-[11px] text-[#56675c]">Đầu mục đã đăng ký</p>
+          <p className="text-[11px] text-[#56675c] dark:text-muted-foreground">
+            Đầu mục đã đăng ký
+          </p>
         </div>
-        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs">
-          <p className="text-xs text-[#718077]">Tổng bản sao vật lý</p>
-          <p className="mt-1 text-2xl font-semibold text-[#1f3b2b]">
+        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
+          <p className="text-xs text-[#718077] dark:text-muted-foreground">
+            Tổng bản sao vật lý
+          </p>
+          <p className="mt-1 text-2xl font-semibold text-[#1f3b2b] dark:text-foreground">
             {totalCopiesCount}
           </p>
-          <p className="text-[11px] text-[#56675c]">Cuốn sách đang quản lý</p>
+          <p className="text-[11px] text-[#56675c] dark:text-muted-foreground">
+            Cuốn sách đang quản lý
+          </p>
         </div>
-        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs">
-          <p className="text-xs text-[#718077]">Sẵn sàng cho mượn</p>
-          <p className="mt-1 text-2xl font-semibold text-[#246237]">
+        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
+          <p className="text-xs text-[#718077] dark:text-muted-foreground">
+            Sẵn sàng cho mượn
+          </p>
+          <p className="mt-1 text-2xl font-semibold text-[#246237] dark:text-emerald-400">
             {availableCopiesCount}
           </p>
-          <p className="text-[11px] text-[#4e9661]">Sách nằm trên kệ</p>
+          <p className="text-[11px] text-[#4e9661] dark:text-emerald-400">
+            Sách nằm trên kệ
+          </p>
         </div>
-        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs">
-          <p className="text-xs text-[#718077]">Đang cho độc giả mượn</p>
-          <p className="mt-1 text-2xl font-semibold text-[#c27652]">
+        <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
+          <p className="text-xs text-[#718077] dark:text-muted-foreground">
+            Đang cho độc giả mượn
+          </p>
+          <p className="mt-1 text-2xl font-semibold text-[#c27652] dark:text-orange-400">
             {borrowedCopiesCount}
           </p>
-          <p className="text-[11px] text-[#b05828]">Trong các phiếu mượn</p>
+          <p className="text-[11px] text-[#b05828] dark:text-orange-400">
+            Trong các phiếu mượn
+          </p>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col gap-3 rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs md:flex-row md:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs md:flex-row md:items-center dark:border-border dark:bg-card">
         <div className="relative flex-1">
-          <Search className="absolute top-2.5 left-3 size-4 text-[#8b9a8f]" />
+          <Search className="absolute top-2.5 left-3 size-4 text-[#8b9a8f] dark:text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo tên sách, tác giả hoặc ISBN..."
-            className="h-9 border-[#cbd8ce] bg-white pl-9"
+            className="h-9 border-[#cbd8ce] bg-white pl-9 dark:border-border dark:bg-muted/20 dark:text-foreground"
           />
         </div>
 
@@ -445,8 +470,8 @@ export function BooksManagementPage() {
             value={categoryFilter}
             onValueChange={(val) => setCategoryFilter(val ?? "Tất cả")}
           >
-            <SelectTrigger className="h-9 w-40 border-[#cbd8ce] bg-white text-xs">
-              <Filter className="mr-1 size-3.5 text-[#718077]" />
+            <SelectTrigger className="h-9 w-40 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
+              <Filter className="mr-1 size-3.5 text-[#718077] dark:text-muted-foreground" />
               <SelectValue placeholder="Thể loại" />
             </SelectTrigger>
             <SelectContent>
@@ -462,7 +487,7 @@ export function BooksManagementPage() {
             value={statusFilter}
             onValueChange={(val) => setStatusFilter(val ?? "Tất cả")}
           >
-            <SelectTrigger className="h-9 w-36 border-[#cbd8ce] bg-white text-xs">
+            <SelectTrigger className="h-9 w-36 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
               <SelectValue placeholder="Trạng thái" />
             </SelectTrigger>
             <SelectContent>
@@ -475,33 +500,31 @@ export function BooksManagementPage() {
       </div>
 
       {/* Main Table */}
-      <div className="rounded-xl border border-[#dfe5dc] bg-white shadow-xs">
-        <CommonTable
-          data={filteredBooks}
-          columns={columns}
-          loading={loading}
-          pagination={{
-            page: currentPage,
-            pageSize,
-            total: filteredBooks.length,
-            onPageChange: setCurrentPage,
-          }}
-          emptyMessage={
-            <div className="py-12 text-center text-sm text-[#718077]">
-              <BookOpen className="mx-auto mb-2 size-8 text-[#cbd8ce]" />
-              Không tìm thấy đầu sách nào phù hợp.
-            </div>
-          }
-        />
-      </div>
+      <CommonTable
+        data={filteredBooks}
+        columns={columns}
+        loading={loading}
+        pagination={{
+          page: currentPage,
+          pageSize,
+          total: filteredBooks.length,
+          onPageChange: setCurrentPage,
+        }}
+        emptyMessage={
+          <div className="py-12 text-center text-sm text-[#718077] dark:text-muted-foreground">
+            <BookOpen className="mx-auto mb-2 size-8 text-[#cbd8ce] dark:text-muted-foreground" />
+            Không tìm thấy đầu sách nào phù hợp.
+          </div>
+        }
+      />
 
       {/* Modal: Thêm / Sửa đầu sách */}
       <AppDialog
         open={isAddEditOpen}
         onOpenChange={setIsAddEditOpen}
         title={
-          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b]">
-            <BookOpen className="size-5 text-[#1f5a45]" />
+          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
+            <BookOpen className="size-5 text-[#1f5a45] dark:text-emerald-400" />
             {editingBook
               ? "Cập nhật đầu sách"
               : "Thêm mới đầu sách vào thư viện"}
@@ -513,7 +536,7 @@ export function BooksManagementPage() {
         <form onSubmit={handleSubmitBook} className="mt-3 flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-xs font-semibold text-[#56675c]">
+              <label className="text-xs font-semibold text-[#56675c] dark:text-muted-foreground">
                 Tên sách <span className="text-[#b43428]">*</span>
               </label>
               <Input
@@ -523,12 +546,12 @@ export function BooksManagementPage() {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 placeholder="Ví dụ: Nghệ thuật tư duy rành mạch"
-                className="mt-1 border-[#cbd8ce]"
+                className="mt-1 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-[#56675c]">
+              <label className="text-xs font-semibold text-[#56675c] dark:text-muted-foreground">
                 Tác giả <span className="text-[#b43428]">*</span>
               </label>
               <Input
@@ -538,7 +561,7 @@ export function BooksManagementPage() {
                   setFormData({ ...formData, author: e.target.value })
                 }
                 placeholder="Ví dụ: Rolf Dobelli"
-                className="mt-1 border-[#cbd8ce]"
+                className="mt-1 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
               />
             </div>
 
@@ -659,8 +682,8 @@ export function BooksManagementPage() {
         open={isCopiesOpen}
         onOpenChange={setIsCopiesOpen}
         title={
-          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b]">
-            <Layers className="size-5 text-[#1f5a45]" />
+          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
+            <Layers className="size-5 text-[#1f5a45] dark:text-emerald-400" />
             Bản sao cuốn sách: {selectedBookForCopies?.title}
           </div>
         }
@@ -669,9 +692,9 @@ export function BooksManagementPage() {
       >
         <div className="mt-3 flex flex-col gap-6">
           {/* List of Copies */}
-          <div className="overflow-x-auto rounded-lg border border-[#dfe5dc]">
+          <div className="overflow-x-auto rounded-lg border border-[#dfe5dc] dark:border-border dark:bg-card">
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-[#edf0eb] bg-[#f7f9f6] font-semibold text-[#718077]">
+              <thead className="border-b border-[#edf0eb] bg-[#f7f9f6] font-semibold text-[#718077] dark:border-border dark:bg-muted/40 dark:text-muted-foreground">
                 <tr>
                   <th className="p-2.5">Mã bản sao</th>
                   <th className="p-2.5">Mã vạch Barcode</th>
@@ -681,48 +704,57 @@ export function BooksManagementPage() {
                   <th className="p-2.5">Trạng thái</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#f0f3ee]">
+              <tbody className="divide-y divide-[#f0f3ee] dark:divide-border/60">
                 {(selectedBookForCopies?.copies || []).map(
                   (copy: BookCopyItem) => (
-                    <tr key={copy.id} className="hover:bg-[#fbfcfb]">
-                      <td className="p-2.5 font-mono text-[11px] font-medium text-[#1f5a45]">
+                    <tr
+                      key={copy.id}
+                      className="hover:bg-[#fbfcfb] dark:hover:bg-muted/30"
+                    >
+                      <td className="p-2.5 font-mono text-[11px] font-medium text-[#1f5a45] dark:text-emerald-400">
                         {copy.id}
                       </td>
-                      <td className="p-2.5 font-mono text-[11px] text-[#17231d]">
+                      <td className="p-2.5 font-mono text-[11px] text-[#17231d] dark:text-foreground">
                         {copy.barcode}
                       </td>
                       <td className="p-2.5">
-                        <span className="flex items-center gap-1 text-[#385145]">
+                        <span className="flex items-center gap-1 text-[#385145] dark:text-muted-foreground">
                           <MapPin className="size-3 text-[#c27652]" />
                           {copy.shelfCode} ({copy.location})
                         </span>
                       </td>
-                      <td className="p-2.5 font-medium">
+                      <td className="p-2.5 font-medium text-foreground">
                         {copy.price.toLocaleString("vi-VN")} đ
                       </td>
                       <td className="p-2.5">
                         {copy.conditionStatus === "Good" && (
-                          <span className="text-[#246237]">Tốt</span>
+                          <span className="text-[#246237] dark:text-emerald-400">
+                            Tốt
+                          </span>
                         )}
                         {copy.conditionStatus === "SlightlyDamaged" && (
-                          <span className="text-[#b05828]">Sờn nhẹ</span>
+                          <span className="text-[#b05828] dark:text-orange-400">
+                            Sờn nhẹ
+                          </span>
                         )}
                         {copy.conditionStatus === "Damaged" && (
-                          <span className="text-[#b83828]">Hư hại</span>
+                          <span className="text-[#b83828] dark:text-rose-400">
+                            Hư hại
+                          </span>
                         )}
                       </td>
                       <td className="p-2.5">
                         {copy.copyStatus === "Available" ? (
                           <Badge
                             variant="outline"
-                            className="border-[#cce1d2] bg-[#edf6ef] text-[10px] text-[#246237]"
+                            className="border-[#cce1d2] bg-[#edf6ef] text-[10px] text-[#246237] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
                           >
                             Có sẵn
                           </Badge>
                         ) : (
                           <Badge
                             variant="outline"
-                            className="border-[#f3d9ca] bg-[#fdf3ec] text-[10px] text-[#b05828]"
+                            className="border-[#f3d9ca] bg-[#fdf3ec] text-[10px] text-[#b05828] dark:border-orange-800/40 dark:bg-orange-950/40 dark:text-orange-300"
                           >
                             Đang mượn
                           </Badge>
@@ -738,40 +770,44 @@ export function BooksManagementPage() {
           {/* Add New Copy Form */}
           <form
             onSubmit={handleAddCopy}
-            className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f9f6] p-4"
+            className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f9f6] p-4 dark:border-border dark:bg-muted/20"
           >
-            <div className="flex items-center gap-2 text-xs font-semibold text-[#1f3b2b]">
-              <Plus className="size-4 text-[#1f5a45]" /> Thêm bản sao vật lý mới
-              vào kho
+            <div className="flex items-center gap-2 text-xs font-semibold text-[#1f3b2b] dark:text-foreground">
+              <Plus className="size-4 text-[#1f5a45] dark:text-emerald-400" />{" "}
+              Thêm bản sao vật lý mới vào kho
             </div>
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               <div>
-                <label className="text-[11px] text-[#718077]">Mã vạch</label>
+                <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
+                  Mã vạch
+                </label>
                 <Input
                   required
                   value={newBarcode}
                   onChange={(e) => setNewBarcode(e.target.value)}
-                  className="h-8 border-[#cbd8ce] bg-white font-mono text-xs"
+                  className="h-8 border-[#cbd8ce] bg-white font-mono text-xs dark:border-border dark:bg-muted/20 dark:text-foreground"
                 />
               </div>
               <div>
-                <label className="text-[11px] text-[#718077]">Vị trí kệ</label>
+                <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
+                  Vị trí kệ
+                </label>
                 <Input
                   value={newShelf}
                   onChange={(e) => setNewShelf(e.target.value)}
                   placeholder="Kệ A-01..."
-                  className="h-8 border-[#cbd8ce] bg-white text-xs"
+                  className="h-8 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground"
                 />
               </div>
               <div>
-                <label className="text-[11px] text-[#718077]">
+                <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
                   Giá nhập (VNĐ)
                 </label>
                 <Input
                   type="number"
                   value={newPrice}
                   onChange={(e) => setNewPrice(Number(e.target.value) || 0)}
-                  className="h-8 border-[#cbd8ce] bg-white text-xs"
+                  className="h-8 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground"
                 />
               </div>
             </div>
@@ -786,7 +822,7 @@ export function BooksManagementPage() {
             </div>
           </form>
 
-          <div className="flex items-center gap-2 rounded-lg border border-[#dfe5dc] bg-white p-3 text-xs text-[#718077]">
+          <div className="flex items-center gap-2 rounded-lg border border-[#dfe5dc] bg-white p-3 text-xs text-[#718077] dark:border-border dark:bg-card dark:text-muted-foreground">
             <AlertCircle className="size-4 shrink-0 text-[#c27652]" />
             <span>
               Theo quy định thư viện, mỗi cuốn sách vật lý khi nhập kho đều được

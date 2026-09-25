@@ -105,10 +105,10 @@ export const Component = () => {
   return (
     <>
       <div className="flex flex-col gap-1 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-[#1f3b2b]">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
           {activeTab === "login" ? "Đăng nhập" : "Đăng ký Độc giả"}
         </h1>
-        <p className="text-sm text-[#718077]">
+        <p className="text-sm text-[#718077] dark:text-muted-foreground">
           {activeTab === "login"
             ? "Nhập tài khoản để quản lý thẻ và mượn sách"
             : "Tạo tài khoản độc giả mới để tra cứu và mượn sách"}
@@ -116,7 +116,7 @@ export const Component = () => {
       </div>
 
       {/* Tabs */}
-      <div className="mt-4 flex rounded-lg bg-[#eef4ee] p-1">
+      <div className="mt-4 flex rounded-lg bg-[#eef4ee] p-1 dark:bg-muted/40">
         <button
           type="button"
           onClick={() => {
@@ -125,8 +125,8 @@ export const Component = () => {
           }}
           className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition-all ${
             activeTab === "login"
-              ? "bg-white text-[#1f3b2b] shadow-xs"
-              : "text-[#627768] hover:text-[#1f3b2b]"
+              ? "bg-white text-[#1f3b2b] shadow-xs dark:bg-card dark:text-foreground"
+              : "text-[#627768] hover:text-[#1f3b2b] dark:text-muted-foreground dark:hover:text-foreground"
           }`}
         >
           Đăng nhập
@@ -139,8 +139,8 @@ export const Component = () => {
           }}
           className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition-all ${
             activeTab === "register"
-              ? "bg-white text-[#1f3b2b] shadow-xs"
-              : "text-[#627768] hover:text-[#1f3b2b]"
+              ? "bg-white text-[#1f3b2b] shadow-xs dark:bg-card dark:text-foreground"
+              : "text-[#627768] hover:text-[#1f3b2b] dark:text-muted-foreground dark:hover:text-foreground"
           }`}
         >
           Đăng ký Độc giả
@@ -165,11 +165,11 @@ export const Component = () => {
                 >
                   <FieldLabel
                     htmlFor="login-username"
-                    className="text-xs font-semibold tracking-wider text-[#56675c] uppercase"
+                    className="text-xs font-semibold tracking-wider text-[#56675c] uppercase dark:text-muted-foreground"
                   >
                     Tên đăng nhập
                   </FieldLabel>
-                  <InputGroup className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45]">
+                  <InputGroup className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45] dark:border-border dark:bg-muted/20 dark:text-foreground">
                     <InputGroupInput
                       id="login-username"
                       aria-invalid={fieldState.invalid}
@@ -199,7 +199,7 @@ export const Component = () => {
                 >
                   <FieldLabel
                     htmlFor="login-password"
-                    className="text-xs font-semibold tracking-wider text-[#56675c] uppercase"
+                    className="text-xs font-semibold tracking-wider text-[#56675c] uppercase dark:text-muted-foreground"
                   >
                     Mật khẩu
                   </FieldLabel>
@@ -208,7 +208,7 @@ export const Component = () => {
                     aria-invalid={fieldState.invalid}
                     disabled={isFormDisabled}
                     autoComplete="current-password"
-                    className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45]"
+                    className="h-10 w-full rounded-lg border-[#cbd8ce] bg-[#fbfcfa] transition-colors focus-within:border-[#1f5a45] dark:border-border dark:bg-muted/20 dark:text-foreground"
                     placeholder="Nhập mật khẩu"
                     {...field}
                     onChange={(event) => {
@@ -225,7 +225,7 @@ export const Component = () => {
           {error ? (
             <div
               role="alert"
-              className="flex items-start gap-2.5 rounded-lg border border-[#f2d6d3] bg-[#fdf3f2] p-3 text-sm text-[#b43428]"
+              className="flex items-start gap-2.5 rounded-lg border border-[#f2d6d3] bg-[#fdf3f2] p-3 text-sm text-[#b43428] dark:border-rose-800/40 dark:bg-rose-950/40 dark:text-rose-300"
             >
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <p className="leading-snug">{error}</p>
@@ -244,49 +244,49 @@ export const Component = () => {
             Đăng nhập
           </Button>
 
-          <div className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f8f4] p-3.5 text-xs text-[#617067]">
-            <p className="font-medium text-[#24382b]">
+          <div className="rounded-xl border border-dashed border-[#cbd8ce] bg-[#f7f8f4] p-3.5 text-xs text-[#617067] dark:border-border dark:bg-muted/20 dark:text-muted-foreground">
+            <p className="font-medium text-[#24382b] dark:text-foreground">
               Tài khoản thử nghiệm hệ thống:
             </p>
             <div className="mt-2.5 grid grid-cols-3 gap-1.5">
               <button
                 type="button"
                 onClick={() => handleFillAccount("admin", "123456")}
-                className="rounded-lg border border-[#1f5a45] bg-[#eef5ee] px-2 py-1.5 text-center transition-colors hover:bg-[#dfeade]"
+                className="rounded-lg border border-[#1f5a45] bg-[#eef5ee] px-2 py-1.5 text-center transition-colors hover:bg-[#dfeade] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-300"
               >
-                <span className="block font-semibold text-[#1f5a45]">
+                <span className="block font-semibold text-[#1f5a45] dark:text-emerald-300">
                   Admin
                 </span>
-                <span className="block font-mono text-[10px] text-[#4a6353]">
+                <span className="block font-mono text-[10px] text-[#4a6353] dark:text-emerald-400/80">
                   admin
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleFillAccount("thuthu", "123456")}
-                className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+                className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3] dark:border-border dark:bg-card dark:hover:bg-muted"
               >
-                <span className="block font-semibold text-[#2d5a3f]">
+                <span className="block font-semibold text-[#2d5a3f] dark:text-foreground">
                   Thủ thư
                 </span>
-                <span className="block font-mono text-[10px] text-[#718077]">
+                <span className="block font-mono text-[10px] text-[#718077] dark:text-muted-foreground">
                   thuthu
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => handleFillAccount("admin239", "12345678")}
-                className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3]"
+                className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3] dark:border-border dark:bg-card dark:hover:bg-muted"
               >
-                <span className="block font-semibold text-[#617067]">
+                <span className="block font-semibold text-[#617067] dark:text-foreground">
                   Độc giả
                 </span>
-                <span className="block font-mono text-[10px] text-[#718077]">
+                <span className="block font-mono text-[10px] text-[#718077] dark:text-muted-foreground">
                   admin239
                 </span>
               </button>
             </div>
-            <p className="mt-2 text-[10px] text-[#8b9a8f]">
+            <p className="mt-2 text-[10px] text-[#8b9a8f] dark:text-muted-foreground/80">
               * Mật khẩu Admin: <strong>123456</strong>. Thủ thư &amp; Admin vào
               trang Quản lý.
             </p>
@@ -295,7 +295,7 @@ export const Component = () => {
           <div className="pt-2 text-center">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#718077] transition-colors hover:text-[#1f5a45]"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#718077] transition-colors hover:text-[#1f5a45] dark:text-muted-foreground dark:hover:text-emerald-400"
             >
               <ArrowLeft className="size-3.5" /> Quay lại trang chủ
             </Link>
@@ -307,7 +307,7 @@ export const Component = () => {
           onSubmit={handleRegisterReader}
         >
           <div>
-            <label className="text-xs font-semibold text-[#56675c] uppercase">
+            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
               Tên đăng nhập *
             </label>
             <input
@@ -316,12 +316,12 @@ export const Component = () => {
               value={regUsername}
               onChange={(e) => setRegUsername(e.target.value)}
               placeholder="VD: nguyenvanan"
-              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#56675c] uppercase">
+            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
               Mật khẩu *
             </label>
             <input
@@ -330,12 +330,12 @@ export const Component = () => {
               value={regPassword}
               onChange={(e) => setRegPassword(e.target.value)}
               placeholder="Mật khẩu bảo mật"
-              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
             />
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#56675c] uppercase">
+            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
               Họ và tên
             </label>
             <input
@@ -343,13 +343,13 @@ export const Component = () => {
               value={regFullName}
               onChange={(e) => setRegFullName(e.target.value)}
               placeholder="VD: Nguyễn Văn An"
-              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-xs font-semibold text-[#56675c] uppercase">
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
                 Email
               </label>
               <input
@@ -357,11 +357,11 @@ export const Component = () => {
                 value={regEmail}
                 onChange={(e) => setRegEmail(e.target.value)}
                 placeholder="an@gmail.com"
-                className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+                className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-[#56675c] uppercase">
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
                 Số điện thoại
               </label>
               <input
@@ -369,13 +369,13 @@ export const Component = () => {
                 value={regPhone}
                 onChange={(e) => setRegPhone(e.target.value)}
                 placeholder="0912345678"
-                className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+                className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#56675c] uppercase">
+            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
               Địa chỉ
             </label>
             <input
@@ -383,12 +383,12 @@ export const Component = () => {
               value={regAddress}
               onChange={(e) => setRegAddress(e.target.value)}
               placeholder="Ký túc xá Khu B, ĐHQG"
-              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden"
+              className="mt-1 h-9 w-full rounded-lg border border-[#cbd8ce] bg-[#fbfcfa] px-3 text-sm focus:border-[#1f5a45] focus:outline-hidden dark:border-border dark:bg-muted/20 dark:text-foreground"
             />
           </div>
 
           {regError ? (
-            <div className="flex items-start gap-2 rounded-lg border border-[#f2d6d3] bg-[#fdf3f2] p-2 text-xs text-[#b43428]">
+            <div className="flex items-start gap-2 rounded-lg border border-[#f2d6d3] bg-[#fdf3f2] p-2 text-xs text-[#b43428] dark:border-rose-800/40 dark:bg-rose-950/40 dark:text-rose-300">
               <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
               <span>{regError}</span>
             </div>
@@ -407,12 +407,12 @@ export const Component = () => {
             Tạo tài khoản Độc giả
           </Button>
 
-          <p className="text-center text-xs text-[#718077]">
+          <p className="text-center text-xs text-[#718077] dark:text-muted-foreground">
             Đã có tài khoản?{" "}
             <button
               type="button"
               onClick={() => setActiveTab("login")}
-              className="font-medium text-[#1f5a45] hover:underline"
+              className="font-medium text-[#1f5a45] hover:underline dark:text-emerald-400"
             >
               Đăng nhập ngay
             </button>

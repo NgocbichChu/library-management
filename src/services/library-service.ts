@@ -41,9 +41,15 @@ export const libraryService = {
     const availableCopies = bookCopies.filter(
       (c) => c.copy_status === "AVAILABLE"
     ).length
-    const totalReaders = readers.filter((r) => r.reader_status === "ACTIVE").length
-    const activeLoans = borrowSlips.filter((s) => s.slip_status === "BORROWING").length
-    const overdueLoans = borrowSlips.filter((s) => s.slip_status === "OVERDUE").length
+    const totalReaders = readers.filter(
+      (r) => r.reader_status === "ACTIVE"
+    ).length
+    const activeLoans = borrowSlips.filter(
+      (s) => s.slip_status === "BORROWING"
+    ).length
+    const overdueLoans = borrowSlips.filter(
+      (s) => s.slip_status === "OVERDUE"
+    ).length
     const totalOutstandingFines = fines.reduce(
       (sum, f) => sum + f.outstanding_amount,
       0
@@ -63,8 +69,12 @@ export const libraryService = {
   // === BOOKS (book_title) ===
   getBooks: async (): Promise<BookTitle[]> => {
     return bookTitles.map((title) => {
-      const copies = bookCopies.filter((c) => c.book_title_id === title.book_title_id)
-      const available = copies.filter((c) => c.copy_status === "AVAILABLE").length
+      const copies = bookCopies.filter(
+        (c) => c.book_title_id === title.book_title_id
+      )
+      const available = copies.filter(
+        (c) => c.copy_status === "AVAILABLE"
+      ).length
       return {
         ...title,
         copies_count: copies.length,
@@ -80,7 +90,9 @@ export const libraryService = {
     return {
       ...book,
       copies_count: copies.length,
-      available_copies_count: copies.filter((c) => c.copy_status === "AVAILABLE").length,
+      available_copies_count: copies.filter(
+        (c) => c.copy_status === "AVAILABLE"
+      ).length,
     }
   },
 
@@ -130,7 +142,9 @@ export const libraryService = {
 
   updateBook: async (
     id: number,
-    data: Partial<Omit<BookTitle, "book_title_id" | "created_at" | "updated_at">>
+    data: Partial<
+      Omit<BookTitle, "book_title_id" | "created_at" | "updated_at">
+    >
   ): Promise<BookTitle> => {
     const index = bookTitles.findIndex((b) => b.book_title_id === id)
     if (index === -1) throw new Error("Không tìm thấy đầu sách")
@@ -193,8 +207,13 @@ export const libraryService = {
     }))
   },
 
-  createCategory: async (name: string, description: string): Promise<CategoryItem> => {
-    const exists = categories.some((c) => c.name.toLowerCase() === name.toLowerCase())
+  createCategory: async (
+    name: string,
+    description: string
+  ): Promise<CategoryItem> => {
+    const exists = categories.some(
+      (c) => c.name.toLowerCase() === name.toLowerCase()
+    )
     if (exists) throw new Error("Danh mục đã tồn tại.")
     const newCat: CategoryItem = {
       id: `cat-${Date.now()}`,
@@ -236,7 +255,9 @@ export const libraryService = {
     if (!cat) return
     const hasBooks = bookTitles.some((b) => b.category === cat.name)
     if (hasBooks) {
-      throw new Error("Không thể xóa danh mục đang có sách. Hãy đổi danh mục cho sách trước.")
+      throw new Error(
+        "Không thể xóa danh mục đang có sách. Hãy đổi danh mục cho sách trước."
+      )
     }
     categories = categories.filter((c) => c.id !== id)
   },
@@ -268,7 +289,9 @@ export const libraryService = {
 
   updateReader: async (
     id: number,
-    data: Partial<Omit<Reader, "reader_id" | "account_id" | "created_at" | "updated_at">>
+    data: Partial<
+      Omit<Reader, "reader_id" | "account_id" | "created_at" | "updated_at">
+    >
   ): Promise<Reader> => {
     const index = readers.findIndex((r) => r.reader_id === id)
     if (index === -1) throw new Error("Không tìm thấy độc giả.")
@@ -283,7 +306,8 @@ export const libraryService = {
   toggleReaderStatus: async (id: number): Promise<Reader> => {
     const reader = readers.find((r) => r.reader_id === id)
     if (!reader) throw new Error("Không tìm thấy độc giả.")
-    const nextStatus: ReaderStatus = reader.reader_status === "ACTIVE" ? "LOCKED" : "ACTIVE"
+    const nextStatus: ReaderStatus =
+      reader.reader_status === "ACTIVE" ? "LOCKED" : "ACTIVE"
     return libraryService.updateReader(id, { reader_status: nextStatus })
   },
 
@@ -296,8 +320,12 @@ export const libraryService = {
         .filter((d) => d.borrow_slip_id === slip.borrow_slip_id)
         .map((d) => {
           const copy = bookCopies.find((c) => c.book_copy_id === d.book_copy_id)
-          const title = copy ? bookTitles.find((t) => t.book_title_id === copy.book_title_id) : undefined
-          const fine = fines.find((f) => f.borrow_slip_detail_id === d.borrow_slip_detail_id)
+          const title = copy
+            ? bookTitles.find((t) => t.book_title_id === copy.book_title_id)
+            : undefined
+          const fine = fines.find(
+            (f) => f.borrow_slip_detail_id === d.borrow_slip_detail_id
+          )
           return {
             ...d,
             book_copy: copy,
@@ -341,11 +369,18 @@ export const libraryService = {
     const currentActiveBookCount = currentActiveSlips.reduce((count, s) => {
       return (
         count +
-        borrowSlipDetails.filter((d) => d.borrow_slip_id === s.borrow_slip_id && d.detail_status === "BORROWING").length
+        borrowSlipDetails.filter(
+          (d) =>
+            d.borrow_slip_id === s.borrow_slip_id &&
+            d.detail_status === "BORROWING"
+        ).length
       )
     }, 0)
 
-    if (currentActiveBookCount + bookCopyIds.length > systemPolicy.max_borrow_books) {
+    if (
+      currentActiveBookCount + bookCopyIds.length >
+      systemPolicy.max_borrow_books
+    ) {
       throw new Error(
         `Độc giả đã mượn ${currentActiveBookCount} cuốn. Hạn mức tối đa theo quy định là ${systemPolicy.max_borrow_books} cuốn.`
       )
@@ -355,15 +390,20 @@ export const libraryService = {
     for (const copyId of bookCopyIds) {
       const copy = bookCopies.find((c) => c.book_copy_id === copyId)
       if (!copy || copy.copy_status !== "AVAILABLE") {
-        throw new Error(`Cuốn sách mã ${copy?.barcode ?? copyId} hiện không sẵn sàng để mượn.`)
+        throw new Error(
+          `Cuốn sách mã ${copy?.barcode ?? copyId} hiện không sẵn sàng để mượn.`
+        )
       }
     }
 
-    const newSlipId = Math.max(...borrowSlips.map((s) => s.borrow_slip_id), 0) + 1
+    const newSlipId =
+      Math.max(...borrowSlips.map((s) => s.borrow_slip_id), 0) + 1
     const slipCode = `SLIP-2026-${String(newSlipId).padStart(3, "0")}`
     const now = new Date()
     const dueDate = new Date(now)
-    dueDate.setDate(dueDate.getDate() + (dueDays || systemPolicy.max_borrow_days))
+    dueDate.setDate(
+      dueDate.getDate() + (dueDays || systemPolicy.max_borrow_days)
+    )
 
     const newSlip: BorrowSlip = {
       borrow_slip_id: newSlipId,
@@ -383,7 +423,9 @@ export const libraryService = {
 
     // Create slip details and mark copies as BORROWED
     for (const copyId of bookCopyIds) {
-      const detailId = Math.max(...borrowSlipDetails.map((d) => d.borrow_slip_detail_id), 0) + 1
+      const detailId =
+        Math.max(...borrowSlipDetails.map((d) => d.borrow_slip_detail_id), 0) +
+        1
       borrowSlipDetails.push({
         borrow_slip_detail_id: detailId,
         borrow_slip_id: newSlipId,
@@ -434,7 +476,10 @@ export const libraryService = {
 
     // Calculate overdue days if any
     const overdueDays = isOverdue
-      ? Math.max(1, Math.ceil((now.getTime() - dueDate.getTime()) / (1000 * 3600 * 24)))
+      ? Math.max(
+          1,
+          Math.ceil((now.getTime() - dueDate.getTime()) / (1000 * 3600 * 24))
+        )
       : 0
 
     // Mark slip as RETURNED
@@ -464,7 +509,9 @@ export const libraryService = {
       }
 
       // Mark copy as AVAILABLE
-      const copyIndex = bookCopies.findIndex((c) => c.book_copy_id === detail.book_copy_id)
+      const copyIndex = bookCopies.findIndex(
+        (c) => c.book_copy_id === detail.book_copy_id
+      )
       if (copyIndex !== -1) {
         bookCopies[copyIndex] = {
           ...bookCopies[copyIndex],
@@ -479,7 +526,10 @@ export const libraryService = {
         const fineId = Math.max(...fines.map((f) => f.fine_id), 0) + 1
         const basicAmount = overdueDays * systemPolicy.overdue_fine_per_day
         const reader = readers.find((r) => r.reader_id === slip.reader_id)
-        const discountRate = reader?.reader_type === "STUDENT" ? systemPolicy.student_discount_rate : 0
+        const discountRate =
+          reader?.reader_type === "STUDENT"
+            ? systemPolicy.student_discount_rate
+            : 0
         const discountAmount = (basicAmount * discountRate) / 100
         const finalAmount = Math.max(0, basicAmount - discountAmount)
 
@@ -528,7 +578,9 @@ export const libraryService = {
     return { ...systemPolicy }
   },
 
-  updateSystemPolicy: async (data: Partial<SystemPolicy>): Promise<SystemPolicy> => {
+  updateSystemPolicy: async (
+    data: Partial<SystemPolicy>
+  ): Promise<SystemPolicy> => {
     systemPolicy = {
       ...systemPolicy,
       ...data,
