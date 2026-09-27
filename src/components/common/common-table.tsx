@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
 import {
   Pagination,
@@ -92,13 +93,19 @@ export function CommonTable<T>({
   const skeletonRows = Math.min(pagination?.pageSize ?? 6, 6)
 
   return (
-    <div aria-busy={loading} className="flex flex-col gap-2 px-3 pb-3">
-      <div className="overflow-hidden rounded-xl border border-border">
+    <div aria-busy={loading} className="flex flex-col gap-3">
+      <div className="overflow-hidden rounded-xl border border-[#dfe5dc] bg-white shadow-xs dark:border-border dark:bg-card">
         <Table className="min-w-full table-auto border-y-0 [&_td]:px-4 [&_th]:px-4">
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b border-[#dfe5dc] bg-[#f7f9f6] hover:bg-[#f7f9f6] dark:border-border dark:bg-muted/30 dark:hover:bg-muted/30">
               {columns.map((column) => (
-                <TableHead key={column.id} className={column.className}>
+                <TableHead
+                  key={column.id}
+                  className={cn(
+                    "text-xs font-semibold tracking-wider text-[#56675c] uppercase dark:text-muted-foreground",
+                    column.className
+                  )}
+                >
                   {loading ? <Skeleton className="h-4 w-3/5" /> : column.header}
                 </TableHead>
               ))}
@@ -107,9 +114,15 @@ export function CommonTable<T>({
           <TableBody>
             {loading
               ? Array.from({ length: skeletonRows }, (_, rowIndex) => (
-                  <TableRow key={`skeleton-row-${rowIndex}`}>
+                  <TableRow
+                    key={`skeleton-row-${rowIndex}`}
+                    className="border-b border-[#f0f3ee] dark:border-border/60"
+                  >
                     {columns.map((column) => (
-                      <TableCell key={column.id} className={column.className}>
+                      <TableCell
+                        key={column.id}
+                        className={cn("py-3.5", column.className)}
+                      >
                         <Skeleton
                           className={column.skeletonClassName ?? "h-6 w-4/5"}
                         />
@@ -118,9 +131,18 @@ export function CommonTable<T>({
                   </TableRow>
                 ))
               : pageData.map((item, index) => (
-                  <TableRow key={getRowId?.(item, index) ?? index}>
+                  <TableRow
+                    key={getRowId?.(item, index) ?? index}
+                    className="border-b border-[#f0f3ee] hover:bg-[#fbfcfb] dark:border-border/60 dark:hover:bg-muted/30"
+                  >
                     {columns.map((column) => (
-                      <TableCell key={column.id} className={column.className}>
+                      <TableCell
+                        key={column.id}
+                        className={cn(
+                          "py-3.5 text-foreground",
+                          column.className
+                        )}
+                      >
                         {column.cell(item)}
                       </TableCell>
                     ))}
@@ -129,7 +151,7 @@ export function CommonTable<T>({
             {!loading && pageData.length === 0 ? (
               <TableRow>
                 <TableCell
-                  className="py-8 text-center text-muted-foreground"
+                  className="py-12 text-center text-muted-foreground"
                   colSpan={columns.length}
                 >
                   {emptyMessage}
@@ -141,9 +163,9 @@ export function CommonTable<T>({
       </div>
 
       {summary || (pagination && pageCount > 1) ? (
-        <div className="flex flex-col gap-4 px-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 px-1 sm:flex-row sm:items-center sm:justify-between">
           {summary ? (
-            <div className="text-sm text-muted-foreground">{summary}</div>
+            <div className="text-xs text-muted-foreground">{summary}</div>
           ) : (
             <div />
           )}

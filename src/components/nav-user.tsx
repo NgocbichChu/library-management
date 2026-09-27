@@ -16,20 +16,22 @@ import {
 import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router"
-import { useAuthStore } from "@/stores/use-auth-store"
+import { useAuth } from "@/hooks/use-auth"
 
 export function NavUser({
   user,
 }: {
   user: {
     name: string
-    email: string
+    email?: string
+    username?: string
   }
 }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
-  const isLoggingOut = useAuthStore((state) => state.isLoggingOut)
-  const logout = useAuthStore((state) => state.logout)
+  const { logout, isLoggingOut } = useAuth()
+  const displayIdentifier = user.email || user.username || ""
+
   const handleLogout = async () => {
     try {
       await logout()
@@ -40,6 +42,11 @@ export function NavUser({
     }
   }
 
+  // const roleLabel =
+  //   user.role === "manager"
+  //     ? (user.position ?? "Thủ thư / Quản lý")
+  //     : "Độc giả thư viện"
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -49,15 +56,15 @@ export function NavUser({
               <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
             }
           >
-            <UserAvatar email={user.email} />
+            <UserAvatar email={displayIdentifier} />
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate text-xs">{displayIdentifier}</span>
             </div>
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-50"
+            className="w-56"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -66,7 +73,7 @@ export function NavUser({
               <DropdownMenuItem>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs">{displayIdentifier}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>

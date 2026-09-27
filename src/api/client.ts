@@ -1,11 +1,45 @@
 import { API_BASE_URL } from "@/api/config"
 
+const TOKEN_KEY = "accessToken"
+
+export const getStoredToken = (): string | null => {
+  try {
+    return (
+      localStorage.getItem(TOKEN_KEY) ||
+      localStorage.getItem("library_access_token")
+    )
+  } catch {
+    return null
+  }
+}
+
+export const setStoredToken = (token: string | null) => {
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token)
+      localStorage.setItem("library_access_token", token)
+    } else {
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem("library_access_token")
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export class ApiError extends Error {
   readonly status: number
   readonly data: unknown
 
   constructor(status: number, data: unknown) {
-    super(`HTTP ${status}`)
+    const message =
+      typeof data === "object" &&
+      data !== null &&
+      "message" in data &&
+      typeof (data as { message: unknown }).message === "string"
+        ? (data as { message: string }).message
+        : `HTTP ${status}`
+    super(message)
     this.name = "ApiError"
     this.status = status
     this.data = data
@@ -24,6 +58,12 @@ async function request<T>(
   const requestHeaders = new Headers(headers)
   if (!requestHeaders.has("Accept"))
     requestHeaders.set("Accept", "application/json")
+
+  const token = localStorage.getItem("accessToken") || getStoredToken()
+  if (token && !requestHeaders.has("Authorization")) {
+    requestHeaders.set("Authorization", `Bearer ${token}`)
+  }
+
   const isFormData = body instanceof FormData
   if (
     body !== undefined &&
@@ -33,9 +73,18 @@ async function request<T>(
     requestHeaders.set("Content-Type", "application/json")
   }
 
-  const response = await fetch(`${API_BASE_URL}/${path.replace(/^\/+/, "")}`, {
-    credentials: "include",
-    ...options,
+  const cleanPath = path.replace(/^\/+/, "")
+  const normalizedPath =
+    API_BASE_URL.endsWith("/api") && cleanPath.startsWith("api/")
+      ? cleanPath.slice(4)
+      : cleanPath
+
+  // Omit credentials: "include" to avoid cross-origin CORS conflicts
+  const restOptions = { ...options } as Record<string, unknown>
+  delete restOptions.credentials
+
+  const response = await fetch(`${API_BASE_URL}/${normalizedPath}`, {
+    ...restOptions,
     method,
     headers: requestHeaders,
     body:
