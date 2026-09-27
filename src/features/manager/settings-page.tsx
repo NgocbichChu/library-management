@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Settings, Save, ShieldCheck, HelpCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useLibraryStore } from "@/stores/use-library-store"
+import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Field, FieldLabel } from "@/components/ui/field"
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/card"
 
 export const SettingsPage = () => {
+  const { isAdmin } = useAuth()
   const { policy, updatePolicy, fetchPolicy } = useLibraryStore()
 
   const [formData, setFormData] = useState({
@@ -30,6 +32,7 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     if (policy) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         policy_code: policy.policy_code,
         policy_name: policy.policy_name,
@@ -48,6 +51,12 @@ export const SettingsPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isAdmin) {
+      toast.error(
+        "Chỉ Quản trị viên (Admin) mới có quyền thay đổi chính sách hệ thống."
+      )
+      return
+    }
     try {
       await updatePolicy({
         policy_code: formData.policy_code.trim(),
@@ -67,11 +76,14 @@ export const SettingsPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-4xl">
+    <div className="flex max-w-4xl flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Cài đặt quy định thư viện</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          Cài đặt quy định thư viện
+        </h1>
         <p className="text-sm text-muted-foreground">
-          Cấu hình chính sách hệ thống (system_policy) áp dụng cho mượn trả, hạn mức và mức phạt vi phạm.
+          Cấu hình chính sách hệ thống (system_policy) áp dụng cho mượn trả, hạn
+          mức và mức phạt vi phạm.
         </p>
       </div>
 
@@ -83,7 +95,8 @@ export const SettingsPage = () => {
               <CardTitle>Quy định mượn sách & Thời hạn</CardTitle>
             </div>
             <CardDescription>
-              Các tham số kiểm soát số lượng tài liệu độc giả được phép mượn và số ngày mượn tối đa.
+              Các tham số kiểm soát số lượng tài liệu độc giả được phép mượn và
+              số ngày mượn tối đa.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -110,7 +123,9 @@ export const SettingsPage = () => {
             </Field>
 
             <Field>
-              <FieldLabel>Số lượng sách mượn tối đa (cuốn / độc giả)</FieldLabel>
+              <FieldLabel>
+                Số lượng sách mượn tối đa (cuốn / độc giả)
+              </FieldLabel>
               <Input
                 type="number"
                 min={1}
@@ -118,7 +133,10 @@ export const SettingsPage = () => {
                 required
                 value={formData.max_borrow_books}
                 onChange={(e) =>
-                  setFormData({ ...formData, max_borrow_books: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    max_borrow_books: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -132,7 +150,10 @@ export const SettingsPage = () => {
                 required
                 value={formData.max_borrow_days}
                 onChange={(e) =>
-                  setFormData({ ...formData, max_borrow_days: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    max_borrow_days: Number(e.target.value),
+                  })
                 }
               />
             </Field>
@@ -146,7 +167,8 @@ export const SettingsPage = () => {
               <CardTitle>Quy định mức phạt vi phạm (fine)</CardTitle>
             </div>
             <CardDescription>
-              Tỷ lệ và đơn giá phạt áp dụng khi bạn đọc trả sách trễ hạn hoặc làm hư hỏng, thất lạc.
+              Tỷ lệ và đơn giá phạt áp dụng khi bạn đọc trả sách trễ hạn hoặc
+              làm hư hỏng, thất lạc.
             </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -234,9 +256,22 @@ export const SettingsPage = () => {
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <HelpCircle className="size-4" />
-            <span>Mọi thay đổi sẽ có hiệu lực ngay với các giao dịch mượn mới.</span>
+            <span>
+              {isAdmin
+                ? "Mọi thay đổi sẽ có hiệu lực ngay với các giao dịch mượn mới."
+                : "Chế độ chỉ đọc. Chỉ Quản trị viên (Admin) mới có quyền lưu thay đổi chính sách."}
+            </span>
           </div>
-          <Button type="submit" className="gap-2">
+          <Button
+            type="submit"
+            className="gap-2"
+            disabled={!isAdmin}
+            title={
+              !isAdmin
+                ? "Chỉ Quản trị viên mới có quyền lưu cấu hình"
+                : undefined
+            }
+          >
             <Save className="size-4" /> Lưu cấu hình
           </Button>
         </div>

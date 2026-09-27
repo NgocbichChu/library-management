@@ -4,17 +4,25 @@ import { toast } from "sonner"
 import { useLibraryStore } from "@/stores/use-library-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CommonTable, type CommonTableColumn } from "@/components/common/common-table"
+import {
+  CommonTable,
+  type CommonTableColumn,
+} from "@/components/common/common-table"
 import { AppDialog } from "@/components/common/app-dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
 import type { CategoryItem } from "@/types/library"
 
 export const CategoriesPage = () => {
-  const { categories, createCategory, updateCategory, deleteCategory } = useLibraryStore()
+  const { categories, createCategory, updateCategory, deleteCategory } =
+    useLibraryStore()
 
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null)
-  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null)
+  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(
+    null
+  )
+  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(
+    null
+  )
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -57,7 +65,9 @@ export const CategoriesPage = () => {
       toast.success("Đã cập nhật danh mục thành công.")
       setEditingCategory(null)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Cập nhật danh mục thất bại")
+      toast.error(
+        err instanceof Error ? err.message : "Cập nhật danh mục thất bại"
+      )
     }
   }
 
@@ -68,7 +78,9 @@ export const CategoriesPage = () => {
       toast.success(`Đã xóa danh mục: ${deletingCategory.name}`)
       setDeletingCategory(null)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Không thể xóa danh mục.")
+      toast.error(
+        err instanceof Error ? err.message : "Không thể xóa danh mục."
+      )
     }
   }
 
@@ -87,7 +99,7 @@ export const CategoriesPage = () => {
       id: "description",
       header: "Mô tả",
       cell: (cat) => (
-        <span className="text-sm text-muted-foreground line-clamp-1">
+        <span className="line-clamp-1 text-sm text-muted-foreground">
           {cat.description || "—"}
         </span>
       ),
@@ -135,7 +147,8 @@ export const CategoriesPage = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Danh mục sách</h1>
           <p className="text-sm text-muted-foreground">
-            Phân loại các đầu sách theo từng thể loại và chuyên ngành trong thư viện.
+            Phân loại các đầu sách theo từng thể loại và chuyên ngành trong thư
+            viện.
           </p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-2">
@@ -188,8 +201,12 @@ export const CategoriesPage = () => {
             />
           </Field>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddOpen(false)}
+            >
               Hủy
             </Button>
             <Button type="submit">Lưu danh mục</Button>
@@ -222,8 +239,12 @@ export const CategoriesPage = () => {
             />
           </Field>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setEditingCategory(null)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditingCategory(null)}
+            >
               Hủy
             </Button>
             <Button type="submit">Cập nhật thay đổi</Button>

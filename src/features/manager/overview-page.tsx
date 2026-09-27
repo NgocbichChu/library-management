@@ -42,10 +42,14 @@ export const OverviewPage = () => {
       {/* Header */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Tổng quan quản lý</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Tổng quan quản lý
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Xin chào, <span className="font-medium text-foreground">{user?.name}</span> (
-            {user?.position ?? "Thủ thư trưởng / Quản lý"}). Theo dõi tình hình thư viện hôm nay.
+            Xin chào,{" "}
+            <span className="font-medium text-foreground">{user?.name}</span> (
+            {user?.position ?? "Thủ thư trưởng / Quản lý"}). Theo dõi tình hình
+            thư viện hôm nay.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -71,7 +75,7 @@ export const OverviewPage = () => {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
               Đầu sách
             </CardTitle>
             <BookOpen className="size-4 text-primary" />
@@ -86,7 +90,7 @@ export const OverviewPage = () => {
 
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
               Sẵn sàng mượn
             </CardTitle>
             <Library className="size-4 text-emerald-600" />
@@ -95,26 +99,30 @@ export const OverviewPage = () => {
             <div className="text-2xl font-bold text-emerald-600">
               {stats?.availableCopies ?? 0}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Bản sao trên các kệ</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Bản sao trên các kệ
+            </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
               Độc giả
             </CardTitle>
             <Users className="size-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalReaders ?? 0}</div>
-            <p className="mt-1 text-xs text-muted-foreground">Thẻ đang hoạt động</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Thẻ đang hoạt động
+            </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
               Đang mượn
             </CardTitle>
             <ArrowLeftRight className="size-4 text-amber-600" />
@@ -123,13 +131,15 @@ export const OverviewPage = () => {
             <div className="text-2xl font-bold text-amber-600">
               {stats?.activeLoans ?? 0}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Giao dịch trong hạn</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Giao dịch trong hạn
+            </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-destructive">
+            <CardTitle className="text-xs font-medium tracking-wider text-destructive uppercase">
               Quá hạn
             </CardTitle>
             <AlertTriangle className="size-4 text-destructive" />
@@ -138,13 +148,15 @@ export const OverviewPage = () => {
             <div className="text-2xl font-bold text-destructive">
               {stats?.overdueLoans ?? 0}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Cần gửi thông báo nhắc</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Cần gửi thông báo nhắc
+            </p>
           </CardContent>
         </Card>
 
         <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CardTitle className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
               Tiền phạt tồn
             </CardTitle>
             <Coins className="size-4 text-orange-600" />
@@ -153,7 +165,9 @@ export const OverviewPage = () => {
             <div className="text-2xl font-bold">
               {(stats?.totalOutstandingFines ?? 0).toLocaleString("vi-VN")} đ
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">Chưa thanh toán</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Chưa thanh toán
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -162,13 +176,14 @@ export const OverviewPage = () => {
       {overdueSlips.length > 0 ? (
         <div className="flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/10 p-4">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="size-5 text-destructive shrink-0" />
+            <AlertTriangle className="size-5 shrink-0 text-destructive" />
             <div>
               <p className="font-semibold text-destructive">
                 Có {overdueSlips.length} phiếu mượn đã quá hạn cần thu hồi
               </p>
               <p className="text-xs text-muted-foreground">
-                Hệ thống đã tính tiền phạt trễ hạn tự động theo quy định chính sách.
+                Hệ thống đã tính tiền phạt trễ hạn tự động theo quy định chính
+                sách.
               </p>
             </div>
           </div>
@@ -185,11 +200,13 @@ export const OverviewPage = () => {
       {/* Main Sections: Recent loans & Quick shortcuts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Recent loans table */}
-        <Card className="lg:col-span-2 shadow-xs">
+        <Card className="shadow-xs lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Giao dịch mượn trả gần đây</CardTitle>
-              <CardDescription>Các lượt mượn và trả sách mới nhất</CardDescription>
+              <CardDescription>
+                Các lượt mượn và trả sách mới nhất
+              </CardDescription>
             </div>
             <Button
               variant="ghost"
@@ -204,10 +221,10 @@ export const OverviewPage = () => {
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-border text-xs text-muted-foreground uppercase">
                   <tr>
-                    <th className="py-2.5 px-3">Mã phiếu</th>
-                    <th className="py-2.5 px-3">Độc giả</th>
-                    <th className="py-2.5 px-3">Hạn trả</th>
-                    <th className="py-2.5 px-3">Trạng thái</th>
+                    <th className="px-3 py-2.5">Mã phiếu</th>
+                    <th className="px-3 py-2.5">Độc giả</th>
+                    <th className="px-3 py-2.5">Hạn trả</th>
+                    <th className="px-3 py-2.5">Trạng thái</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -216,12 +233,14 @@ export const OverviewPage = () => {
                       BORROWING: {
                         label: "Đang mượn",
                         variant: "outline" as const,
-                        className: "border-amber-500/30 text-amber-600 bg-amber-500/10",
+                        className:
+                          "border-amber-500/30 text-amber-600 bg-amber-500/10",
                       },
                       RETURNED: {
                         label: "Đã trả",
                         variant: "outline" as const,
-                        className: "border-emerald-500/30 text-emerald-600 bg-emerald-500/10",
+                        className:
+                          "border-emerald-500/30 text-emerald-600 bg-emerald-500/10",
                       },
                       OVERDUE: {
                         label: "Quá hạn",
@@ -236,11 +255,14 @@ export const OverviewPage = () => {
                     }[slip.slip_status]
 
                     return (
-                      <tr key={slip.borrow_slip_id} className="hover:bg-muted/50">
-                        <td className="py-3 px-3 font-mono font-medium">
+                      <tr
+                        key={slip.borrow_slip_id}
+                        className="hover:bg-muted/50"
+                      >
+                        <td className="px-3 py-3 font-mono font-medium">
                           {slip.borrow_slip_code}
                         </td>
-                        <td className="py-3 px-3">
+                        <td className="px-3 py-3">
                           <div className="font-medium">
                             {slip.reader?.full_name ?? "Độc giả"}
                           </div>
@@ -248,10 +270,10 @@ export const OverviewPage = () => {
                             {slip.reader?.reader_code}
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-muted-foreground">
+                        <td className="px-3 py-3 text-muted-foreground">
                           {new Date(slip.due_date).toLocaleDateString("vi-VN")}
                         </td>
-                        <td className="py-3 px-3">
+                        <td className="px-3 py-3">
                           <Badge
                             variant={statusConfig.variant}
                             className={statusConfig.className}
@@ -273,12 +295,14 @@ export const OverviewPage = () => {
           <Card className="shadow-xs">
             <CardHeader>
               <CardTitle>Lối tắt thao tác nhanh</CardTitle>
-              <CardDescription>Các chức năng thường dùng hàng ngày</CardDescription>
+              <CardDescription>
+                Các chức năng thường dùng hàng ngày
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-2.5">
               <Button
                 variant="outline"
-                className="justify-start gap-3 h-11"
+                className="h-11 justify-start gap-3"
                 onClick={() => navigate("/dashboard/loans")}
               >
                 <PlusCircle className="size-4 text-primary" />
@@ -286,7 +310,7 @@ export const OverviewPage = () => {
               </Button>
               <Button
                 variant="outline"
-                className="justify-start gap-3 h-11"
+                className="h-11 justify-start gap-3"
                 onClick={() => navigate("/dashboard/books")}
               >
                 <BookOpen className="size-4 text-emerald-600" />
@@ -294,7 +318,7 @@ export const OverviewPage = () => {
               </Button>
               <Button
                 variant="outline"
-                className="justify-start gap-3 h-11"
+                className="h-11 justify-start gap-3"
                 onClick={() => navigate("/dashboard/readers")}
               >
                 <Users className="size-4 text-blue-600" />
@@ -302,7 +326,7 @@ export const OverviewPage = () => {
               </Button>
               <Button
                 variant="outline"
-                className="justify-start gap-3 h-11"
+                className="h-11 justify-start gap-3"
                 onClick={() => navigate("/dashboard/settings")}
               >
                 <Clock className="size-4 text-amber-600" />
@@ -311,17 +335,19 @@ export const OverviewPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-xs bg-muted/30">
+          <Card className="bg-muted/30 shadow-xs">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                 <CheckCircle2 className="size-4 text-primary" />
                 Thông tin quy định hiện hành
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-xs text-muted-foreground space-y-2">
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
               <div className="flex justify-between border-b border-border/60 pb-1.5">
                 <span>Số sách mượn tối đa:</span>
-                <span className="font-semibold text-foreground">5 cuốn / thẻ</span>
+                <span className="font-semibold text-foreground">
+                  5 cuốn / thẻ
+                </span>
               </div>
               <div className="flex justify-between border-b border-border/60 pb-1.5">
                 <span>Thời hạn mượn:</span>
@@ -329,11 +355,15 @@ export const OverviewPage = () => {
               </div>
               <div className="flex justify-between border-b border-border/60 pb-1.5">
                 <span>Mức phạt quá hạn:</span>
-                <span className="font-semibold text-foreground">5.000 đ / ngày</span>
+                <span className="font-semibold text-foreground">
+                  5.000 đ / ngày
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Ưu đãi sinh viên:</span>
-                <span className="font-semibold text-emerald-600">Giảm 20% phí phạt</span>
+                <span className="font-semibold text-emerald-600">
+                  Giảm 20% phí phạt
+                </span>
               </div>
             </CardContent>
           </Card>

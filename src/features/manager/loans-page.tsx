@@ -16,7 +16,10 @@ import { useAuthStore } from "@/stores/use-auth-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { CommonTable, type CommonTableColumn } from "@/components/common/common-table"
+import {
+  CommonTable,
+  type CommonTableColumn,
+} from "@/components/common/common-table"
 import { AppDialog } from "@/components/common/app-dialog"
 import { AppSelect } from "@/components/common/app-select"
 import { Field, FieldLabel } from "@/components/ui/field"
@@ -63,7 +66,8 @@ export const LoansPage = () => {
 
   const filteredSlips = useMemo(() => {
     return borrowSlips.filter((s) => {
-      const matchStatus = statusFilter === "all" || s.slip_status === statusFilter
+      const matchStatus =
+        statusFilter === "all" || s.slip_status === statusFilter
       const query = searchQuery.toLowerCase()
       const matchQuery =
         searchQuery === "" ||
@@ -76,7 +80,9 @@ export const LoansPage = () => {
 
   const handleOpenCreate = () => {
     const firstActiveReader = readers.find((r) => r.reader_status === "ACTIVE")
-    setSelectedReaderId(firstActiveReader ? String(firstActiveReader.reader_id) : "")
+    setSelectedReaderId(
+      firstActiveReader ? String(firstActiveReader.reader_id) : ""
+    )
     setSelectedCopyIds([])
     setBorrowDays(policy?.max_borrow_days ?? 14)
     setBorrowNote("")
@@ -119,7 +125,9 @@ export const LoansPage = () => {
       toast.success(`Đã tạo thành công phiếu mượn: ${newSlip.borrow_slip_code}`)
       setIsCreateOpen(false)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Tạo phiếu mượn thất bại")
+      toast.error(
+        err instanceof Error ? err.message : "Tạo phiếu mượn thất bại"
+      )
     }
   }
 
@@ -133,7 +141,9 @@ export const LoansPage = () => {
         conditionAfter,
         note: returnNote.trim() || undefined,
       })
-      toast.success(`Đã xác nhận trả sách cho phiếu ${returningSlip.borrow_slip_code}`)
+      toast.success(
+        `Đã xác nhận trả sách cho phiếu ${returningSlip.borrow_slip_code}`
+      )
       setReturningSlip(null)
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Trả sách thất bại")
@@ -145,11 +155,13 @@ export const LoansPage = () => {
     try {
       await payFine(payingFine.fine_id)
       toast.success(
-        `Đã thanh toán đủ khoản phạt ${(payingFine.outstanding_amount).toLocaleString("vi-VN")} đ`
+        `Đã thanh toán đủ khoản phạt ${payingFine.outstanding_amount.toLocaleString("vi-VN")} đ`
       )
       setPayingFine(null)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Thanh toán phạt thất bại")
+      toast.error(
+        err instanceof Error ? err.message : "Thanh toán phạt thất bại"
+      )
     }
   }
 
@@ -173,12 +185,12 @@ export const LoansPage = () => {
       header: "Độc giả",
       cell: (slip) => (
         <div className="flex items-start gap-2">
-          <User className="size-4 text-primary shrink-0 mt-0.5" />
+          <User className="mt-0.5 size-4 shrink-0 text-primary" />
           <div>
             <p className="font-medium text-foreground">
               {slip.reader?.full_name ?? "Độc giả"}
             </p>
-            <p className="text-xs font-mono text-muted-foreground">
+            <p className="font-mono text-xs text-muted-foreground">
               Mã thẻ: {slip.reader?.reader_code}
             </p>
           </div>
@@ -193,9 +205,12 @@ export const LoansPage = () => {
         return (
           <div className="space-y-1">
             {details.map((d) => (
-              <div key={d.borrow_slip_detail_id} className="flex items-center gap-1.5 text-xs">
+              <div
+                key={d.borrow_slip_detail_id}
+                className="flex items-center gap-1.5 text-xs"
+              >
                 <BookOpen className="size-3 text-muted-foreground" />
-                <span className="font-medium line-clamp-1">
+                <span className="line-clamp-1 font-medium">
                   {d.book_title?.title ?? "Sách thư viện"}
                 </span>
                 <span className="font-mono text-[10px] text-muted-foreground">
@@ -213,21 +228,26 @@ export const LoansPage = () => {
       cell: (slip) => {
         const isOverdue =
           slip.slip_status === "OVERDUE" ||
-          (slip.slip_status === "BORROWING" && new Date() > new Date(slip.due_date))
+          (slip.slip_status === "BORROWING" &&
+            new Date() > new Date(slip.due_date))
 
         return (
-          <div className="text-xs space-y-0.5">
+          <div className="space-y-0.5 text-xs">
             <p className="flex items-center gap-1 text-muted-foreground">
               <Calendar className="size-3" />
-              <span>Hạn: {new Date(slip.due_date).toLocaleDateString("vi-VN")}</span>
+              <span>
+                Hạn: {new Date(slip.due_date).toLocaleDateString("vi-VN")}
+              </span>
             </p>
             {slip.returned_at ? (
-              <p className="flex items-center gap-1 text-emerald-600 font-medium">
+              <p className="flex items-center gap-1 font-medium text-emerald-600">
                 <CheckCircle2 className="size-3" />
-                <span>Trả: {new Date(slip.returned_at).toLocaleDateString("vi-VN")}</span>
+                <span>
+                  Trả: {new Date(slip.returned_at).toLocaleDateString("vi-VN")}
+                </span>
               </p>
             ) : isOverdue ? (
-              <p className="flex items-center gap-1 text-destructive font-medium">
+              <p className="flex items-center gap-1 font-medium text-destructive">
                 <AlertTriangle className="size-3" />
                 <span>Đã quá hạn trả</span>
               </p>
@@ -260,10 +280,12 @@ export const LoansPage = () => {
         }[slip.slip_status]
 
         // Check if there is an outstanding fine
-        const fine = slip.details?.find((d) => d.fine && d.fine.outstanding_amount > 0)?.fine
+        const fine = slip.details?.find(
+          (d) => d.fine && d.fine.outstanding_amount > 0
+        )?.fine
 
         return (
-          <div className="flex flex-col gap-1 items-start">
+          <div className="flex flex-col items-start gap-1">
             <Badge variant="outline" className={config.badge}>
               {config.label}
             </Badge>
@@ -271,12 +293,14 @@ export const LoansPage = () => {
               <Button
                 size="icon-xs"
                 variant="destructive"
-                className="h-5 px-1.5 text-[10px] gap-1"
+                className="h-5 gap-1 px-1.5 text-[10px]"
                 title="Bấm để thu phạt"
                 onClick={() => setPayingFine(fine)}
               >
                 <Receipt className="size-3" />
-                <span>Phạt: {fine.outstanding_amount.toLocaleString("vi-VN")} đ</span>
+                <span>
+                  Phạt: {fine.outstanding_amount.toLocaleString("vi-VN")} đ
+                </span>
               </Button>
             ) : null}
           </div>
@@ -297,7 +321,7 @@ export const LoansPage = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="gap-1.5 h-8 text-xs border-emerald-600/30 text-emerald-600 hover:bg-emerald-50"
+                className="h-8 gap-1.5 border-emerald-600/30 text-xs text-emerald-600 hover:bg-emerald-50"
                 onClick={() => {
                   setReturningSlip(slip)
                   setConditionAfter("GOOD")
@@ -332,9 +356,12 @@ export const LoansPage = () => {
     <div className="flex flex-col gap-6 p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Quản lý mượn trả</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Quản lý mượn trả
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Lập phiếu mượn sách (borrow_slip), theo dõi hạn trả, thu hồi sách và xử lý tiền phạt trễ hạn (fine).
+            Lập phiếu mượn sách (borrow_slip), theo dõi hạn trả, thu hồi sách và
+            xử lý tiền phạt trễ hạn (fine).
           </p>
         </div>
         <Button onClick={handleOpenCreate} className="gap-2">
@@ -344,8 +371,8 @@ export const LoansPage = () => {
 
       {/* Filter toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
           <Input
             placeholder="Tìm theo mã phiếu, tên độc giả, mã thẻ..."
             value={searchQuery}
@@ -446,22 +473,30 @@ export const LoansPage = () => {
                 </span>
               </div>
 
-              <div className="max-h-52 overflow-y-auto rounded-lg border divide-y text-xs">
+              <div className="max-h-52 divide-y overflow-y-auto rounded-lg border text-xs">
                 {availableCopies.length === 0 ? (
                   <p className="p-4 text-center text-muted-foreground">
                     Không có cuốn sách nào đang sẵn sàng mượn trong kho.
                   </p>
                 ) : (
                   availableCopies.map((copy) => {
-                    const book = books.find((b) => b.book_title_id === copy.book_title_id)
-                    const isSelected = selectedCopyIds.includes(copy.book_copy_id)
+                    const book = books.find(
+                      (b) => b.book_title_id === copy.book_title_id
+                    )
+                    const isSelected = selectedCopyIds.includes(
+                      copy.book_copy_id
+                    )
 
                     return (
                       <div
                         key={copy.book_copy_id}
-                        onClick={() => handleToggleSelectCopy(copy.book_copy_id)}
-                        className={`p-2.5 flex items-center justify-between cursor-pointer transition-colors ${
-                          isSelected ? "bg-primary/10 border-l-4 border-primary" : "hover:bg-muted/40"
+                        onClick={() =>
+                          handleToggleSelectCopy(copy.book_copy_id)
+                        }
+                        className={`flex cursor-pointer items-center justify-between p-2.5 transition-colors ${
+                          isSelected
+                            ? "border-l-4 border-primary bg-primary/10"
+                            : "hover:bg-muted/40"
                         }`}
                       >
                         <div className="flex items-center gap-2">
@@ -476,8 +511,9 @@ export const LoansPage = () => {
                               {book?.title ?? "Đầu sách"}
                             </p>
                             <p className="text-muted-foreground">
-                              Mã vạch: <span className="font-mono">{copy.barcode}</span> • Kệ:{" "}
-                              {copy.shelf_code}
+                              Mã vạch:{" "}
+                              <span className="font-mono">{copy.barcode}</span>{" "}
+                              • Kệ: {copy.shelf_code}
                             </p>
                           </div>
                         </div>
@@ -501,8 +537,12 @@ export const LoansPage = () => {
             </Field>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsCreateOpen(false)}
+            >
               Hủy
             </Button>
             <Button type="submit">Xác nhận tạo phiếu</Button>
@@ -518,7 +558,7 @@ export const LoansPage = () => {
         description="Kiểm tra tình trạng sách khi bạn đọc hoàn trả lại quầy thủ thư."
       >
         <form onSubmit={handleSubmitReturn} className="space-y-4">
-          <div className="rounded-lg border bg-muted/30 p-3 text-xs space-y-1.5">
+          <div className="space-y-1.5 rounded-lg border bg-muted/30 p-3 text-xs">
             <p>
               <strong>Độc giả:</strong> {returningSlip?.reader?.full_name} (
               {returningSlip?.reader?.reader_code})
@@ -530,14 +570,17 @@ export const LoansPage = () => {
                 : ""}
             </p>
             {returningSlip && new Date() > new Date(returningSlip.due_date) ? (
-              <div className="flex items-center gap-2 text-destructive font-semibold mt-1">
+              <div className="mt-1 flex items-center gap-2 font-semibold text-destructive">
                 <AlertTriangle className="size-4" />
                 <span>
-                  Phiếu này đã quá hạn! Hệ thống sẽ tự động phát sinh tiền phạt theo chính sách.
+                  Phiếu này đã quá hạn! Hệ thống sẽ tự động phát sinh tiền phạt
+                  theo chính sách.
                 </span>
               </div>
             ) : (
-              <p className="text-emerald-600 font-medium">Hoàn trả đúng hạn hợp lệ.</p>
+              <p className="font-medium text-emerald-600">
+                Hoàn trả đúng hạn hợp lệ.
+              </p>
             )}
           </div>
 
@@ -564,11 +607,18 @@ export const LoansPage = () => {
             />
           </Field>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setReturningSlip(null)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setReturningSlip(null)}
+            >
               Hủy
             </Button>
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Button
+              type="submit"
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
               Xác nhận nhận lại sách
             </Button>
           </div>
@@ -583,7 +633,7 @@ export const LoansPage = () => {
         description="Ghi nhận thanh toán tiền phạt vi phạm mượn trả sách."
       >
         <div className="space-y-4">
-          <div className="rounded-lg border bg-destructive/10 border-destructive/20 p-4 space-y-2 text-sm">
+          <div className="space-y-2 rounded-lg border border-destructive/20 bg-destructive/10 p-4 text-sm">
             <div className="flex justify-between">
               <span>Lý do phạt:</span>
               <span className="font-semibold text-destructive">
@@ -594,17 +644,19 @@ export const LoansPage = () => {
             </div>
             <div className="flex justify-between">
               <span>Số tiền phạt:</span>
-              <span className="font-bold text-destructive text-base">
-                {(payingFine?.outstanding_amount ?? 0).toLocaleString("vi-VN")} đ
+              <span className="text-base font-bold text-destructive">
+                {(payingFine?.outstanding_amount ?? 0).toLocaleString("vi-VN")}{" "}
+                đ
               </span>
             </div>
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Bấm "Xác nhận đã thu" sau khi bạn đọc đã nộp đủ tiền mặt hoặc chuyển khoản tại quầy.
+            Bấm "Xác nhận đã thu" sau khi bạn đọc đã nộp đủ tiền mặt hoặc chuyển
+            khoản tại quầy.
           </p>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
+          <div className="flex justify-end gap-2 border-t pt-3">
             <Button variant="outline" onClick={() => setPayingFine(null)}>
               Hủy
             </Button>
@@ -623,7 +675,7 @@ export const LoansPage = () => {
         description="Toàn bộ thông tin phiếu mượn và danh sách sách liên quan."
       >
         <div className="space-y-4 text-sm">
-          <div className="grid grid-cols-2 gap-3 border p-3 rounded-lg bg-muted/20">
+          <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/20 p-3">
             <div>
               <p className="text-xs text-muted-foreground">Độc giả mượn</p>
               <p className="font-semibold">{viewingSlip?.reader?.full_name}</p>
@@ -631,32 +683,42 @@ export const LoansPage = () => {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Thủ thư tiếp nhận</p>
-              <p className="font-semibold">{viewingSlip?.employee?.full_name ?? "Thủ thư"}</p>
+              <p className="font-semibold">
+                {viewingSlip?.employee?.full_name ?? "Thủ thư"}
+              </p>
               <p className="text-xs">{viewingSlip?.employee?.position}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Ngày mượn</p>
               <p className="font-medium">
-                {viewingSlip ? new Date(viewingSlip.borrow_date).toLocaleString("vi-VN") : ""}
+                {viewingSlip
+                  ? new Date(viewingSlip.borrow_date).toLocaleString("vi-VN")
+                  : ""}
               </p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Hạn hoàn trả</p>
               <p className="font-medium text-amber-600">
-                {viewingSlip ? new Date(viewingSlip.due_date).toLocaleString("vi-VN") : ""}
+                {viewingSlip
+                  ? new Date(viewingSlip.due_date).toLocaleString("vi-VN")
+                  : ""}
               </p>
             </div>
           </div>
 
           <div>
-            <p className="font-semibold mb-2">Các cuốn sách trong phiếu:</p>
-            <div className="border rounded-lg divide-y text-xs">
+            <p className="mb-2 font-semibold">Các cuốn sách trong phiếu:</p>
+            <div className="divide-y rounded-lg border text-xs">
               {viewingSlip?.details?.map((d) => (
-                <div key={d.borrow_slip_detail_id} className="p-2.5 flex justify-between">
+                <div
+                  key={d.borrow_slip_detail_id}
+                  className="flex justify-between p-2.5"
+                >
                   <div>
                     <p className="font-semibold">{d.book_title?.title}</p>
-                    <p className="text-muted-foreground font-mono">
-                      Mã vạch: {d.book_copy?.barcode} • Vị trí: {d.book_copy?.shelf_code}
+                    <p className="font-mono text-muted-foreground">
+                      Mã vạch: {d.book_copy?.barcode} • Vị trí:{" "}
+                      {d.book_copy?.shelf_code}
                     </p>
                   </div>
                   <Badge variant="outline">{d.detail_status}</Badge>
@@ -665,8 +727,12 @@ export const LoansPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-end pt-2 border-t">
-            <Button variant="outline" size="sm" onClick={() => setViewingSlip(null)}>
+          <div className="flex justify-end border-t pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewingSlip(null)}
+            >
               Đóng
             </Button>
           </div>

@@ -39,7 +39,9 @@ interface LibraryState {
   ) => Promise<BookTitle>
   updateBook: (
     id: number,
-    data: Partial<Omit<BookTitle, "book_title_id" | "created_at" | "updated_at">>
+    data: Partial<
+      Omit<BookTitle, "book_title_id" | "created_at" | "updated_at">
+    >
   ) => Promise<BookTitle>
   deleteBook: (id: number) => Promise<void>
 
@@ -60,7 +62,9 @@ interface LibraryState {
   ) => Promise<Reader>
   updateReader: (
     id: number,
-    data: Partial<Omit<Reader, "reader_id" | "account_id" | "created_at" | "updated_at">>
+    data: Partial<
+      Omit<Reader, "reader_id" | "account_id" | "created_at" | "updated_at">
+    >
   ) => Promise<Reader>
   toggleReaderStatus: (id: number) => Promise<Reader>
 
@@ -130,17 +134,25 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
 
   fetchAll: async () => {
     return withLoading(async () => {
-      const [stats, books, copies, categories, readers, borrowSlips, fines, policy] =
-        await Promise.all([
-          libraryService.getDashboardStats(),
-          libraryService.getBooks(),
-          libraryService.getAllCopies(),
-          libraryService.getCategories(),
-          libraryService.getReaders(),
-          libraryService.getBorrowSlips(),
-          libraryService.getFines(),
-          libraryService.getSystemPolicy(),
-        ])
+      const [
+        stats,
+        books,
+        copies,
+        categories,
+        readers,
+        borrowSlips,
+        fines,
+        policy,
+      ] = await Promise.all([
+        libraryService.getDashboardStats(),
+        libraryService.getBooks(),
+        libraryService.getAllCopies(),
+        libraryService.getCategories(),
+        libraryService.getReaders(),
+        libraryService.getBorrowSlips(),
+        libraryService.getFines(),
+        libraryService.getSystemPolicy(),
+      ])
       set({
         stats,
         books,
@@ -158,7 +170,11 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   createBook: async (data, copies = 2) => {
     return withLoading(async () => {
       const newBook = await libraryService.createBook(data, copies)
-      await Promise.all([get().fetchBooks(), get().fetchCategories(), get().fetchStats()])
+      await Promise.all([
+        get().fetchBooks(),
+        get().fetchCategories(),
+        get().fetchStats(),
+      ])
       return newBook
     })
   },
@@ -174,7 +190,11 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   deleteBook: async (id) => {
     return withLoading(async () => {
       await libraryService.deleteBook(id)
-      await Promise.all([get().fetchBooks(), get().fetchCategories(), get().fetchStats()])
+      await Promise.all([
+        get().fetchBooks(),
+        get().fetchCategories(),
+        get().fetchStats(),
+      ])
     })
   },
 

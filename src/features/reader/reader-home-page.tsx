@@ -1,5 +1,12 @@
 import { useNavigate } from "react-router"
-import { BookOpen, User, LogOut, ShieldCheck, Calendar, Search } from "lucide-react"
+import {
+  BookOpen,
+  User,
+  LogOut,
+  ShieldCheck,
+  Calendar,
+  Search,
+} from "lucide-react"
 import { useAuthStore } from "@/stores/use-auth-store"
 import { useLibraryStore } from "@/stores/use-library-store"
 import { Button } from "@/components/ui/button"
@@ -42,16 +49,18 @@ export const ReaderHomePage = () => {
   }, [books, search])
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background">
       {/* Navbar */}
-      <header className="border-b border-border bg-card/60 backdrop-blur-md sticky top-0 z-10 px-6 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card/60 px-6 py-3 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="size-8 text-primary">
             <MainLogo />
           </div>
           <div>
-            <span className="font-bold text-base tracking-tight">Thư Viện Mộc Miên</span>
-            <span className="ml-2 text-xs text-muted-foreground hidden sm:inline">
+            <span className="text-base font-bold tracking-tight">
+              Thư Viện Mộc Miên
+            </span>
+            <span className="ml-2 hidden text-xs text-muted-foreground sm:inline">
               Cổng tra cứu độc giả
             </span>
           </div>
@@ -60,9 +69,11 @@ export const ReaderHomePage = () => {
         <div className="flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="text-right hidden sm:block text-xs">
+              <div className="hidden text-right text-xs sm:block">
                 <p className="font-semibold text-foreground">{user.name}</p>
-                <p className="text-muted-foreground">Độc giả ({user.readerCode ?? "RD001"})</p>
+                <p className="text-muted-foreground">
+                  Độc giả ({user.readerCode ?? "RD001"})
+                </p>
               </div>
               <Button
                 variant="outline"
@@ -83,29 +94,33 @@ export const ReaderHomePage = () => {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-6 space-y-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 p-6">
         {/* User Card & Active Loans */}
         {user ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="shadow-xs border-primary/20 bg-primary/5">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <Card className="border-primary/20 bg-primary/5 shadow-xs">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+                  <CardTitle className="flex items-center gap-1.5 text-sm font-semibold">
                     <User className="size-4 text-primary" /> Thẻ độc giả điện tử
                   </CardTitle>
-                  <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30 text-[10px]">
-                    <ShieldCheck className="size-3 mr-1" /> Đang kích hoạt
+                  <Badge className="border-emerald-500/30 bg-emerald-500/10 text-[10px] text-emerald-600">
+                    <ShieldCheck className="mr-1 size-3" /> Đang kích hoạt
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="text-xs space-y-2">
+              <CardContent className="space-y-2 text-xs">
                 <div className="flex justify-between border-b pb-1">
                   <span className="text-muted-foreground">Họ và tên:</span>
-                  <span className="font-medium text-foreground">{user.name}</span>
+                  <span className="font-medium text-foreground">
+                    {user.name}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b pb-1">
                   <span className="text-muted-foreground">Mã độc giả:</span>
-                  <span className="font-mono font-medium">{user.readerCode ?? "RD001"}</span>
+                  <span className="font-mono font-medium">
+                    {user.readerCode ?? "RD001"}
+                  </span>
                 </div>
                 <div className="flex justify-between border-b pb-1">
                   <span className="text-muted-foreground">Đối tượng:</span>
@@ -113,51 +128,69 @@ export const ReaderHomePage = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Hạn mức mượn:</span>
-                  <span className="font-medium text-primary">Tối đa 5 cuốn / lần</span>
+                  <span className="font-medium text-primary">
+                    Tối đa 5 cuốn / lần
+                  </span>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="md:col-span-2 shadow-xs">
+            <Card className="shadow-xs md:col-span-2">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <BookOpen className="size-4 text-amber-600" /> Sách đang mượn của bạn
+                <CardTitle className="flex items-center gap-1.5 text-sm font-semibold">
+                  <BookOpen className="size-4 text-amber-600" /> Sách đang mượn
+                  của bạn
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {myLoans.length === 0 ? (
                   <div className="py-6 text-center text-xs text-muted-foreground">
-                    Bạn hiện chưa mượn cuốn sách nào. Hãy chọn sách bên dưới để đến quầy làm thủ tục mượn nhé!
+                    Bạn hiện chưa mượn cuốn sách nào. Hãy chọn sách bên dưới để
+                    đến quầy làm thủ tục mượn nhé!
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {myLoans.map((slip) => (
                       <div
                         key={slip.borrow_slip_id}
-                        className="p-3 rounded-lg border bg-muted/30 flex items-center justify-between text-xs"
+                        className="flex items-center justify-between rounded-lg border bg-muted/30 p-3 text-xs"
                       >
                         <div>
-                          <p className="font-semibold text-foreground font-mono">
+                          <p className="font-mono font-semibold text-foreground">
                             {slip.borrow_slip_code}
                           </p>
                           <div className="mt-1 space-y-0.5">
                             {slip.details?.map((d) => (
-                              <p key={d.borrow_slip_detail_id} className="text-muted-foreground">
+                              <p
+                                key={d.borrow_slip_detail_id}
+                                className="text-muted-foreground"
+                              >
                                 • {d.book_title?.title} ({d.book_copy?.barcode})
                               </p>
                             ))}
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="flex items-center gap-1 text-muted-foreground justify-end">
+                          <p className="flex items-center justify-end gap-1 text-muted-foreground">
                             <Calendar className="size-3" />
-                            <span>Hạn trả: {new Date(slip.due_date).toLocaleDateString("vi-VN")}</span>
+                            <span>
+                              Hạn trả:{" "}
+                              {new Date(slip.due_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </span>
                           </p>
                           <Badge
-                            variant={slip.slip_status === "OVERDUE" ? "destructive" : "outline"}
+                            variant={
+                              slip.slip_status === "OVERDUE"
+                                ? "destructive"
+                                : "outline"
+                            }
                             className="mt-1"
                           >
-                            {slip.slip_status === "OVERDUE" ? "Quá hạn" : "Đang mượn"}
+                            {slip.slip_status === "OVERDUE"
+                              ? "Quá hạn"
+                              : "Đang mượn"}
                           </Badge>
                         </div>
                       </div>
@@ -171,15 +204,18 @@ export const ReaderHomePage = () => {
 
         {/* Book Search and Catalog */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <h2 className="text-xl font-bold tracking-tight">Kho sách thư viện</h2>
+              <h2 className="text-xl font-bold tracking-tight">
+                Kho sách thư viện
+              </h2>
               <p className="text-xs text-muted-foreground">
-                Tra cứu tài liệu, vị trí kệ sách và tình trạng sẵn sàng trước khi tới mượn.
+                Tra cứu tài liệu, vị trí kệ sách và tình trạng sẵn sàng trước
+                khi tới mượn.
               </p>
             </div>
             <div className="relative w-full sm:w-72">
-              <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+              <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
               <Input
                 placeholder="Tìm tên sách, tác giả, thể loại..."
                 value={search}
@@ -189,21 +225,24 @@ export const ReaderHomePage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredBooks.map((book) => {
               const isAvailable = (book.available_copies_count ?? 0) > 0
 
               return (
-                <Card key={book.book_title_id} className="shadow-xs overflow-hidden flex flex-col">
-                  <div className="h-44 overflow-hidden bg-muted relative">
+                <Card
+                  key={book.book_title_id}
+                  className="flex flex-col overflow-hidden shadow-xs"
+                >
+                  <div className="relative h-44 overflow-hidden bg-muted">
                     {book.cover_image_url ? (
                       <img
                         src={book.cover_image_url}
                         alt={book.title}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                      <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                         <BookOpen className="size-10" />
                       </div>
                     )}
@@ -223,14 +262,18 @@ export const ReaderHomePage = () => {
                     <Badge variant="outline" className="w-fit text-[10px]">
                       {book.category}
                     </Badge>
-                    <CardTitle className="text-sm font-semibold line-clamp-2 mt-1">
+                    <CardTitle className="mt-1 line-clamp-2 text-sm font-semibold">
                       {book.title}
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground">Tác giả: {book.author}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Tác giả: {book.author}
+                    </p>
                   </CardHeader>
-                  <CardContent className="p-4 pt-0 text-xs text-muted-foreground flex-1 flex flex-col justify-end">
-                    <p className="line-clamp-2 mb-2 text-[11px]">{book.description}</p>
-                    <div className="border-t pt-2 flex justify-between items-center text-[11px]">
+                  <CardContent className="flex flex-1 flex-col justify-end p-4 pt-0 text-xs text-muted-foreground">
+                    <p className="mb-2 line-clamp-2 text-[11px]">
+                      {book.description}
+                    </p>
+                    <div className="flex items-center justify-between border-t pt-2 text-[11px]">
                       <span>{book.publisher}</span>
                       <span>{book.publication_year}</span>
                     </div>
@@ -243,7 +286,7 @@ export const ReaderHomePage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border p-6 text-center text-xs text-muted-foreground mt-12">
+      <footer className="mt-12 border-t border-border p-6 text-center text-xs text-muted-foreground">
         Hệ thống Thư Viện Mộc Miên • Phân hệ Tra cứu & Độc giả
       </footer>
     </div>

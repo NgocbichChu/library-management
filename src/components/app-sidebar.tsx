@@ -32,10 +32,10 @@ export const AppSidebar = ({
             <Library className="size-4" />
           </span>
           <div className="flex flex-col overflow-hidden text-left group-data-[collapsible=icon]:hidden">
-            <span className="truncate text-sm font-semibold text-[#1f3b2b]">
+            <span className="truncate text-sm font-semibold text-[#1f3b2b] dark:text-foreground">
               Mộc Miên Library
             </span>
-            <span className="truncate text-[11px] text-[#718077]">
+            <span className="truncate text-[11px] text-[#718077] dark:text-muted-foreground">
               Cổng quản trị thư viện
             </span>
           </div>

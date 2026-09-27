@@ -15,14 +15,18 @@ import { useLibraryStore } from "@/stores/use-library-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { CommonTable, type CommonTableColumn } from "@/components/common/common-table"
+import {
+  CommonTable,
+  type CommonTableColumn,
+} from "@/components/common/common-table"
 import { AppDialog } from "@/components/common/app-dialog"
 import { AppSelect } from "@/components/common/app-select"
 import { Field, FieldLabel } from "@/components/ui/field"
 import type { Reader, ReaderType } from "@/types/library"
 
 export const ReadersPage = () => {
-  const { readers, createReader, updateReader, toggleReaderStatus } = useLibraryStore()
+  const { readers, createReader, updateReader, toggleReaderStatus } =
+    useLibraryStore()
 
   const [searchQuery, setSearchQuery] = useState("")
   const [typeFilter, setTypeFilter] = useState("all")
@@ -132,7 +136,9 @@ export const ReadersPage = () => {
       toast.success("Cập nhật độc giả thành công.")
       setEditingReader(null)
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Cập nhật độc giả thất bại")
+      toast.error(
+        err instanceof Error ? err.message : "Cập nhật độc giả thất bại"
+      )
     }
   }
 
@@ -174,7 +180,9 @@ export const ReadersPage = () => {
           <p className="font-semibold text-foreground">{reader.full_name}</p>
           <p className="text-xs text-muted-foreground">{reader.email}</p>
           {reader.phone_number ? (
-            <p className="text-[11px] text-muted-foreground">SĐT: {reader.phone_number}</p>
+            <p className="text-[11px] text-muted-foreground">
+              SĐT: {reader.phone_number}
+            </p>
           ) : null}
         </div>
       ),
@@ -234,7 +242,7 @@ export const ReadersPage = () => {
       header: "Trạng thái thẻ",
       cell: (reader) =>
         reader.reader_status === "ACTIVE" ? (
-          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+          <Badge className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600">
             Đang hoạt động
           </Badge>
         ) : (
@@ -281,7 +289,8 @@ export const ReadersPage = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Quản lý độc giả</h1>
           <p className="text-sm text-muted-foreground">
-            Quản lý danh sách bạn đọc, cấp mới thẻ thư viện và quản lý tình trạng tài khoản độc giả (reader).
+            Quản lý danh sách bạn đọc, cấp mới thẻ thư viện và quản lý tình
+            trạng tài khoản độc giả (reader).
           </p>
         </div>
         <Button onClick={handleOpenAdd} className="gap-2">
@@ -291,8 +300,8 @@ export const ReadersPage = () => {
 
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
           <Input
             placeholder="Tìm theo tên, mã thẻ, email, SĐT..."
             value={searchQuery}
@@ -388,7 +397,9 @@ export const ReadersPage = () => {
                 type="email"
                 placeholder="example@library.com"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </Field>
 
@@ -437,8 +448,12 @@ export const ReadersPage = () => {
             </Field>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddOpen(false)}
+            >
               Hủy
             </Button>
             <Button type="submit">Hoàn tất cấp thẻ</Button>
@@ -498,7 +513,9 @@ export const ReadersPage = () => {
                 required
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </Field>
 
@@ -545,8 +562,12 @@ export const ReadersPage = () => {
             </Field>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button type="button" variant="outline" onClick={() => setEditingReader(null)}>
+          <div className="flex justify-end gap-2 border-t pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditingReader(null)}
+            >
               Hủy
             </Button>
             <Button type="submit">Cập nhật hồ sơ</Button>
