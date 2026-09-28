@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   Plus,
   Search,
@@ -30,13 +30,22 @@ export const LoansPage = () => {
   const {
     borrowSlips,
     readers,
+    employees,
     copies,
     books,
     policy,
+    isInitialized,
+    fetchAll,
     createBorrowSlip,
     returnBorrowSlip,
     payFine,
   } = useLibraryStore()
+
+  useEffect(() => {
+    if (!isInitialized || copies.length === 0) {
+      void fetchAll()
+    }
+  }, [isInitialized, copies.length, fetchAll])
 
   const [statusFilter, setStatusFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
@@ -115,9 +124,11 @@ export const LoansPage = () => {
     }
 
     try {
+      const empId =
+        employees.find((e) => e.account_id === user?.accountId)?.employee_id || 1
       const newSlip = await createBorrowSlip({
         readerId: Number(selectedReaderId),
-        employeeId: 1, // Current employee ID
+        employeeId: empId,
         bookCopyIds: selectedCopyIds,
         dueDays: Number(borrowDays),
         note: borrowNote.trim() || undefined,
@@ -420,7 +431,7 @@ export const LoansPage = () => {
         onOpenChange={setIsCreateOpen}
         title="Lập phiếu mượn sách mới"
         description="Chọn độc giả hợp lệ và các cuốn sách có sẵn trong kho để xuất phiếu."
-        className="max-w-2xl"
+        className="max-h-[90vh] w-full overflow-y-auto sm:max-w-2xl"
       >
         <form onSubmit={handleSubmitCreate} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -469,11 +480,12 @@ export const LoansPage = () => {
                   {policy?.max_borrow_books ?? 5} cuốn) *
                 </FieldLabel>
                 <span className="text-xs text-muted-foreground">
-                  Chỉ hiển thị bản sao sẵn sàng
+                  Chỉ hiển thị bản sao sẵn sàng ({availableCopies.length} bản
+                  sao trong kho)
                 </span>
               </div>
 
-              <div className="max-h-52 divide-y overflow-y-auto rounded-lg border text-xs">
+              <div className="max-h-64 divide-y overflow-y-auto rounded-lg border text-xs">
                 {availableCopies.length === 0 ? (
                   <p className="p-4 text-center text-muted-foreground">
                     Không có cuốn sách nào đang sẵn sàng mượn trong kho.
@@ -495,31 +507,47 @@ export const LoansPage = () => {
                         }
                         className={`flex cursor-pointer items-center justify-between p-2.5 transition-colors ${
                           isSelected
-                            ? "border-l-4 border-primary bg-primary/10"
+                            ? "border-l-4 border-[#1f5a45] bg-[#1f5a45]/10 dark:border-emerald-400 dark:bg-emerald-950/30"
                             : "hover:bg-muted/40"
                         }`}
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex min-w-0 items-center gap-2.5">
                           <input
                             type="checkbox"
                             checked={isSelected}
                             readOnly
-                            className="size-4 rounded text-primary"
+                            className="size-4 shrink-0 rounded accent-[#1f5a45]"
                           />
-                          <div>
-                            <p className="font-semibold text-foreground">
+                          <div className="min-w-0">
+                            <p className="truncate font-semibold text-foreground">
                               {book?.title ?? "Đầu sách"}
                             </p>
-                            <p className="text-muted-foreground">
+                            <p className="truncate text-xs text-muted-foreground">
+                              {book?.author ? `${book.author} · ` : ""}
                               Mã vạch:{" "}
-                              <span className="font-mono">{copy.barcode}</span>{" "}
-                              • Kệ: {copy.shelf_code}
+                              <span className="font-mono font-medium">
+                                {copy.barcode}
+                              </span>{" "}
+                              · Kệ: {copy.shelf_code}{" "}
+                              {copy.location ? `(${copy.location})` : ""}
                             </p>
                           </div>
                         </div>
-                        <Badge variant="outline" className="text-[10px]">
-                          {copy.condition_status}
-                        </Badge>
+                        <div className="ml-2 flex shrink-0 items-center gap-2">
+                          <span className="text-[11px] font-medium text-foreground">
+                            {(copy.price ?? 85000).toLocaleString("vi-VN")} đ
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className="border-border bg-background text-[10px]"
+                          >
+                            {copy.condition_status === "GOOD"
+                              ? "Tốt"
+                              : copy.condition_status === "FAIR"
+                                ? "Sờn nhẹ"
+                                : "Hư hại"}
+                          </Badge>
+                        </div>
                       </div>
                     )
                   })

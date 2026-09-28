@@ -22,10 +22,7 @@ import {
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
-import {
-  publicBooksService,
-  type PublicBook,
-} from "@/services/public-books"
+import { managerBooksService } from "@/services/manager-books"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -44,90 +41,69 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const fallbackBooks: PublicBook[] = [
-  {
-    id: "nam-phia-sau",
-    title: "Năm phía sau",
-    author: "Erling Kagge",
-    category: "Khám phá",
-    description:
-      "Một cuốn sách nhỏ về nghệ thuật tìm thấy khoảng lặng và những điều thật sự quan trọng trong đời sống hiện đại.",
-    color: "#d9e6d1",
-    available: 4,
-  },
-  {
-    id: "nha-gia-kim",
-    title: "Nhà giả kim",
-    author: "Paulo Coelho",
-    category: "Văn học",
-    description:
-      "Hành trình theo đuổi kho báu và lắng nghe tiếng gọi của ước mơ, một câu chuyện đã truyền cảm hứng cho hàng triệu độc giả.",
-    color: "#ead7b4",
-    available: 2,
-  },
-  {
-    id: "su-im-lang",
-    title: "Sức mạnh của sự im lặng",
-    author: "Susan Cain",
-    category: "Tâm lý",
-    description:
-      "Một góc nhìn sâu sắc về sức mạnh của những người hướng nội trong một thế giới luôn ưa chuộng sự ồn ào.",
-    color: "#cbdde0",
-    available: 6,
-  },
-  {
-    id: "tuoi-tre-dang-gia",
-    title: "Tuổi trẻ đáng giá bao nhiêu",
-    author: "Rosie Nguyễn",
-    category: "Phát triển bản thân",
-    description:
-      "Những gợi ý gần gũi để sống, học tập và làm việc có chủ đích hơn trong những năm tháng tuổi trẻ.",
-    color: "#e6c8c2",
-    available: 0,
-  },
-  {
-    id: "muoi-nguoi-da-den",
-    title: "Mười người da đen nhỏ",
-    author: "Agatha Christie",
-    category: "Trinh thám",
-    description:
-      "Một vụ án bí ẩn trên hòn đảo biệt lập, nơi từng người một biến mất theo một bài đồng dao đáng sợ.",
-    color: "#d8d1df",
-    available: 3,
-  },
-  {
-    id: "thiet-ke-cuoc-doi",
-    title: "Thiết kế cuộc đời",
-    author: "Bill Burnett",
-    category: "Kỹ năng",
-    description:
-      "Tư duy thiết kế giúp bạn thử nghiệm nhiều hướng đi và chủ động tạo ra một cuộc đời phù hợp.",
-    color: "#d4dec1",
-    available: 5,
-  },
+export type Book = {
+  id: string
+  title: string
+  author: string
+  category: string
+  description: string
+  color: string
+  available: number
+}
+
+const DEFAULT_BOOK: Book = {
+  id: "1",
+  title: "Tài liệu thư viện",
+  author: "Nhiều tác giả",
+  category: "Tổng hợp",
+  description: "Tài liệu lưu hành tại Thư viện Mộc Miên.",
+  color: "#d9e6d1",
+  available: 1,
+}
+
+const BOOK_PALETTES = [
+  "#d9e6d1",
+  "#ead7b4",
+  "#cbdde0",
+  "#e6c8c2",
+  "#d8d1df",
+  "#d4dec1",
 ]
 
 function usePublicBooks() {
-  const [books, setBooks] = useState<PublicBook[]>(fallbackBooks)
+  const [books, setBooks] = useState<Book[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let cancelled = false
-    publicBooksService
+    let mounted = true
+    managerBooksService
       .getAll()
       .then((data) => {
-        if (!cancelled && data.length > 0) setBooks(data)
+        if (!mounted) return
+        const mapped: Book[] = data.map((b, idx) => ({
+          id: String(b.id),
+          title: b.title,
+          author: b.author,
+          category: b.category || "Văn học",
+          description: b.description || "Tài liệu lưu hành nội bộ.",
+          color: b.color || BOOK_PALETTES[idx % BOOK_PALETTES.length],
+          available: b.availableCopies ?? 1,
+        }))
+        setBooks(mapped)
+        setLoading(false)
       })
       .catch(() => {
-        // Keep the sample catalogue visible when the API is unavailable.
+        if (mounted) setLoading(false)
       })
-
     return () => {
-      cancelled = true
+      mounted = false
     }
   }, [])
 
-  return books
+  return { books, loading }
 }
+
+export type PublicBook = Book
 
 function BookCover({
   book,
@@ -190,8 +166,7 @@ function BookCard({ book }: { book: PublicBook }) {
 }
 
 export function HomePage() {
-  const books = usePublicBooks()
-
+  const { books } = usePublicBooks()
   return (
     <div>
       <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-16 lg:px-8 lg:py-24 dark:border-border dark:bg-card/40">
@@ -226,12 +201,16 @@ export function HomePage() {
           <div className="relative flex min-h-80 items-center justify-center">
             <div className="absolute h-64 w-64 rounded-full border border-[#b8cdb8] dark:border-border/30" />
             <div className="absolute h-80 w-80 rounded-full border border-[#c8d8c5] dark:border-border/20" />
-            <div className="relative rotate-[-5deg]">
-              <BookCover book={books[0]} large />
-            </div>
-            <div className="absolute bottom-5 left-4 rotate-[8deg] md:left-12">
-              <BookCover book={books[1] ?? books[0]} />
-            </div>
+            {books[0] && (
+              <div className="relative rotate-[-5deg]">
+                <BookCover book={books[0]} large />
+              </div>
+            )}
+            {books[1] && (
+              <div className="absolute bottom-5 left-4 rotate-[8deg] md:left-12">
+                <BookCover book={books[1]} />
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -294,7 +273,7 @@ export function HomePage() {
 }
 
 export function BooksPage() {
-  const books = usePublicBooks()
+  const { books } = usePublicBooks()
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("Tất cả")
   const [availableOnly, setAvailableOnly] = useState(false)
@@ -484,9 +463,9 @@ export function BooksPage() {
 }
 
 export function BookDetailPage() {
-  const books = usePublicBooks()
   const { id } = useParams()
-  const book = books.find((item) => item.id === id) ?? books[0]
+  const { books } = usePublicBooks()
+  const book = books.find((item) => item.id === id) ?? books[0] ?? DEFAULT_BOOK
   const { user } = useAuth()
   const navigate = useNavigate()
   const borrow = () =>
@@ -543,9 +522,9 @@ export function BookDetailPage() {
 }
 
 export function BorrowPage() {
-  const books = usePublicBooks()
   const { id } = useParams()
-  const book = books.find((item) => item.id === id) ?? books[0]
+  const { books } = usePublicBooks()
+  const book = books.find((item) => item.id === id) ?? books[0] ?? DEFAULT_BOOK
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 lg:px-8">
       <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">

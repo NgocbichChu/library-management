@@ -275,20 +275,19 @@ export const Component = () => {
               </button>
               <button
                 type="button"
-                onClick={() => handleFillAccount("admin239", "12345678")}
+                onClick={() => handleFillAccount("chubich", "123456")}
                 className="rounded-lg border border-[#cbd8ce] bg-white px-2 py-1.5 text-center transition-colors hover:border-[#1f5a45] hover:bg-[#e7eee3] dark:border-border dark:bg-card dark:hover:bg-muted"
               >
                 <span className="block font-semibold text-[#617067] dark:text-foreground">
                   Độc giả
                 </span>
                 <span className="block font-mono text-[10px] text-[#718077] dark:text-muted-foreground">
-                  admin239
+                  chubich
                 </span>
               </button>
             </div>
             <p className="mt-2 text-[10px] text-[#8b9a8f] dark:text-muted-foreground/80">
-              * Mật khẩu Admin: <strong>123456</strong>. Thủ thư &amp; Admin vào
-              trang Quản lý.
+              * Mật khẩu: <strong>123456</strong> (cho cả 3 tài khoản Admin, Thủ thư, Độc giả).
             </p>
           </div>
 

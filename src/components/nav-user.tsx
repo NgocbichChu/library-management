@@ -13,24 +13,47 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon, ShieldCheck } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { useNavigate } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
+import type { AuthUser } from "@/types/auth"
 
 export function NavUser({
   user,
 }: {
-  user: {
+  user: AuthUser | {
     name: string
     email?: string
     username?: string
+    roles?: string[]
+    fullName?: string | null
+    position?: string
   }
 }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   const { logout, isLoggingOut } = useAuth()
-  const displayIdentifier = user.email || user.username || ""
+
+  const isAdmin =
+    user.roles?.includes("ADMIN") ||
+    user.username === "admin"
+  const isEmployee =
+    user.roles?.includes("EMPLOYEE") ||
+    user.roles?.includes("LIBRARIAN") ||
+    user.username === "thuthu"
+
+  const roleLabel = isAdmin
+    ? "Quản trị viên"
+    : isEmployee
+      ? (user.position ?? "Thủ thư / Quản lý")
+      : "Độc giả thư viện"
+
+  const displayName =
+    user.fullName ||
+    (isAdmin ? "Quản trị viên" : user.name || user.username || "Người dùng")
+
+  const displayIdentifier = user.email || (user.username ? `@${user.username}` : "")
 
   const handleLogout = async () => {
     try {
@@ -42,11 +65,6 @@ export function NavUser({
     }
   }
 
-  // const roleLabel =
-  //   user.role === "manager"
-  //     ? (user.position ?? "Thủ thư / Quản lý")
-  //     : "Độc giả thư viện"
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -56,10 +74,10 @@ export function NavUser({
               <SidebarMenuButton size="lg" className="aria-expanded:bg-muted" />
             }
           >
-            <UserAvatar email={displayIdentifier} />
+            <UserAvatar email={user.email || user.username || "user"} />
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{user.name}</span>
-              <span className="truncate text-xs">{displayIdentifier}</span>
+              <span className="truncate font-medium">{displayName}</span>
+              <span className="truncate text-xs text-muted-foreground">{roleLabel}</span>
             </div>
             <ChevronsUpDownIcon className="ml-auto size-4" />
           </DropdownMenuTrigger>
@@ -72,8 +90,12 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{displayIdentifier}</span>
+                  <span className="truncate font-medium">{displayName}</span>
+                  <span className="truncate text-xs text-muted-foreground">{displayIdentifier}</span>
+                  <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#1f5a45] dark:text-emerald-400">
+                    <ShieldCheck className="size-3.5" />
+                    <span>{roleLabel}</span>
+                  </div>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -92,3 +114,4 @@ export function NavUser({
     </SidebarMenu>
   )
 }
+

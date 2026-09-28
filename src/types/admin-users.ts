@@ -38,6 +38,8 @@ export interface UpdateUserRequest {
   email?: string | null
   phoneNumber?: string | null
   status?: string | null
+  role?: "ADMIN" | "EMPLOYEE" | "READER"
+  position?: string | null
 }
 
 export interface CreateEmployeeRequest {
@@ -47,4 +49,15 @@ export interface CreateEmployeeRequest {
   email?: string | null
   phoneNumber?: string | null
   position?: string | null
+  role?: "EMPLOYEE" | "ADMIN"
+}
+
+export interface CreateReaderRequest {
+  username: string
+  password?: string
+  fullName?: string | null
+  email?: string | null
+  phoneNumber?: string | null
+  readerType?: "Student" | "Regular"
+  address?: string | null
 }

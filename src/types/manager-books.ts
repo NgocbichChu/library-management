@@ -30,6 +30,7 @@ export interface BookTitleItem {
   category: string
   description: string
   pageCount: number
+  price?: number
   coverImageUrl?: string
   bookStatus: BookTitleStatus
   totalCopies: number
@@ -50,6 +51,7 @@ export interface CreateBookTitleInput {
   category: string
   description: string
   pageCount: number
+  price?: number
   coverImageUrl?: string
   bookStatus?: BookTitleStatus
 }
@@ -65,14 +67,15 @@ export interface UpdateBookTitleInput {
   category?: string
   description?: string
   pageCount?: number
+  price?: number
   coverImageUrl?: string
   bookStatus?: BookTitleStatus
 }
 
 export interface AddCopyInput {
   barcode: string
-  location: string
+  location?: string
   shelfCode: string
   price: number
-  conditionStatus: CopyConditionStatus
+  conditionStatus?: CopyConditionStatus
 }

@@ -8,10 +8,20 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   server: {
+    host: true,
+    port: 3000,
+    proxy: {
+      "/api": {
+        target: "http://103.38.236.159",
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
     host: true,
     port: 3000,
     proxy: {

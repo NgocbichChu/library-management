@@ -5,6 +5,7 @@ import {
   Pencil,
   Search,
   Shield,
+  ShieldAlert,
   ShieldCheck,
   Trash2,
   Unlock,
@@ -60,14 +61,27 @@ export function UsersManagementPage() {
   const [empFullName, setEmpFullName] = useState("")
   const [empEmail, setEmpEmail] = useState("")
   const [empPhone, setEmpPhone] = useState("")
-  const [empPosition, setEmpPosition] = useState("Thủ thư mượn trả")
+  const [empRole, setEmpRole] = useState<"EMPLOYEE" | "ADMIN">("EMPLOYEE")
   const [submittingEmp, setSubmittingEmp] = useState(false)
+
+  // Form state: Add Reader
+  const [isAddReaderOpen, setIsAddReaderOpen] = useState(false)
+  const [readerUsername, setReaderUsername] = useState("")
+  const [readerPassword, setReaderPassword] = useState("123456")
+  const [readerFullName, setReaderFullName] = useState("")
+  const [readerEmail, setReaderEmail] = useState("")
+  const [readerPhone, setReaderPhone] = useState("")
+  const [readerAddress, setReaderAddress] = useState("")
+  const [readerType, setReaderType] = useState<"Student" | "Regular">("Student")
+  const [submittingReader, setSubmittingReader] = useState(false)
 
   // Form state: Edit User
   const [editFullName, setEditFullName] = useState("")
   const [editEmail, setEditEmail] = useState("")
   const [editPhone, setEditPhone] = useState("")
   const [editStatus, setEditStatus] = useState<UserStatus>("Active")
+  const [editRole, setEditRole] = useState<"ADMIN" | "EMPLOYEE" | "READER">("EMPLOYEE")
+  const [editPosition, setEditPosition] = useState("")
   const [submittingEdit, setSubmittingEdit] = useState(false)
 
   const refreshUsers = async () => {
@@ -172,7 +186,7 @@ export function UsersManagementPage() {
     setEmpFullName("")
     setEmpEmail("")
     setEmpPhone("")
-    setEmpPosition("Thủ thư mượn trả")
+    setEmpRole("EMPLOYEE")
     setIsAddEmployeeOpen(true)
   }
 
@@ -190,10 +204,13 @@ export function UsersManagementPage() {
         fullName: empFullName.trim() || undefined,
         email: empEmail.trim() || undefined,
         phoneNumber: empPhone.trim() || undefined,
-        position: empPosition.trim() || undefined,
+        position: empRole === "ADMIN" ? "Quản trị viên" : "Thủ thư",
+        role: empRole,
       }
       await adminUsersService.createEmployee(payload)
-      toast.success(`Đã thêm nhân viên "${empUsername.trim()}" thành công.`)
+      toast.success(
+        `Đã tạo tài khoản ${empRole === "ADMIN" ? "Quản trị viên (Admin)" : "Nhân viên"} "${empUsername.trim()}" thành công.`
+      )
       setIsAddEmployeeOpen(false)
       refreshUsers()
     } catch (err) {
@@ -205,12 +222,71 @@ export function UsersManagementPage() {
     }
   }
 
+  const handleOpenAddReader = () => {
+    setReaderUsername("")
+    setReaderPassword("123456")
+    setReaderFullName("")
+    setReaderEmail("")
+    setReaderPhone("")
+    setReaderAddress("")
+    setReaderType("Student")
+    setIsAddReaderOpen(true)
+  }
+
+  const handleCreateReaderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!readerUsername.trim() || !readerPassword.trim()) {
+      toast.error("Vui lòng nhập tên đăng nhập và mật khẩu.")
+      return
+    }
+    setSubmittingReader(true)
+    try {
+      await adminUsersService.createReader({
+        username: readerUsername.trim(),
+        password: readerPassword,
+        fullName: readerFullName.trim() || undefined,
+        email: readerEmail.trim() || undefined,
+        phoneNumber: readerPhone.trim() || undefined,
+        address: readerAddress.trim() || undefined,
+        readerType,
+      })
+      toast.success(
+        `Đã đăng ký tài khoản độc giả "${readerUsername.trim()}" thành công.`
+      )
+      setIsAddReaderOpen(false)
+      refreshUsers()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Đăng ký độc giả thất bại."
+      )
+    } finally {
+      setSubmittingReader(false)
+    }
+  }
+
   const handleOpenEdit = (user: AdminUserItem) => {
     setEditingUser(user)
     setEditFullName(user.fullName || "")
     setEditEmail(user.email || "")
     setEditPhone(user.phoneNumber || "")
     setEditStatus(user.status)
+    const initialRole: "ADMIN" | "EMPLOYEE" | "READER" =
+      user.roles.includes("ADMIN") || user.userType === "ADMIN"
+        ? "ADMIN"
+        : user.roles.includes("EMPLOYEE") ||
+            user.roles.includes("LIBRARIAN") ||
+            user.userType === "EMPLOYEE"
+          ? "EMPLOYEE"
+          : "READER"
+    setEditRole(initialRole)
+    setEditPosition(
+      user.position ||
+        (initialRole === "ADMIN"
+          ? "Quản trị viên"
+          : initialRole === "EMPLOYEE"
+            ? "Thủ thư"
+            : "")
+    )
     setIsEditOpen(true)
   }
 
@@ -224,6 +300,12 @@ export function UsersManagementPage() {
         email: editEmail.trim() || null,
         phoneNumber: editPhone.trim() || null,
         status: editStatus,
+        role: editRole,
+        position:
+          editRole !== "READER"
+            ? editPosition.trim() ||
+              (editRole === "ADMIN" ? "Quản trị viên" : "Thủ thư")
+            : null,
       }
       await adminUsersService.updateUser(editingUser.accountId, payload)
       toast.success("Cập nhật thông tin người dùng thành công.")
@@ -240,8 +322,7 @@ export function UsersManagementPage() {
 
   const handleGrantAdmin = async (user: AdminUserItem) => {
     try {
-      const targetId = user.employeeId ?? user.accountId
-      await adminUsersService.grantAdmin(targetId)
+      await adminUsersService.grantAdmin(user.accountId)
       toast.success(
         `Đã cấp quyền Quản trị viên (Admin) cho "${user.fullName || user.username}".`
       )
@@ -249,6 +330,20 @@ export function UsersManagementPage() {
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Cấp quyền Admin thất bại."
+      )
+    }
+  }
+
+  const handleRevokeAdmin = async (user: AdminUserItem) => {
+    try {
+      await adminUsersService.removeRole(user.accountId, "ADMIN")
+      toast.success(
+        `Đã chuyển tài khoản "${user.fullName || user.username}" về vai trò Thủ thư.`
+      )
+      refreshUsers()
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Không thể thay đổi quyền tài khoản."
       )
     }
   }
@@ -446,6 +541,20 @@ export function UsersManagementPage() {
               </Button>
             ) : null}
 
+            {/* Demote admin if admin and not primary admin */}
+            {isAdmin && user.username !== "admin" && user.accountId !== 1 ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleRevokeAdmin(user)}
+                title="Hạ quyền Admin về vai trò Thủ thư"
+                className="h-8 gap-1 border-slate-300 bg-slate-50 px-2 text-xs text-slate-700 hover:bg-slate-100 dark:border-border dark:bg-muted/40 dark:text-muted-foreground dark:hover:bg-muted"
+              >
+                <ShieldAlert className="size-3.5 text-rose-500" />
+                <span className="hidden sm:inline">Hạ Admin</span>
+              </Button>
+            ) : null}
+
             {/* Lock / Unlock */}
             <Button
               size="sm"
@@ -514,6 +623,14 @@ export function UsersManagementPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleOpenAddReader}
+            className="h-10 gap-1.5 border-[#1f5a45] text-[#1f5a45] hover:bg-[#eef4ee] dark:border-emerald-500/60 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+          >
+            <UserPlus className="size-4" />
+            <span>Đăng ký Độc giả</span>
+          </Button>
           <Button
             onClick={handleOpenAddEmployee}
             className="h-10 gap-1.5 bg-[#1f5a45] text-white shadow-xs hover:bg-[#174735]"
@@ -692,7 +809,7 @@ export function UsersManagementPage() {
         onOpenChange={setIsAddEmployeeOpen}
         title="Đăng ký tài khoản Nhân viên / Thủ thư"
         description="Admin đăng ký tài khoản cho nhân viên thư viện mới."
-        className="sm:max-w-[500px]"
+        className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[500px]"
       >
         <form
           onSubmit={handleCreateEmployeeSubmit}
@@ -767,14 +884,22 @@ export function UsersManagementPage() {
 
           <div>
             <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
-              Vị trí / Chức vụ
+              Vai trò &amp; Phân quyền ban đầu *
             </label>
-            <Input
-              value={empPosition}
-              onChange={(e) => setEmpPosition(e.target.value)}
-              placeholder="VD: Thủ thư quản lý kho, Nhân viên mượn trả..."
-              className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
-            />
+            <Select
+              value={empRole}
+              onValueChange={(val) => {
+                if (val) setEmpRole(val as "EMPLOYEE" | "ADMIN")
+              }}
+            >
+              <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="EMPLOYEE">Thủ thư (Mặc định)</SelectItem>
+                <SelectItem value="ADMIN">Quản trị viên (Admin)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="mt-3 flex justify-end gap-2">
@@ -791,7 +916,11 @@ export function UsersManagementPage() {
               disabled={submittingEmp}
               className="bg-[#1f5a45] text-white hover:bg-[#174735]"
             >
-              {submittingEmp ? "Đang tạo..." : "Tạo tài khoản Nhân viên"}
+              {submittingEmp
+                ? "Đang tạo..."
+                : empRole === "ADMIN"
+                  ? "Tạo tài khoản Admin"
+                  : "Tạo tài khoản Nhân viên"}
             </Button>
           </div>
         </form>
@@ -803,7 +932,7 @@ export function UsersManagementPage() {
         onOpenChange={setIsEditOpen}
         title="Chỉnh sửa thông tin người dùng"
         description={`Cập nhật thông tin tài khoản @${editingUser?.username}`}
-        className="sm:max-w-[480px]"
+        className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[480px]"
       >
         <form onSubmit={handleEditSubmit} className="flex flex-col gap-3.5">
           <div>
@@ -845,24 +974,77 @@ export function UsersManagementPage() {
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
-              Trạng thái tài khoản
-            </label>
-            <Select
-              value={editStatus}
-              onValueChange={(val) => setEditStatus(val as UserStatus)}
-            >
-              <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Hoạt động (Active)</SelectItem>
-                <SelectItem value="Locked">Đang khóa (Locked)</SelectItem>
-                <SelectItem value="Pending">Chờ duyệt (Pending)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Vai trò &amp; Phân quyền
+              </label>
+              <Select
+                value={editRole}
+                onValueChange={(val) => {
+                  if (val) {
+                    const r = val as "ADMIN" | "EMPLOYEE" | "READER"
+                    setEditRole(r)
+                    if (
+                      r === "ADMIN" &&
+                      (!editPosition || editPosition === "Thủ thư")
+                    ) {
+                      setEditPosition("Quản trị viên")
+                    } else if (
+                      r === "EMPLOYEE" &&
+                      (!editPosition || editPosition === "Quản trị viên")
+                    ) {
+                      setEditPosition("Thủ thư")
+                    }
+                  }
+                }}
+              >
+                <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EMPLOYEE">Thủ thư / Nhân viên</SelectItem>
+                  <SelectItem value="ADMIN">Quản trị viên (Admin)</SelectItem>
+                  <SelectItem value="READER">Độc giả (Reader)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Trạng thái tài khoản
+              </label>
+              <Select
+                value={editStatus}
+                onValueChange={(val) => {
+                  if (val) setEditStatus(val as UserStatus)
+                }}
+              >
+                <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Active">Hoạt động (Active)</SelectItem>
+                  <SelectItem value="Locked">Đang khóa (Locked)</SelectItem>
+                  <SelectItem value="Pending">Chờ duyệt (Pending)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          {editRole !== "READER" && (
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Vị trí / Chức danh
+              </label>
+              <Input
+                value={editPosition}
+                onChange={(e) => setEditPosition(e.target.value)}
+                placeholder="VD: Thủ thư mượn trả, Quản trị viên..."
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+          )}
 
           <div className="mt-3 flex justify-end gap-2">
             <Button
@@ -879,6 +1061,139 @@ export function UsersManagementPage() {
               className="bg-[#1f5a45] text-white hover:bg-[#174735]"
             >
               {submittingEdit ? "Đang lưu..." : "Lưu thay đổi"}
+            </Button>
+          </div>
+        </form>
+      </AppDialog>
+
+      {/* Dialog: Đăng ký Độc giả mới */}
+      <AppDialog
+        open={isAddReaderOpen}
+        onOpenChange={setIsAddReaderOpen}
+        title="Đăng ký tài khoản Độc giả mới"
+        description="Tạo tài khoản độc giả để mượn sách và tra cứu tại thư viện Mộc Miên."
+        className="max-h-[90vh] w-full overflow-y-auto sm:max-w-[500px]"
+      >
+        <form
+          onSubmit={handleCreateReaderSubmit}
+          className="flex flex-col gap-3.5"
+        >
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Tên đăng nhập *
+              </label>
+              <Input
+                required
+                value={readerUsername}
+                onChange={(e) => setReaderUsername(e.target.value)}
+                placeholder="VD: docgia_nam"
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Mật khẩu ban đầu *
+              </label>
+              <Input
+                required
+                type="password"
+                value={readerPassword}
+                onChange={(e) => setReaderPassword(e.target.value)}
+                placeholder="Mật khẩu đăng nhập"
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+              Họ và tên độc giả *
+            </label>
+            <Input
+              required
+              value={readerFullName}
+              onChange={(e) => setReaderFullName(e.target.value)}
+              placeholder="VD: Nguyễn Văn An"
+              className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Email
+              </label>
+              <Input
+                type="email"
+                value={readerEmail}
+                onChange={(e) => setReaderEmail(e.target.value)}
+                placeholder="docgia@example.com"
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Số điện thoại
+              </label>
+              <Input
+                type="tel"
+                value={readerPhone}
+                onChange={(e) => setReaderPhone(e.target.value)}
+                placeholder="0912345678"
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Đối tượng độc giả
+              </label>
+              <Select
+                value={readerType}
+                onValueChange={(val) => {
+                  if (val) setReaderType(val as "Student" | "Regular")
+                }}
+              >
+                <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Student">Học sinh - Sinh viên</SelectItem>
+                  <SelectItem value="Regular">Độc giả thường</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-[#56675c] uppercase dark:text-muted-foreground">
+                Địa chỉ
+              </label>
+              <Input
+                value={readerAddress}
+                onChange={(e) => setReaderAddress(e.target.value)}
+                placeholder="VD: Cầu Giấy, Hà Nội"
+                className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground"
+              />
+            </div>
+          </div>
+
+          <div className="mt-3 flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsAddReaderOpen(false)}
+              className="border-[#cbd8ce] dark:border-border dark:text-foreground dark:hover:bg-muted"
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              disabled={submittingReader}
+              className="bg-[#1f5a45] text-white hover:bg-[#174735]"
+            >
+              {submittingReader ? "Đang đăng ký..." : "Đăng ký Độc giả"}
             </Button>
           </div>
         </form>

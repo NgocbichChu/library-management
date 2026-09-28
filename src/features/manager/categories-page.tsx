@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Edit2, Trash2, Tag, BookOpen } from "lucide-react"
 import { toast } from "sonner"
 import { useLibraryStore } from "@/stores/use-library-store"
@@ -13,8 +13,17 @@ import { Field, FieldLabel } from "@/components/ui/field"
 import type { CategoryItem } from "@/types/library"
 
 export const CategoriesPage = () => {
-  const { categories, createCategory, updateCategory, deleteCategory } =
-    useLibraryStore()
+  const {
+    categories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    fetchCategories,
+  } = useLibraryStore()
+
+  useEffect(() => {
+    void fetchCategories()
+  }, [fetchCategories])
 
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(
@@ -42,14 +51,17 @@ export const CategoriesPage = () => {
 
   const handleSubmitAdd = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) {
+    const trimmed = name.trim()
+    if (!trimmed) {
       toast.error("Vui lòng nhập tên danh mục.")
       return
     }
 
     try {
-      await createCategory(name.trim(), description.trim())
-      toast.success(`Đã tạo danh mục: ${name}`)
+      await createCategory(trimmed, description.trim())
+      toast.success(`Đã tạo danh mục: ${trimmed}`)
+      setName("")
+      setDescription("")
       setIsAddOpen(false)
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Thêm danh mục thất bại")

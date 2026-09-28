@@ -8,6 +8,7 @@ import type {
   CategoryItem,
   ConditionStatus,
   DashboardStats,
+  Employee,
   Fine,
   Reader,
   SystemPolicy,
@@ -19,6 +20,7 @@ interface LibraryState {
   copies: BookCopy[]
   categories: CategoryItem[]
   readers: Reader[]
+  employees: Employee[]
   borrowSlips: BorrowSlip[]
   fines: Fine[]
   policy: SystemPolicy | null
@@ -91,6 +93,7 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
   copies: [],
   categories: [],
   readers: [],
+  employees: [],
   borrowSlips: [],
   fines: [],
   policy: null,
@@ -134,31 +137,37 @@ export const useLibraryStore = create<LibraryState>((set, get) => ({
 
   fetchAll: async () => {
     return withLoading(async () => {
-      const [
-        stats,
-        books,
-        copies,
-        categories,
-        readers,
-        borrowSlips,
-        fines,
-        policy,
-      ] = await Promise.all([
+      const results = await Promise.allSettled([
         libraryService.getDashboardStats(),
         libraryService.getBooks(),
         libraryService.getAllCopies(),
         libraryService.getCategories(),
         libraryService.getReaders(),
+        libraryService.getEmployees(),
         libraryService.getBorrowSlips(),
         libraryService.getFines(),
         libraryService.getSystemPolicy(),
       ])
+
+      const stats = results[0].status === "fulfilled" ? results[0].value : null
+      const books = results[1].status === "fulfilled" ? results[1].value : []
+      const copies = results[2].status === "fulfilled" ? results[2].value : []
+      const categories =
+        results[3].status === "fulfilled" ? results[3].value : []
+      const readers = results[4].status === "fulfilled" ? results[4].value : []
+      const employees = results[5].status === "fulfilled" ? results[5].value : []
+      const borrowSlips =
+        results[6].status === "fulfilled" ? results[6].value : []
+      const fines = results[7].status === "fulfilled" ? results[7].value : []
+      const policy = results[8].status === "fulfilled" ? results[8].value : null
+
       set({
         stats,
         books,
         copies,
         categories,
         readers,
+        employees,
         borrowSlips,
         fines,
         policy,
