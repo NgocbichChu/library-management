@@ -1,494 +1,41 @@
-import { useEffect, useMemo, useState } from "react"
+import { useState } from "react"
 import {
-  ArrowRight,
   AlertCircle,
+  ArrowRight,
   BookOpen,
   Check,
-  ChevronDown,
-  Clock3,
   CreditCard,
-  Filter,
   Heart,
   KeyRound,
-  Library,
   LogOut,
-  MapPin,
   Pencil,
   Save,
-  Search,
-  Sparkles,
   ShieldCheck,
   UserRound,
 } from "lucide-react"
 import { Link, useNavigate, useParams } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
-import {
-  publicBooksService,
-  type PublicBook,
-} from "@/services/public-books"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-const fallbackBooks: PublicBook[] = [
-  {
-    id: "nam-phia-sau",
-    title: "Năm phía sau",
-    author: "Erling Kagge",
-    category: "Khám phá",
-    description:
-      "Một cuốn sách nhỏ về nghệ thuật tìm thấy khoảng lặng và những điều thật sự quan trọng trong đời sống hiện đại.",
-    color: "#d9e6d1",
-    available: 4,
-  },
-  {
-    id: "nha-gia-kim",
-    title: "Nhà giả kim",
-    author: "Paulo Coelho",
-    category: "Văn học",
-    description:
-      "Hành trình theo đuổi kho báu và lắng nghe tiếng gọi của ước mơ, một câu chuyện đã truyền cảm hứng cho hàng triệu độc giả.",
-    color: "#ead7b4",
-    available: 2,
-  },
-  {
-    id: "su-im-lang",
-    title: "Sức mạnh của sự im lặng",
-    author: "Susan Cain",
-    category: "Tâm lý",
-    description:
-      "Một góc nhìn sâu sắc về sức mạnh của những người hướng nội trong một thế giới luôn ưa chuộng sự ồn ào.",
-    color: "#cbdde0",
-    available: 6,
-  },
-  {
-    id: "tuoi-tre-dang-gia",
-    title: "Tuổi trẻ đáng giá bao nhiêu",
-    author: "Rosie Nguyễn",
-    category: "Phát triển bản thân",
-    description:
-      "Những gợi ý gần gũi để sống, học tập và làm việc có chủ đích hơn trong những năm tháng tuổi trẻ.",
-    color: "#e6c8c2",
-    available: 0,
-  },
-  {
-    id: "muoi-nguoi-da-den",
-    title: "Mười người da đen nhỏ",
-    author: "Agatha Christie",
-    category: "Trinh thám",
-    description:
-      "Một vụ án bí ẩn trên hòn đảo biệt lập, nơi từng người một biến mất theo một bài đồng dao đáng sợ.",
-    color: "#d8d1df",
-    available: 3,
-  },
-  {
-    id: "thiet-ke-cuoc-doi",
-    title: "Thiết kế cuộc đời",
-    author: "Bill Burnett",
-    category: "Kỹ năng",
-    description:
-      "Tư duy thiết kế giúp bạn thử nghiệm nhiều hướng đi và chủ động tạo ra một cuộc đời phù hợp.",
-    color: "#d4dec1",
-    available: 5,
-  },
-]
-
-function usePublicBooks() {
-  const [books, setBooks] = useState<PublicBook[]>(fallbackBooks)
-
-  useEffect(() => {
-    let cancelled = false
-    publicBooksService
-      .getAll()
-      .then((data) => {
-        if (!cancelled && data.length > 0) setBooks(data)
-      })
-      .catch(() => {
-        // Keep the sample catalogue visible when the API is unavailable.
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return books
-}
-
-function BookCover({
-  book,
-  large = false,
-}: {
-  book: PublicBook
-  large?: boolean
-}) {
-  return (
-    <div
-      className={`relative flex shrink-0 flex-col justify-between overflow-hidden rounded-[3px] p-5 shadow-[8px_10px_0_rgba(23,35,29,0.08)] ${large ? "h-96 w-64" : "h-64 w-44"}`}
-      style={{ backgroundColor: book.color }}
-    >
-      <div className="flex justify-between text-[10px] font-bold tracking-[0.22em] text-[#385145] uppercase">
-        <span>Mộc Miên</span>
-        <span>MM.01</span>
-      </div>
-      <div>
-        <div className="mb-3 h-px w-9 bg-[#385145]" />
-        <h3
-          className={`${large ? "text-3xl" : "text-xl"} max-w-[10ch] leading-[1.05] font-semibold text-[#24382b]`}
-        >
-          {book.title}
-        </h3>
-        <p className="mt-3 text-xs text-[#385145]">{book.author}</p>
-      </div>
-      <BookOpen className="absolute -right-5 -bottom-5 size-28 rotate-12 text-[#385145]/10" />
-    </div>
-  )
-}
-
-function BookCard({ book }: { book: PublicBook }) {
-  const navigate = useNavigate()
-  return (
-    <article className="group flex flex-col items-start">
-      <Link to={`/books/${book.id}`} className="mb-4 w-full">
-        <BookCover book={book} />
-      </Link>
-      <p className="mb-1 text-xs font-medium tracking-[0.14em] text-[#7b8b7f] uppercase dark:text-muted-foreground">
-        {book.category}
-      </p>
-      <Link
-        to={`/books/${book.id}`}
-        className="font-semibold hover:text-[#1f5a45] dark:hover:text-emerald-400"
-      >
-        {book.title}
-      </Link>
-      <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
-        {book.author}
-      </p>
-      <Button
-        variant="link"
-        className="mt-2 h-auto p-0 text-[#1f5a45] dark:text-emerald-400"
-        onClick={() => navigate(`/books/${book.id}`)}
-      >
-        Xem chi tiết <ArrowRight className="ml-1 size-3" />
-      </Button>
-    </article>
-  )
-}
-
-export function HomePage() {
-  const books = usePublicBooks()
-
-  return (
-    <div>
-      <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-16 lg:px-8 lg:py-24 dark:border-border dark:bg-card/40">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <p className="mb-5 flex items-center gap-2 text-sm font-semibold tracking-[0.18em] text-[#6e826f] uppercase dark:text-muted-foreground">
-              <Sparkles className="size-4" /> Không gian đọc của bạn
-            </p>
-            <h1 className="max-w-2xl text-5xl leading-[0.98] font-semibold tracking-[-0.04em] text-[#1f3b2b] md:text-7xl dark:text-foreground">
-              Mỗi cuốn sách mở ra một{" "}
-              <span className="text-[#c27652]">góc nhìn mới.</span>
-            </h1>
-            <p className="mt-7 max-w-lg text-lg leading-8 text-[#617067] dark:text-muted-foreground">
-              Khám phá bộ sưu tập được chọn lọc, mượn sách dễ dàng và giữ lại
-              những câu chuyện bạn yêu thích.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/books"
-                className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1f5a45] px-2.5 text-sm font-medium text-white hover:bg-[#174735]"
-              >
-                Khám phá kho sách <ArrowRight className="ml-2 size-4" />
-              </Link>
-              <Link
-                to="/about"
-                className="inline-flex h-9 items-center justify-center rounded-lg border border-[#b9cbbb] px-2.5 text-sm font-medium hover:bg-[#dce8d9] dark:border-border dark:text-foreground dark:hover:bg-muted"
-              >
-                Tìm hiểu thư viện
-              </Link>
-            </div>
-          </div>
-          <div className="relative flex min-h-80 items-center justify-center">
-            <div className="absolute h-64 w-64 rounded-full border border-[#b8cdb8] dark:border-border/30" />
-            <div className="absolute h-80 w-80 rounded-full border border-[#c8d8c5] dark:border-border/20" />
-            <div className="relative rotate-[-5deg]">
-              <BookCover book={books[0]} large />
-            </div>
-            <div className="absolute bottom-5 left-4 rotate-[8deg] md:left-12">
-              <BookCover book={books[1] ?? books[0]} />
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-              Được yêu thích
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
-              Gợi ý cho hôm nay
-            </h2>
-          </div>
-          <Link
-            to="/books"
-            className="hidden items-center gap-1 text-sm font-semibold text-[#1f5a45] sm:flex dark:text-emerald-400"
-          >
-            Xem tất cả <ArrowRight className="size-4" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-6">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-5 pb-16 lg:px-8">
-        <div className="grid gap-6 border-y border-[#dfe5dc] py-10 sm:grid-cols-3 dark:border-border">
-          <div>
-            <Clock3 className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-              Mượn trong 3 phút
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
-              Tìm sách, đặt mượn và nhận tại quầy gần bạn.
-            </p>
-          </div>
-          <div>
-            <Library className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-              Hơn 2.000 đầu sách
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
-              Từ văn học, kỹ năng đến những chuyến du hành khám phá.
-            </p>
-          </div>
-          <div>
-            <MapPin className="mb-4 size-5 text-[#c27652]" />
-            <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-              Một nơi để trở về
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-[#718077] dark:text-muted-foreground">
-              Không gian yên tĩnh cho việc đọc, học và kết nối.
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
-
-export function BooksPage() {
-  const books = usePublicBooks()
-  const [query, setQuery] = useState("")
-  const [category, setCategory] = useState("Tất cả")
-  const [availableOnly, setAvailableOnly] = useState(false)
-  const [sortBy, setSortBy] = useState<
-    "featured" | "title" | "author" | "available"
-  >("featured")
-  const categories = ["Tất cả", ...new Set(books.map((book) => book.category))]
-  const filteredBooks = useMemo(() => {
-    const result = books.filter(
-      (book) =>
-        (category === "Tất cả" || book.category === category) &&
-        (!availableOnly || book.available > 0) &&
-        `${book.title} ${book.author}`
-          .toLowerCase()
-          .includes(query.toLowerCase())
-    )
-
-    return [...result].sort((first, second) => {
-      if (sortBy === "title")
-        return first.title.localeCompare(second.title, "vi")
-      if (sortBy === "author")
-        return first.author.localeCompare(second.author, "vi")
-      if (sortBy === "available") return second.available - first.available
-      return books.indexOf(first) - books.indexOf(second)
-    })
-  }, [availableOnly, books, category, query, sortBy])
-  const activeFilterCount =
-    (category !== "Tất cả" ? 1 : 0) +
-    (availableOnly ? 1 : 0) +
-    (sortBy !== "featured" ? 1 : 0)
-  const clearFilters = () => {
-    setCategory("Tất cả")
-    setAvailableOnly(false)
-    setSortBy("featured")
-  }
-  return (
-    <div className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-      <div className="max-w-2xl">
-        <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-          Thư viện trực tuyến
-        </p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[#1f3b2b] md:text-5xl dark:text-foreground">
-          Tìm cuốn sách tiếp theo
-        </h1>
-        <p className="mt-4 text-[#718077] dark:text-muted-foreground">
-          Tra cứu theo tên sách, tác giả hoặc chủ đề. Bạn có thể xem sách mà
-          không cần đăng nhập.
-        </p>
-      </div>
-      <div className="mt-10 flex flex-col gap-3 border-b border-[#dfe5dc] pb-6 md:flex-row dark:border-border">
-        <div className="relative flex-1">
-          <Search className="absolute top-3 left-3 size-4 text-[#8b9a8f] dark:text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Tìm tên sách hoặc tác giả..."
-            className="h-10 border-[#cbd8ce] bg-white pl-9 dark:border-border dark:bg-card dark:text-foreground"
-          />
-        </div>
-        <Popover>
-          <PopoverTrigger
-            render={
-              <Button
-                variant="outline"
-                className="justify-start border-[#cbd8ce] bg-transparent md:w-48 dark:border-border dark:text-foreground"
-              />
-            }
-          >
-            <Filter className="mr-2 size-4" />
-            Bộ lọc
-            {activeFilterCount > 0 && (
-              <span className="ml-1 flex size-5 items-center justify-center rounded-full bg-[#1f5a45] text-[11px] text-white">
-                {activeFilterCount}
-              </span>
-            )}
-            <ChevronDown className="ml-auto size-4" />
-          </PopoverTrigger>
-          <PopoverContent
-            align="end"
-            className="w-80 border-[#dfe5dc] bg-[#fffefb] p-4 dark:border-border dark:bg-card"
-          >
-            <PopoverHeader>
-              <PopoverTitle className="text-base text-[#1f3b2b] dark:text-foreground">
-                Lọc và sắp xếp
-              </PopoverTitle>
-              <p className="text-xs text-[#718077] dark:text-muted-foreground">
-                Thu hẹp danh sách theo nhu cầu của bạn.
-              </p>
-            </PopoverHeader>
-            <div className="mt-4 space-y-4">
-              <label className="block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
-                Thể loại
-                <Select
-                  value={category}
-                  onValueChange={(value) => setCategory(value ?? "Tất cả")}
-                >
-                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white dark:border-border dark:bg-muted/40 dark:text-foreground">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </label>
-              <label className="flex cursor-pointer items-center gap-3 text-sm text-[#1f3b2b] dark:text-foreground">
-                <Checkbox
-                  checked={availableOnly}
-                  onCheckedChange={(checked) =>
-                    setAvailableOnly(checked === true)
-                  }
-                />
-                Chỉ hiện sách đang có sẵn
-              </label>
-              <label className="block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
-                Sắp xếp theo
-                <Select
-                  value={sortBy}
-                  onValueChange={(value) =>
-                    setSortBy((value ?? "featured") as typeof sortBy)
-                  }
-                >
-                  <SelectTrigger className="mt-2 h-9 w-full border-[#cbd8ce] bg-white dark:border-border dark:bg-muted/40 dark:text-foreground">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="featured">Nổi bật</SelectItem>
-                    <SelectItem value="title">Tên sách A - Z</SelectItem>
-                    <SelectItem value="author">Tên tác giả A - Z</SelectItem>
-                    <SelectItem value="available">
-                      Còn nhiều bản nhất
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </label>
-            </div>
-            <div className="mt-5 flex items-center justify-between border-t border-[#edf0eb] pt-3 dark:border-border">
-              <span className="text-xs text-[#718077] dark:text-muted-foreground">
-                {filteredBooks.length} kết quả
-              </span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={clearFilters}
-                disabled={activeFilterCount === 0}
-                className="text-[#1f5a45] dark:text-emerald-400"
-              >
-                Xoá bộ lọc
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-      <div className="mt-6 flex flex-wrap gap-2">
-        {categories.map((item) => (
-          <Button
-            key={item}
-            onClick={() => setCategory(item)}
-            variant={category === item ? "default" : "outline"}
-            size="sm"
-            className={
-              category === item
-                ? "bg-[#1f5a45] text-white hover:bg-[#174735]"
-                : "border-[#cbd8ce] bg-transparent dark:border-border dark:text-foreground"
-            }
-          >
-            {item}
-          </Button>
-        ))}
-      </div>
-      <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
-        {filteredBooks.map((book) => (
-          <BookCard key={book.id} book={book} />
-        ))}
-      </div>
-      {filteredBooks.length === 0 && (
-        <p className="py-20 text-center text-[#718077] dark:text-muted-foreground">
-          Không tìm thấy sách phù hợp.
-        </p>
-      )}
-    </div>
-  )
-}
-
+import { BookCover } from "./library-shared"
+import { usePublicBooks } from "./library-data"
 export function BookDetailPage() {
-  const books = usePublicBooks()
+  const { books, isLoading, error } = usePublicBooks()
   const { id } = useParams()
-  const book = books.find((item) => item.id === id) ?? books[0]
+  const book = books.find((item) => item.id === id)
   const { user } = useAuth()
   const navigate = useNavigate()
+
+  if (!book) {
+    return (
+      <div className="mx-auto max-w-5xl px-5 py-20 text-center text-[#718077] dark:text-muted-foreground">
+        {isLoading
+          ? "Đang tải thông tin sách..."
+          : (error ?? "Không tìm thấy sách.")}
+      </div>
+    )
+  }
+
   const borrow = () =>
     navigate(user ? `/borrow/${book.id}` : "/login", {
       state: { from: `/borrow/${book.id}` },
@@ -543,9 +90,20 @@ export function BookDetailPage() {
 }
 
 export function BorrowPage() {
-  const books = usePublicBooks()
+  const { books, isLoading, error } = usePublicBooks()
   const { id } = useParams()
-  const book = books.find((item) => item.id === id) ?? books[0]
+  const book = books.find((item) => item.id === id)
+
+  if (!book) {
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-20 text-center text-[#718077] dark:text-muted-foreground">
+        {isLoading
+          ? "Đang tải thông tin sách..."
+          : (error ?? "Không tìm thấy sách.")}
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-12 lg:px-8">
       <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
@@ -975,108 +533,3 @@ export function ProfilePage() {
   )
 }
 
-export function AboutPage() {
-  return (
-    <div>
-      <section className="border-b border-[#dfe5dc] bg-[#e7eee3] px-5 py-14 lg:px-8 lg:py-20 dark:border-border dark:bg-card/40">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="max-w-xl">
-            <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-              Về Mộc Miên
-            </p>
-            <h1 className="mt-4 text-4xl leading-[1.08] font-semibold tracking-tight text-[#1f3b2b] md:text-6xl dark:text-foreground">
-              Một nơi để tìm thấy cuốn sách tiếp theo.
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-[#617067] dark:text-muted-foreground">
-              Mộc Miên là không gian đọc dành cho những người muốn chậm lại,
-              khám phá một ý tưởng mới và tìm thấy niềm vui trong từng trang
-              sách. Chúng mình tin rằng hành trình ấy nên bắt đầu thật dễ dàng:
-              từ lúc tìm sách đến khi chọn được câu chuyện hợp với mình.
-            </p>
-          </div>
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1400&q=85"
-              alt="Không gian thư viện yên tĩnh với những kệ sách cao"
-              className="h-72 w-full object-cover md:h-[27rem]"
-            />
-            <p className="absolute right-3 bottom-3 bg-[#f7f8f4]/95 px-3 py-2 text-xs font-medium text-[#385145] sm:right-5 sm:bottom-5 sm:text-sm">
-              Một góc nhỏ dành cho những ý tưởng lớn.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:px-8 lg:py-24">
-        <div className="relative order-2 lg:order-1">
-          <img
-            src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=85"
-            alt="Những cuốn sách được xếp trên kệ trong thư viện"
-            className="h-72 w-full object-cover md:h-[26rem]"
-          />
-          <div className="absolute -right-3 -bottom-5 max-w-52 bg-[#c27652] p-5 text-sm leading-6 text-white sm:-right-5 sm:max-w-60">
-            Mỗi cuốn sách là một lời mời nhìn thế giới theo cách khác.
-          </div>
-        </div>
-        <div className="order-1 lg:order-2 lg:pl-8">
-          <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-            Đọc theo cách của bạn
-          </p>
-          <h2 className="mt-3 text-3xl leading-tight font-semibold text-[#1f3b2b] md:text-4xl dark:text-foreground">
-            Sách hay nên dễ tìm, và niềm vui đọc nên được sẻ chia.
-          </h2>
-          <p className="mt-6 leading-7 text-[#617067] dark:text-muted-foreground">
-            Từ văn học, khám phá đến kỹ năng sống, kho sách Mộc Miên được sắp
-            xếp để bạn có thể dạo quanh theo chủ đề hoặc lần theo một gợi ý bất
-            ngờ. Bạn có thể xem thông tin từng đầu sách, kiểm tra tình trạng
-            sẵn có và lưu lại những lựa chọn muốn đọc.
-          </p>
-          <p className="mt-4 leading-7 text-[#617067] dark:text-muted-foreground">
-            Dù bạn đang tìm một khoảng lặng cuối ngày, một góc nhìn mới cho
-            công việc hay một câu chuyện để đọc cùng người thân, Mộc Miên mong
-            rằng bạn sẽ luôn tìm được điều đáng mang về từ trang sách.
-          </p>
-        </div>
-      </section>
-
-      <section className="bg-[#f0ede5] px-5 py-16 lg:px-8 lg:py-20 dark:bg-muted/40">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[0.8fr_1.2fr] md:items-center">
-          <div>
-            <p className="text-sm font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-              Một thư viện gần gũi
-            </p>
-            <h2 className="mt-3 text-3xl leading-tight font-semibold text-[#1f3b2b] md:text-4xl dark:text-foreground">
-              Từ lần tìm kiếm đầu tiên đến trang cuối cùng.
-            </h2>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            <article className="border-t border-[#c9c6ba] pt-4 dark:border-border">
-              <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-                Khám phá
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-[#617067] dark:text-muted-foreground">
-                Tìm sách theo thể loại, tác giả hoặc cảm hứng bạn đang muốn đọc.
-              </p>
-            </article>
-            <article className="border-t border-[#c9c6ba] pt-4 dark:border-border">
-              <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-                Lựa chọn
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-[#617067] dark:text-muted-foreground">
-                Xem mô tả và tình trạng sách để chọn cuốn phù hợp với mình.
-              </p>
-            </article>
-            <article className="border-t border-[#c9c6ba] pt-4 dark:border-border">
-              <h3 className="font-semibold text-[#1f3b2b] dark:text-foreground">
-                Kết nối
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-[#617067] dark:text-muted-foreground">
-                Chia sẻ tình yêu đọc sách và tìm thêm những câu chuyện đáng nhớ.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-    </div>
-  )
-}
