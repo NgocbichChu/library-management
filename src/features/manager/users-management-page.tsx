@@ -645,7 +645,15 @@ export function UsersManagementPage() {
               }}
             >
               <SelectTrigger className="h-10 w-[160px] border-[#cbd8ce] bg-[#fbfcfa] dark:border-border dark:bg-muted/20 dark:text-foreground">
-                <SelectValue placeholder="Trạng thái" />
+                <SelectValue placeholder="Trạng thái">
+                  {statusFilter === "Active"
+                    ? "Hoạt động"
+                    : statusFilter === "Locked"
+                      ? "Đang khóa"
+                      : statusFilter === "Pending"
+                        ? "Chờ duyệt"
+                        : "Tất cả trạng thái"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">Tất cả trạng thái</SelectItem>
@@ -854,7 +862,13 @@ export function UsersManagementPage() {
               onValueChange={(val) => setEditStatus(val as UserStatus)}
             >
               <SelectTrigger className="mt-1 h-9 border-[#cbd8ce] dark:border-border dark:bg-muted/20 dark:text-foreground">
-                <SelectValue />
+                <SelectValue>
+                  {editStatus === "Active"
+                    ? "Hoạt động (Active)"
+                    : editStatus === "Locked"
+                      ? "Đang khóa (Locked)"
+                      : "Chờ duyệt (Pending)"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Active">Hoạt động (Active)</SelectItem>
