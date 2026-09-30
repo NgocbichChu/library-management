@@ -27,6 +27,7 @@ import { UsersManagementPage } from "@/features/manager/users-management-page"
 import { CategoriesPage } from "@/features/manager/categories-page"
 import { LoansPage } from "@/features/manager/loans-page"
 import { SettingsPage } from "@/features/manager/settings-page"
+import { SqlDemoPage } from "./features/manager/sql-demo-page"
 
 function AuthListener() {
   const navigate = useNavigate()
@@ -76,6 +77,7 @@ export function App() {
           </Route>
         </Route>
         <Route element={<RequireManager />}>
+          <Route path="/sql-demo" element={<SqlDemoPage />} />
           <Route path="/dashboard" element={<AdminLayout />}>
             <Route index element={<DashboardOverviewPage />} />
             <Route path="books" element={<BooksManagementPage />} />
