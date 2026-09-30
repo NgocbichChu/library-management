@@ -10,12 +10,12 @@ import { AdminLayout } from "@/layouts/admin-layout"
 import { AuthLayout } from "@/layouts/auth-layout"
 import { Component as LoginPage } from "@/features/auth/login-page"
 import { PublicLayout } from "@/layouts/public-layout"
+import { AboutPage } from "@/features/library/about-page"
+import { BooksPage } from "@/features/library/books-page"
+import { HomePage } from "@/features/library/home-page"
 import {
-  AboutPage,
   BookDetailPage,
-  BooksPage,
   BorrowPage,
-  HomePage,
   ProfilePage,
 } from "@/features/library/library-pages"
 import { DashboardOverviewPage } from "@/features/manager/dashboard-overview-page"
@@ -24,6 +24,7 @@ import { UsersManagementPage } from "@/features/manager/users-management-page"
 import { CategoriesPage } from "@/features/manager/categories-page"
 import { LoansPage } from "@/features/manager/loans-page"
 import { SettingsPage } from "@/features/manager/settings-page"
+import { SqlDemoPage } from "./features/manager/sql-demo-page"
 
 export function App() {
   return (
@@ -47,6 +48,7 @@ export function App() {
           </Route>
         </Route>
         <Route element={<RequireManager />}>
+          <Route path="/sql-demo" element={<SqlDemoPage />} />
           <Route path="/dashboard" element={<AdminLayout />}>
             <Route index element={<DashboardOverviewPage />} />
             <Route path="books" element={<BooksManagementPage />} />

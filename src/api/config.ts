@@ -1,6 +1,11 @@
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api"
+
 export const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "/api"
+  import.meta.env.PROD ? "/api" : configuredApiBaseUrl
 ).replace(/\/+$/, "")
 
-// Keep the existing demo login until a backend is available.
-export const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API !== "false"
+const configuredMockMode = import.meta.env.VITE_USE_MOCK_API
+
+export const USE_MOCK_API =
+  configuredMockMode === "true" ||
+  (!import.meta.env.PROD && configuredMockMode !== "false")

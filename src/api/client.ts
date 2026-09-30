@@ -48,19 +48,20 @@ export class ApiError extends Error {
 
 type RequestOptions = Omit<RequestInit, "body" | "method"> & {
   body?: unknown
+  skipAuth?: boolean
 }
 
 async function request<T>(
   method: string,
   path: string,
-  { body, headers, ...options }: RequestOptions = {}
+  { body, headers, skipAuth, ...options }: RequestOptions = {}
 ): Promise<T> {
   const requestHeaders = new Headers(headers)
   if (!requestHeaders.has("Accept"))
     requestHeaders.set("Accept", "application/json")
 
   const token = localStorage.getItem("accessToken") || getStoredToken()
-  if (token && !requestHeaders.has("Authorization")) {
+  if (token && !skipAuth && !requestHeaders.has("Authorization")) {
     requestHeaders.set("Authorization", `Bearer ${token}`)
   }
 

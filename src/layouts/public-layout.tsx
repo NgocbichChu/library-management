@@ -9,7 +9,7 @@ export function PublicLayout() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-[#f7f8f4] text-[#17231d] dark:bg-background dark:text-foreground">
+    <div className="flex min-h-screen flex-col bg-[#f7f8f4] text-[#17231d] dark:bg-background dark:text-foreground">
       <header className="sticky top-0 z-20 border-b border-[#dfe5dc] bg-[#f7f8f4]/95 backdrop-blur dark:border-border dark:bg-background/95">
         <div className="mx-auto flex h-18 max-w-7xl items-center gap-6 px-5 lg:px-8">
           <Link to="/" className="flex shrink-0 items-center gap-2.5">
@@ -90,7 +90,7 @@ export function PublicLayout() {
           </div>
         </div>
       </header>
-      <main>
+      <main className="flex-1">
         <Outlet />
       </main>
       <footer className="border-t border-[#dfe5dc] bg-[#eef2ea] px-5 py-8 lg:px-8 dark:border-border dark:bg-card">
