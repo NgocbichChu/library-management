@@ -2,10 +2,10 @@ import { apiClient } from "@/api/client"
 import { executeSql, type SqlExecutionResult } from "@/api/sql-demo"
 
 export interface LoanDemoBookCopy {
-  book_copy_id: number
+  book_copy_id: number | null
   book_title_id: number
   title: string
-  barcode: string
+  barcode: string | null
   available_copies: number
   total_copies: number
   reader_id: number
@@ -30,10 +30,10 @@ interface ApiResult {
 }
 
 const copyAndInventorySql = `SELECT
-  bc.book_copy_id,
-  bc.book_title_id,
+  available_copy.book_copy_id,
+  bt.book_title_id,
   bt.title,
-  bc.barcode,
+  available_copy.barcode,
   inventory.available_copies,
   inventory.total_copies,
   reader.reader_id,
@@ -41,14 +41,23 @@ const copyAndInventorySql = `SELECT
   reader.full_name,
   policy.policy_id,
   policy.max_borrow_days
-FROM app_db.book_copy AS bc
-JOIN app_db.book_title AS bt ON bt.book_title_id = bc.book_title_id
+FROM app_db.book_title AS bt
 JOIN (
-  SELECT book_title_id, COUNT(*) AS total_copies,
-    SUM(copy_status = 'AVAILABLE') AS available_copies
+  SELECT bt.book_title_id,
+    COUNT(bc.book_copy_id) AS total_copies,
+    SUM(CASE WHEN bc.copy_status = 'AVAILABLE' THEN 1 ELSE 0 END) AS available_copies
+  FROM app_db.book_title AS bt
+  LEFT JOIN app_db.book_copy AS bc ON bc.book_title_id = bt.book_title_id
+  GROUP BY bt.book_title_id
+) AS inventory ON inventory.book_title_id = bt.book_title_id
+LEFT JOIN (
+  SELECT book_title_id, MIN(book_copy_id) AS book_copy_id
   FROM app_db.book_copy
+  WHERE copy_status = 'AVAILABLE'
   GROUP BY book_title_id
-) AS inventory ON inventory.book_title_id = bc.book_title_id
+) AS available_pick ON available_pick.book_title_id = bt.book_title_id
+LEFT JOIN app_db.book_copy AS available_copy
+  ON available_copy.book_copy_id = available_pick.book_copy_id
 CROSS JOIN (
   SELECT reader_id, reader_code, full_name
   FROM app_db.reader
@@ -63,18 +72,17 @@ CROSS JOIN (
   ORDER BY effective_from DESC
   LIMIT 1
 ) AS policy
-WHERE bc.copy_status = 'AVAILABLE'
-ORDER BY bt.title, bc.book_copy_id`
+ORDER BY bt.title, bt.book_title_id`
 
 export async function loadLoanDemoCopies(): Promise<LoanDemoBookCopy[]> {
   const result: SqlExecutionResult = await executeSql(copyAndInventorySql)
   const byTitle = new Map<number, LoanDemoBookCopy>()
   for (const row of result.rows) {
     const copy: LoanDemoBookCopy = {
-      book_copy_id: Number(row.book_copy_id),
+      book_copy_id: row.book_copy_id === null ? null : Number(row.book_copy_id),
       book_title_id: Number(row.book_title_id),
       title: String(row.title),
-      barcode: String(row.barcode),
+      barcode: row.barcode === null ? null : String(row.barcode),
       available_copies: Number(row.available_copies),
       total_copies: Number(row.total_copies),
       reader_id: Number(row.reader_id),

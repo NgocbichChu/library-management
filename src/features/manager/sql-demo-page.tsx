@@ -29,7 +29,7 @@ const readError = (cause: unknown) =>
 
 export function SqlDemoPage() {
   const [copies, setCopies] = useState<LoanDemoBookCopy[]>([])
-  const [selectedCopyId, setSelectedCopyId] = useState("")
+  const [selectedBookTitleId, setSelectedBookTitleId] = useState("")
   const [requests, setRequests] = useState<LoanRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [processingId, setProcessingId] = useState<string | null>(null)
@@ -41,7 +41,7 @@ export function SqlDemoPage() {
       .then((nextCopies) => {
         if (cancelled) return
         setCopies(nextCopies)
-        setSelectedCopyId(String(nextCopies[0]?.book_copy_id ?? ""))
+        setSelectedBookTitleId(String(nextCopies[0]?.book_title_id ?? ""))
       })
       .catch((cause: unknown) => {
         if (!cancelled) setError(readError(cause))
@@ -56,11 +56,11 @@ export function SqlDemoPage() {
   }, [])
 
   const selectedCopy = copies.find(
-    (copy) => String(copy.book_copy_id) === selectedCopyId
+    (copy) => String(copy.book_title_id) === selectedBookTitleId
   )
 
   const createRequest = () => {
-    if (!selectedCopy) return
+    if (!selectedCopy || selectedCopy.available_copies < 1) return
     setRequests((current) => [
       {
         id: `REQ-${Date.now()}`,
@@ -90,7 +90,7 @@ export function SqlDemoPage() {
           copy.book_title_id === request.copy.book_title_id &&
           copy.available_copies > 0
       )
-      if (!availableCopy) {
+      if (!availableCopy || availableCopy.book_copy_id === null) {
         setError("Đầu sách này đã hết bản có thể cho mượn.")
         setCopies(currentCopies)
         return
@@ -116,10 +116,10 @@ export function SqlDemoPage() {
       )
       const refreshedCopies = await loadLoanDemoCopies()
       setCopies(refreshedCopies)
-      setSelectedCopyId((current) =>
-        refreshedCopies.some((copy) => String(copy.book_copy_id) === current)
+      setSelectedBookTitleId((current) =>
+        refreshedCopies.some((copy) => String(copy.book_title_id) === current)
           ? current
-          : String(refreshedCopies[0]?.book_copy_id ?? "")
+          : String(refreshedCopies[0]?.book_title_id ?? "")
       )
       setRequests((current) =>
         current.map((item) => {
@@ -214,25 +214,25 @@ export function SqlDemoPage() {
               <BookOpen className="size-4" /> Tạo yêu cầu mượn
             </h2>
             <label
-              htmlFor="copy-choice"
+              htmlFor="book-choice"
               className="mt-4 block text-xs font-medium text-[#68756c]"
             >
-              Chọn sách còn bản
+              Chọn đầu sách
             </label>
             <select
-              id="copy-choice"
-              value={selectedCopyId}
-              onChange={(event) => setSelectedCopyId(event.target.value)}
+              id="book-choice"
+              value={selectedBookTitleId}
+              onChange={(event) => setSelectedBookTitleId(event.target.value)}
               disabled={loading || copies.length === 0}
               className="mt-1.5 h-10 w-full border border-[#d3dcd3] bg-white px-3 text-sm text-[#263b2d] outline-none focus:border-[#63836a]"
             >
               {copies.length === 0 ? (
                 <option value="">
-                  {loading ? "Đang tải sách..." : "Không còn sách sẵn"}
+                  {loading ? "Đang tải sách..." : "Chưa có đầu sách"}
                 </option>
               ) : (
                 copies.map((copy) => (
-                  <option key={copy.book_copy_id} value={copy.book_copy_id}>
+                  <option key={copy.book_title_id} value={copy.book_title_id}>
                     {copy.title} · còn {copy.available_copies}/
                     {copy.total_copies}
                   </option>
@@ -241,12 +241,16 @@ export function SqlDemoPage() {
             </select>
             {selectedCopy && (
               <p className="mt-2 text-xs text-[#748077]">
-                Độc giả: {selectedCopy.full_name} ({selectedCopy.reader_code})
+                {selectedCopy.available_copies > 0
+                  ? `Độc giả: ${selectedCopy.full_name} (${selectedCopy.reader_code})`
+                  : "Đầu sách này đã hết bản có thể cho mượn."}
               </p>
             )}
             <Button
               onClick={createRequest}
-              disabled={!selectedCopy || loading}
+              disabled={
+                !selectedCopy || selectedCopy.available_copies < 1 || loading
+              }
               className="mt-4 h-9 w-full rounded-none bg-[#315842] text-white hover:bg-[#244832]"
             >
               Tạo yêu cầu
