@@ -1,4 +1,8 @@
-import { booksApi, type PublicBookDto } from "@/api/books"
+import {
+  booksApi,
+  type PublicBookSearchParams,
+  type PublicBookDto,
+} from "@/api/books"
 
 export type PublicBook = {
   id: string
@@ -8,26 +12,63 @@ export type PublicBook = {
   description: string
   color: string
   available: number
+  categoryId?: number | null
+  publicationYear?: number | null
+}
+
+export interface PublicBookCategory {
+  id: number
+  name: string
+}
+
+export interface PublicBookSearchResult {
+  books: PublicBook[]
+  totalRecords: number
+  totalPages: number
+  hasNextPage: boolean
 }
 
 const colors = ["#d9e6d1", "#ead7b4", "#cbdde0", "#e6c8c2", "#d8d1df"]
 
 const mapBook = (book: PublicBookDto, index: number): PublicBook => ({
-  id: String(book.id),
+  id: String(book.bookTitleId),
   title: book.title,
   author: book.author,
-  category: "Kho sách",
-  description: "Thông tin chi tiết của cuốn sách sẽ được cập nhật.",
+  category: book.categoryName || "Chưa phân loại",
+  description: book.description || "Thông tin chi tiết của cuốn sách sẽ được cập nhật.",
   color: colors[index % colors.length],
-  available: book.available ? 1 : 0,
+  available: book.availableCopies,
+  categoryId: book.categoryId,
+  publicationYear: book.publicationYear,
 })
 
 export const publicBooksService = {
-  getAll: async (): Promise<PublicBook[]> => {
-    const response = await booksApi.getAll()
-    if (!response.success || !response.data?.data) {
+  search: async (
+    params: PublicBookSearchParams = {}
+  ): Promise<PublicBookSearchResult> => {
+    const response = await booksApi.search(params)
+    if (!response.success || !response.data?.items) {
       throw new Error(response.message || "Không thể tải danh sách sách.")
     }
-    return response.data.data.map(mapBook)
+    return {
+      books: response.data.items.map(mapBook),
+      totalRecords: response.data.totalRecords,
+      totalPages: response.data.totalPages,
+      hasNextPage: response.data.hasNextPage,
+    }
+  },
+  getAll: async (): Promise<PublicBook[]> => {
+    const result = await publicBooksService.search({ pageNumber: 1 })
+    return result.books
+  },
+  getCategories: async (): Promise<PublicBookCategory[]> => {
+    const response = await booksApi.getCategories()
+    if (!response.success || !Array.isArray(response.data)) {
+      throw new Error(response.message || "Không thể tải danh mục sách.")
+    }
+    return response.data.map((category) => ({
+      id: category.categoryId,
+      name: category.categoryName,
+    }))
   },
 }
