@@ -57,7 +57,7 @@ export const Component = () => {
       } else if (isManagerRole) {
         navigate("/dashboard", { replace: true })
       } else {
-        navigate("/profile", { replace: true })
+        navigate("/", { replace: true })
       }
     } catch {
       // The store exposes a user-facing error message below the form.

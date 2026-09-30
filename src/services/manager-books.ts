@@ -308,6 +308,25 @@ export const managerBooksService = {
           rawList as Record<string, unknown>[]
         ).map((item) => {
           const rawId = item.id ?? item.bookTitleId ?? item.book_title_id
+          const localBook = booksStore.find(
+            (book) =>
+              book.id === String(rawId) ||
+              book.title.toLowerCase() ===
+                String(item.title || "").toLowerCase()
+          )
+          const totalCopies = Number(
+            item.totalCopies ?? item.total_copies ?? item.copies_count
+          )
+          const availableCopies = Number(
+            item.availableCopies ??
+              item.available_copies_count ??
+              item.available_count
+          )
+          const borrowedCopies = Number(
+            item.borrowedCopies ??
+              item.borrowed_copies_count ??
+              item.borrowed_count
+          )
           return {
             id: String(rawId),
             isbn: String(item.isbn || "978-604-1-00000-0"),
@@ -324,11 +343,18 @@ export const managerBooksService = {
               ? String(item.coverImageUrl)
               : undefined,
             bookStatus: "Active",
-            totalCopies: 1,
-            availableCopies: item.available !== false ? 1 : 0,
-            borrowedCopies: item.available === false ? 1 : 0,
+            totalCopies: Number.isFinite(totalCopies)
+              ? totalCopies
+              : (localBook?.totalCopies ?? 1),
+            availableCopies: Number.isFinite(availableCopies)
+              ? availableCopies
+              : (localBook?.availableCopies ??
+                (item.available === false ? 0 : 1)),
+            borrowedCopies: Number.isFinite(borrowedCopies)
+              ? borrowedCopies
+              : (localBook?.borrowedCopies ?? 0),
             color: "#e2ead9",
-            copies: [],
+            copies: localBook?.copies ?? [],
           }
         })
 
@@ -360,7 +386,19 @@ export const managerBooksService = {
     try {
       const res = await managerBooksApi.create(input)
       if (res.success && res.data) {
-        createdId = res.data as string | number
+        if (typeof res.data === "string" || typeof res.data === "number") {
+          createdId = res.data
+        } else if (typeof res.data === "object") {
+          const result = res.data as Record<string, unknown>
+          const returnedId =
+            result.id ?? result.bookTitleId ?? result.book_title_id
+          if (
+            typeof returnedId === "string" ||
+            typeof returnedId === "number"
+          ) {
+            createdId = returnedId
+          }
+        }
       }
     } catch {
       // Continue locally for smooth demonstration
