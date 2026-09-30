@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   Check,
+  CheckCircle2,
   CreditCard,
   Heart,
   KeyRound,
@@ -17,6 +18,7 @@ import { Link, useNavigate, useParams } from "react-router"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { borrowRequestsService } from "@/services/borrow-requests"
 import { BookCover } from "./library-shared"
 import { usePublicBooks } from "./library-data"
 export function BookDetailPage() {
@@ -93,6 +95,10 @@ export function BorrowPage() {
   const { books, isLoading, error } = usePublicBooks()
   const { id } = useParams()
   const book = books.find((item) => item.id === id)
+  const { user } = useAuth()
+  const [note, setNote] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   if (!book) {
     return (
@@ -102,6 +108,26 @@ export function BorrowPage() {
           : (error ?? "Không tìm thấy sách.")}
       </div>
     )
+  }
+
+  const submitRequest = () => {
+    if (!user) return
+    setSubmitError(null)
+    try {
+      borrowRequestsService.create({
+        accountId: user.accountId,
+        readerName: user.fullName || user.name || user.username,
+        bookTitleId: Number(book.id),
+        bookTitle: book.title,
+        author: book.author,
+        note: note.trim(),
+      })
+      setSubmitted(true)
+    } catch (cause: unknown) {
+      setSubmitError(
+        cause instanceof Error ? cause.message : "Không thể gửi yêu cầu mượn."
+      )
+    }
   }
 
   return (
@@ -135,12 +161,37 @@ export function BorrowPage() {
           </div>
         </div>
       </div>
-      <Button
-        size="lg"
-        className="mt-8 bg-[#1f5a45] text-white hover:bg-[#174735]"
-      >
-        Xác nhận yêu cầu mượn <ArrowRight className="ml-2 size-4" />
-      </Button>
+      <div className="mt-8 max-w-xl space-y-4">
+        <label className="block text-sm font-medium text-[#1f3b2b] dark:text-foreground">
+          Ghi chú cho thủ thư
+          <Input
+            className="mt-2"
+            placeholder="Ví dụ: thời gian dự kiến đến nhận sách"
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+            disabled={submitted}
+          />
+        </label>
+        {submitError && (
+          <p role="alert" className="text-sm text-destructive">
+            {submitError}
+          </p>
+        )}
+        {submitted ? (
+          <p className="flex items-center gap-2 text-sm font-medium text-[#347247]">
+            <CheckCircle2 className="size-4" />
+            Yêu cầu đã được gửi, vui lòng chờ thủ thư hoặc admin xác nhận.
+          </p>
+        ) : (
+          <Button
+            size="lg"
+            onClick={submitRequest}
+            className="bg-[#1f5a45] text-white hover:bg-[#174735]"
+          >
+            Gửi yêu cầu mượn <ArrowRight className="ml-2 size-4" />
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

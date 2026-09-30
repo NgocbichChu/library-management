@@ -5,6 +5,7 @@ import {
   UsersIcon,
   ArrowLeftRightIcon,
   ClipboardCheckIcon,
+  HistoryIcon,
   SettingsIcon,
 } from "lucide-react"
 interface NavigationItem {
@@ -33,6 +34,11 @@ export const navMain: NavigationItem[] = [
     title: "Mượn trả sách",
     url: "/dashboard/loans",
     icon: <ArrowLeftRightIcon />,
+  },
+  {
+    title: "Lịch sử mượn",
+    url: "/dashboard/loan-history",
+    icon: <HistoryIcon />,
   },
   {
     title: "Demo yêu cầu mượn",

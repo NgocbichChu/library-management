@@ -6,8 +6,11 @@ import {
   AlertTriangle,
   BookOpen,
   Calendar,
+  Clock3,
+  LoaderCircle,
   User,
   RefreshCw,
+  XCircle,
 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -21,6 +24,10 @@ import { AppDialog } from "@/components/common/app-dialog"
 import { AppSelect } from "@/components/common/app-select"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { loansService, type BorrowSlipItem } from "@/services/loans"
+import {
+  borrowRequestsService,
+  type BorrowRequest,
+} from "@/services/borrow-requests"
 import { adminUsersService } from "@/services/admin-users"
 import { managerBooksApi, type BackendBookCopy } from "@/api/manager-books"
 import type { AdminUserItem } from "@/types/admin-users"
@@ -29,8 +36,19 @@ export const LoansPage = () => {
   const [borrowSlips, setBorrowSlips] = useState<BorrowSlipItem[]>([])
   const [readers, setReaders] = useState<AdminUserItem[]>([])
   const [availableCopies, setAvailableCopies] = useState<
-    { bookCopyId: number; barcode: string; bookTitle?: string }[]
+    {
+      bookCopyId: number
+      bookTitleId: number
+      barcode: string
+      bookTitle?: string
+    }[]
   >([])
+  const [borrowRequests, setBorrowRequests] = useState<BorrowRequest[]>(() =>
+    borrowRequestsService.getAll()
+  )
+  const [processingRequestId, setProcessingRequestId] = useState<string | null>(
+    null
+  )
   const [loading, setLoading] = useState(true)
 
   const [statusFilter, setStatusFilter] = useState("all")
@@ -76,6 +94,7 @@ export const LoansPage = () => {
         )
         .map((c) => ({
           bookCopyId: c.bookCopyId,
+          bookTitleId: c.bookTitleId,
           barcode: c.barcode,
           bookTitle: c.bookTitle
             ? `${c.bookTitle} (Bản sao #${c.bookCopyId}${c.shelfCode ? ` - ${c.shelfCode}` : ""})`
@@ -88,6 +107,7 @@ export const LoansPage = () => {
 
   const loadData = useCallback(async () => {
     setLoading(true)
+    setBorrowRequests(borrowRequestsService.removeApproved())
     try {
       const [slipsData, readersData, copiesData] = await Promise.all([
         loansService.getAll({
@@ -138,8 +158,21 @@ export const LoansPage = () => {
     }
   }, [statusFilter, searchQuery])
 
+  useEffect(() => {
+    const reloadRequests = () =>
+      setBorrowRequests(borrowRequestsService.removeApproved())
+    reloadRequests()
+    window.addEventListener("borrow-requests-updated", reloadRequests)
+    window.addEventListener("storage", reloadRequests)
+    return () => {
+      window.removeEventListener("borrow-requests-updated", reloadRequests)
+      window.removeEventListener("storage", reloadRequests)
+    }
+  }, [])
+
   const filteredSlips = useMemo(() => {
     return borrowSlips.filter((s) => {
+      if (s.slipStatus === "RETURNED") return false
       const matchStatus =
         statusFilter === "all" || s.slipStatus === statusFilter
       const query = searchQuery.toLowerCase()
@@ -226,6 +259,79 @@ export const LoansPage = () => {
       await loadData()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Trả sách thất bại")
+    }
+  }
+
+  const handleDecideBorrowRequest = async (
+    request: BorrowRequest,
+    approve: boolean
+  ) => {
+    if (processingRequestId) return
+    setProcessingRequestId(request.id)
+    try {
+      if (!approve) {
+        borrowRequestsService.updateStatus(request.id, "REJECTED")
+        setBorrowRequests(borrowRequestsService.getAll())
+        toast.success(`Đã từ chối yêu cầu ${request.id}.`)
+        return
+      }
+
+      borrowRequestsService.updateStatus(request.id, "WAITING_TO_SEND")
+      setBorrowRequests(borrowRequestsService.getAll())
+      toast.success(`Đã duyệt yêu cầu ${request.bookTitle}, chờ nhận sách.`)
+    } catch (cause: unknown) {
+      toast.error(
+        cause instanceof Error ? cause.message : "Không thể xử lý yêu cầu mượn."
+      )
+    } finally {
+      setProcessingRequestId(null)
+    }
+  }
+
+  const handleMarkBorrowRequestReceived = async (request: BorrowRequest) => {
+    if (processingRequestId) return
+    setProcessingRequestId(request.id)
+    try {
+      const reader = readers.find((item) => item.accountId === request.accountId)
+      const readerId =
+        reader?.readerId ||
+        (reader?.code?.match(/\d+/)
+          ? Number(reader.code.match(/\d+/)?.[0])
+          : undefined)
+      if (!readerId) {
+        throw new Error("Không tìm thấy mã độc giả tương ứng với tài khoản.")
+      }
+
+      const currentCopies = await getAvailableCopies()
+      setAvailableCopies(currentCopies)
+      const copy = currentCopies.find(
+        (item) => item.bookTitleId === request.bookTitleId
+      )
+      if (!copy) {
+        throw new Error("Đầu sách này hiện không còn bản sao sẵn sàng.")
+      }
+
+      const borrowDate = new Date()
+      const dueDate = new Date(borrowDate)
+      dueDate.setDate(dueDate.getDate() + 14)
+      await loansService.createBorrowSlip({
+        policyId: 1,
+        readerId,
+        borrowDate: borrowDate.toISOString(),
+        dueDate: dueDate.toISOString(),
+        note: request.note || undefined,
+        bookCopyIds: [copy.bookCopyId],
+      })
+      borrowRequestsService.remove(request.id)
+      setBorrowRequests(borrowRequestsService.getAll())
+      toast.success(`Đã nhận sách ${request.bookTitle} và tạo phiếu đang mượn.`)
+      await loadData()
+    } catch (cause: unknown) {
+      toast.error(
+        cause instanceof Error ? cause.message : "Không thể xử lý yêu cầu mượn."
+      )
+    } finally {
+      setProcessingRequestId(null)
     }
   }
 
@@ -397,14 +503,174 @@ export const LoansPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={loadData} className="gap-1.5 text-xs">
-            <RefreshCw className="size-3.5" /> Làm mới
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void loadData()}
+            disabled={loading}
+            className="gap-1.5 text-xs"
+          >
+            <RefreshCw
+              className={`size-3.5 ${loading ? "animate-spin" : ""}`}
+            />
+            Làm mới
           </Button>
           <Button onClick={handleOpenCreate} className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]">
             <Plus className="size-4" /> Lập phiếu mượn mới
           </Button>
         </div>
       </div>
+
+      <section className="border-y border-border">
+        <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+          <div>
+            <h2 className="text-sm font-semibold">
+              Yêu cầu mượn chờ xác nhận
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Phiếu mượn chỉ được tạo sau khi thủ thư hoặc admin duyệt.
+            </p>
+          </div>
+          <span className="flex shrink-0 items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock3 className="size-3.5" />
+            {
+              borrowRequests.filter(
+                (item) =>
+                  item.status === "PENDING" ||
+                  item.status === "WAITING_TO_SEND"
+              ).length
+            }
+          </span>
+        </div>
+        {borrowRequests.length === 0 ? (
+          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
+            Chưa có yêu cầu mượn sách.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-190 text-left text-sm">
+              <thead className="bg-muted/40 text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-2.5 font-medium">Độc giả</th>
+                  <th className="px-4 py-2.5 font-medium">Đầu sách</th>
+                  <th className="px-4 py-2.5 font-medium">Gửi lúc</th>
+                  <th className="px-4 py-2.5 font-medium">Trạng thái</th>
+                  <th className="px-4 py-2.5 text-right font-medium">
+                    Xử lý
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {borrowRequests.map((request) => {
+                  const busy = processingRequestId === request.id
+                  const statusLabel =
+                    request.status === "PENDING"
+                      ? "Chờ duyệt"
+                      : request.status === "WAITING_TO_SEND"
+                        ? "Đã duyệt · chờ nhận"
+                        : request.status === "APPROVED"
+                          ? "Đã duyệt"
+                          : "Đã từ chối"
+                  return (
+                    <tr key={request.id} className="border-t">
+                      <td className="px-4 py-3">
+                        <p className="font-medium">{request.readerName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Tài khoản #{request.accountId}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-medium">{request.bookTitle}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {request.author}
+                        </p>
+                        {request.note && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Ghi chú: {request.note}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {new Date(request.requestedAt).toLocaleString("vi-VN")}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge
+                          variant="outline"
+                          className={
+                            request.status === "PENDING"
+                              ? "border-amber-500/30 bg-amber-500/10 text-amber-700"
+                              : request.status === "WAITING_TO_SEND" ||
+                                  request.status === "APPROVED"
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
+                                : "border-destructive/30 bg-destructive/10 text-destructive"
+                          }
+                        >
+                          {statusLabel}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        {request.status === "PENDING" ? (
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              disabled={Boolean(processingRequestId)}
+                              onClick={() =>
+                                void handleDecideBorrowRequest(request, true)
+                              }
+                              className="gap-1.5 bg-[#1f5a45] text-white hover:bg-[#174735]"
+                            >
+                              {busy ? (
+                                <LoaderCircle className="size-3.5 animate-spin" />
+                              ) : (
+                                <CheckCircle2 className="size-3.5" />
+                              )}
+                              Duyệt
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={Boolean(processingRequestId)}
+                              onClick={() =>
+                                void handleDecideBorrowRequest(request, false)
+                              }
+                            >
+                              <XCircle className="size-3.5" /> Từ chối
+                            </Button>
+                          </div>
+                        ) : request.status === "WAITING_TO_SEND" ? (
+                          <div className="flex justify-end">
+                            <Button
+                              size="sm"
+                              disabled={Boolean(processingRequestId)}
+                              onClick={() =>
+                                void handleMarkBorrowRequestReceived(request)
+                              }
+                              className="gap-1.5 bg-[#1f5a45] text-white hover:bg-[#174735]"
+                            >
+                              {busy ? (
+                                <LoaderCircle className="size-3.5 animate-spin" />
+                              ) : (
+                                <CheckCircle2 className="size-3.5" />
+                              )}
+                              Đã nhận sách
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="block text-right text-xs text-muted-foreground">
+                            {request.borrowSlipId
+                              ? `Phiếu #${request.borrowSlipId}`
+                              : "Đã xử lý"}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -425,7 +691,6 @@ export const LoansPage = () => {
           options={[
             { value: "all", label: "Tất cả trạng thái" },
             { value: "BORROWING", label: "Đang mượn" },
-            { value: "RETURNED", label: "Đã hoàn trả" },
             { value: "OVERDUE", label: "Quá hạn" },
           ]}
         />

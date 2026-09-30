@@ -26,6 +26,7 @@ import { BooksManagementPage } from "@/features/manager/books-management-page"
 import { UsersManagementPage } from "@/features/manager/users-management-page"
 import { CategoriesPage } from "@/features/manager/categories-page"
 import { LoansPage } from "@/features/manager/loans-page"
+import { LoanHistoryPage } from "@/features/manager/loan-history-page"
 import { SettingsPage } from "@/features/manager/settings-page"
 import { SqlDemoPage } from "./features/manager/sql-demo-page"
 
@@ -88,6 +89,7 @@ export function App() {
               element={<Navigate to="/dashboard/users" replace />}
             />
             <Route path="loans" element={<LoansPage />} />
+            <Route path="loan-history" element={<LoanHistoryPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>

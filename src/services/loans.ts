@@ -176,7 +176,19 @@ export const loansService = {
 
   // Create borrow slip (runs Stored Procedure sp_borrow_books)
   createBorrowSlip: async (data: CreateBorrowSlipRequest): Promise<void> => {
-    await employeeBorrowApi.create(data)
+    const response = await employeeBorrowApi.create(data)
+    if (
+      response &&
+      typeof response === "object" &&
+      "success" in response &&
+      response.success === false
+    ) {
+      const message =
+        "message" in response && typeof response.message === "string"
+          ? response.message
+          : "Tạo phiếu mượn thất bại."
+      throw new Error(message)
+    }
   },
 
   // Return slip
