@@ -1,4 +1,8 @@
-import { managerBooksApi } from "@/api/manager-books"
+import {
+  managerBooksApi,
+  type BackendBookCopy,
+  type BackendBookTitle,
+} from "@/api/manager-books"
 import type {
   AddCopyInput,
   BookCopyItem,
@@ -7,527 +11,355 @@ import type {
   UpdateBookTitleInput,
 } from "@/types/manager-books"
 
-const INITIAL_BOOKS: BookTitleItem[] = [
-  {
-    id: "nam-phia-sau",
-    isbn: "978-604-1-16472-8",
-    title: "Năm phía sau",
-    subtitle: "Nghệ thuật tìm thấy khoảng lặng",
-    author: "Erling Kagge",
-    publisher: "NXB Trẻ",
-    publicationYear: 2021,
-    languageCode: "VIE",
-    category: "Khám phá",
-    description:
-      "Một cuốn sách nhỏ về nghệ thuật tìm thấy khoảng lặng và những điều thật sự quan trọng trong đời sống hiện đại.",
-    pageCount: 196,
-    bookStatus: "Active",
-    totalCopies: 4,
-    availableCopies: 4,
-    borrowedCopies: 0,
-    color: "#d9e6d1",
-    copies: [
-      {
-        id: "CP-NPS-01",
-        bookTitleId: "nam-phia-sau",
-        barcode: "8934974164721",
-        acquisitionDate: "12/01/2024",
-        price: 85000,
-        location: "Khu A - Tầng 2",
-        shelfCode: "Kệ A-01",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-NPS-02",
-        bookTitleId: "nam-phia-sau",
-        barcode: "8934974164722",
-        acquisitionDate: "12/01/2024",
-        price: 85000,
-        location: "Khu A - Tầng 2",
-        shelfCode: "Kệ A-01",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-NPS-03",
-        bookTitleId: "nam-phia-sau",
-        barcode: "8934974164723",
-        acquisitionDate: "15/02/2024",
-        price: 85000,
-        location: "Khu A - Tầng 2",
-        shelfCode: "Kệ A-02",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-NPS-04",
-        bookTitleId: "nam-phia-sau",
-        barcode: "8934974164724",
-        acquisitionDate: "15/02/2024",
-        price: 85000,
-        location: "Khu A - Tầng 2",
-        shelfCode: "Kệ A-02",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-    ],
-  },
-  {
-    id: "nha-gia-kim",
-    isbn: "978-604-56-2608-5",
-    title: "Nhà giả kim",
-    subtitle: "The Alchemist",
-    author: "Paulo Coelho",
-    publisher: "NXB Hội Nhà Văn",
-    publicationYear: 2020,
-    languageCode: "VIE",
-    category: "Văn học",
-    description:
-      "Hành trình theo đuổi kho báu và lắng nghe tiếng gọi của ước mơ, một câu chuyện đã truyền cảm hứng cho hàng triệu độc giả.",
-    pageCount: 228,
-    bookStatus: "Active",
-    totalCopies: 3,
-    availableCopies: 2,
-    borrowedCopies: 1,
-    color: "#ead7b4",
-    copies: [
-      {
-        id: "CP-NGK-01",
-        bookTitleId: "nha-gia-kim",
-        barcode: "8935235226081",
-        acquisitionDate: "10/11/2023",
-        price: 79000,
-        location: "Khu B - Tầng 1",
-        shelfCode: "Kệ B-03",
-        copyStatus: "Borrowed",
-        conditionStatus: "Good",
-        note: "Đang mượn bởi SV20240018 (Lê Minh Tuấn)",
-      },
-      {
-        id: "CP-NGK-02",
-        bookTitleId: "nha-gia-kim",
-        barcode: "8935235226082",
-        acquisitionDate: "10/11/2023",
-        price: 79000,
-        location: "Khu B - Tầng 1",
-        shelfCode: "Kệ B-03",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-NGK-03",
-        bookTitleId: "nha-gia-kim",
-        barcode: "8935235226083",
-        acquisitionDate: "18/03/2024",
-        price: 79000,
-        location: "Khu B - Tầng 1",
-        shelfCode: "Kệ B-04",
-        copyStatus: "Available",
-        conditionStatus: "SlightlyDamaged",
-        note: "Gáy sách hơi sờn",
-      },
-    ],
-  },
-  {
-    id: "su-im-lang",
-    isbn: "978-604-1-08427-9",
-    title: "Sức mạnh của sự im lặng",
-    subtitle: "Quiet: The Power of Introverts",
-    author: "Susan Cain",
-    publisher: "NXB Trẻ",
-    publicationYear: 2019,
-    languageCode: "VIE",
-    category: "Tâm lý",
-    description:
-      "Một góc nhìn sâu sắc về sức mạnh của những người hướng nội trong một thế giới luôn ưa chuộng sự ồn ào.",
-    pageCount: 440,
-    bookStatus: "Active",
-    totalCopies: 6,
-    availableCopies: 6,
-    borrowedCopies: 0,
-    color: "#cbdde0",
-    copies: [
-      {
-        id: "CP-SIL-01",
-        bookTitleId: "su-im-lang",
-        barcode: "8934974108421",
-        acquisitionDate: "05/05/2023",
-        price: 145000,
-        location: "Khu C - Tầng 2",
-        shelfCode: "Kệ C-01",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-SIL-02",
-        bookTitleId: "su-im-lang",
-        barcode: "8934974108422",
-        acquisitionDate: "05/05/2023",
-        price: 145000,
-        location: "Khu C - Tầng 2",
-        shelfCode: "Kệ C-01",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-    ],
-  },
-  {
-    id: "tuoi-tre-dang-gia",
-    isbn: "978-604-1-09852-8",
-    title: "Tuổi trẻ đáng giá bao nhiêu",
-    subtitle: "Sống có chủ đích",
-    author: "Rosie Nguyễn",
-    publisher: "NXB Trẻ",
-    publicationYear: 2018,
-    languageCode: "VIE",
-    category: "Phát triển bản thân",
-    description:
-      "Những gợi ý gần gũi để sống, học tập và làm việc có chủ đích hơn trong những năm tháng tuổi trẻ.",
-    pageCount: 292,
-    bookStatus: "Active",
-    totalCopies: 2,
-    availableCopies: 0,
-    borrowedCopies: 2,
-    color: "#e6c8c2",
-    copies: [
-      {
-        id: "CP-TT-01",
-        bookTitleId: "tuoi-tre-dang-gia",
-        barcode: "8934974109851",
-        acquisitionDate: "15/08/2023",
-        price: 90000,
-        location: "Khu D - Tầng 1",
-        shelfCode: "Kệ D-02",
-        copyStatus: "Borrowed",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-TT-02",
-        bookTitleId: "tuoi-tre-dang-gia",
-        barcode: "8934974109852",
-        acquisitionDate: "15/08/2023",
-        price: 90000,
-        location: "Khu D - Tầng 1",
-        shelfCode: "Kệ D-02",
-        copyStatus: "Borrowed",
-        conditionStatus: "Good",
-      },
-    ],
-  },
-  {
-    id: "muoi-nguoi-da-den",
-    isbn: "978-604-1-12345-6",
-    title: "Mười người da đen nhỏ",
-    subtitle: "And Then There Were None",
-    author: "Agatha Christie",
-    publisher: "NXB Văn Học",
-    publicationYear: 2022,
-    languageCode: "VIE",
-    category: "Trinh thám",
-    description:
-      "Một vụ án bí ẩn trên hòn đảo biệt lập, nơi từng người một biến mất theo một bài đồng dao đáng sợ.",
-    pageCount: 312,
-    bookStatus: "Active",
-    totalCopies: 4,
-    availableCopies: 3,
-    borrowedCopies: 1,
-    color: "#d8d1df",
-    copies: [
-      {
-        id: "CP-MND-01",
-        bookTitleId: "muoi-nguoi-da-den",
-        barcode: "8934974112341",
-        acquisitionDate: "02/02/2024",
-        price: 110000,
-        location: "Khu E - Tầng 2",
-        shelfCode: "Kệ E-05",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-      {
-        id: "CP-MND-02",
-        bookTitleId: "muoi-nguoi-da-den",
-        barcode: "8934974112342",
-        acquisitionDate: "02/02/2024",
-        price: 110000,
-        location: "Khu E - Tầng 2",
-        shelfCode: "Kệ E-05",
-        copyStatus: "Borrowed",
-        conditionStatus: "Good",
-      },
-    ],
-  },
-  {
-    id: "thiet-ke-cuoc-doi",
-    isbn: "978-604-2-09876-1",
-    title: "Thiết kế cuộc đời",
-    subtitle: "Designing Your Life",
-    author: "Bill Burnett",
-    publisher: "NXB Thế Giới",
-    publicationYear: 2021,
-    languageCode: "VIE",
-    category: "Kỹ năng",
-    description:
-      "Tư duy thiết kế giúp bạn thử nghiệm nhiều hướng đi và chủ động tạo ra một cuộc đời phù hợp.",
-    pageCount: 260,
-    bookStatus: "Active",
-    totalCopies: 5,
-    availableCopies: 5,
-    borrowedCopies: 0,
-    color: "#d4dec1",
-    copies: [
-      {
-        id: "CP-TKC-01",
-        bookTitleId: "thiet-ke-cuoc-doi",
-        barcode: "8934974109871",
-        acquisitionDate: "20/04/2024",
-        price: 135000,
-        location: "Khu A - Tầng 1",
-        shelfCode: "Kệ A-08",
-        copyStatus: "Available",
-        conditionStatus: "Good",
-      },
-    ],
-  },
+// Color generator based on title
+const PALETTE = [
+  "#d9e6d1",
+  "#ead7b4",
+  "#cbdde0",
+  "#e6c8c2",
+  "#d8d1df",
+  "#d4dec1",
+  "#e2ead9",
 ]
 
-// In-memory persistent cache for management session
-let booksStore: BookTitleItem[] = [...INITIAL_BOOKS]
+const getColorForTitle = (title: string): string => {
+  let hash = 0
+  for (let i = 0; i < title.length; i++) {
+    hash = title.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % PALETTE.length
+  return PALETTE[index]
+}
+
+const mapBackendToBookTitleItem = (
+  item: BackendBookTitle
+): BookTitleItem => {
+  const rawId = item.bookTitleId ?? item.id ?? 0
+  const idStr = String(rawId)
+
+  // Proper copy calculation:
+  // Never assume available=false means borrowed!
+  const total = Number(
+    item.totalCopies ?? (item.available ? 1 : 0)
+  )
+  const available = Number(
+    item.availableCopies ?? (item.available === false ? 0 : (total > 0 ? total : 0))
+  )
+  const borrowed = Number(
+    item.borrowedCopies ?? (total > available ? total - available : 0)
+  )
+
+  const rawStatus = String(item.bookStatus || item.status || "Active").toUpperCase()
+  const bookStatus =
+    rawStatus === "ACTIVE" ? "Active" : "Discontinued"
+
+  return {
+    id: idStr,
+    bookTitleId: Number(rawId),
+    isbn: String(item.isbn || "978-604-1-00000-0"),
+    title: String(item.title || "Tài liệu chưa đặt tên"),
+    subtitle: item.subtitle ? String(item.subtitle) : undefined,
+    author: String(item.author || "Nhiều tác giả"),
+    publisher: String(item.publisher || "NXB Trẻ"),
+    publicationYear: Number(item.publicationYear || 2024),
+    languageCode: String(item.languageCode || "VIE"),
+    categoryId: item.categoryId ? Number(item.categoryId) : undefined,
+    category: String(item.categoryName || item.category || "Văn học"),
+    description: String(item.description || ""),
+    pageCount: Number(item.pageCount || 200),
+    coverImageUrl: item.coverImageUrl ? String(item.coverImageUrl) : undefined,
+    bookStatus,
+    totalCopies: total,
+    availableCopies: available,
+    borrowedCopies: borrowed,
+    color: getColorForTitle(item.title || ""),
+    copies: [],
+  }
+}
 
 export const managerBooksService = {
-  // Fetch all books: try API first, fallback to store
-  getAll: async (): Promise<BookTitleItem[]> => {
-    try {
-      const response = await managerBooksApi.getAll()
-      const rawList =
-        (response.data as { data?: unknown[] })?.data ||
-        (Array.isArray(response.data) ? response.data : null)
-      if (response.success && Array.isArray(rawList) && rawList.length > 0) {
-        const beBooks: BookTitleItem[] = (
-          rawList as Record<string, unknown>[]
-        ).map((item) => {
-          const rawId = item.id ?? item.bookTitleId ?? item.book_title_id
-          const localBook = booksStore.find(
-            (book) =>
-              book.id === String(rawId) ||
-              book.title.toLowerCase() ===
-                String(item.title || "").toLowerCase()
-          )
-          const totalCopies = Number(
-            item.totalCopies ?? item.total_copies ?? item.copies_count
-          )
-          const availableCopies = Number(
-            item.availableCopies ??
-              item.available_copies_count ??
-              item.available_count
-          )
-          const borrowedCopies = Number(
-            item.borrowedCopies ??
-              item.borrowed_copies_count ??
-              item.borrowed_count
-          )
-          return {
-            id: String(rawId),
-            isbn: String(item.isbn || "978-604-1-00000-0"),
-            title: String(item.title || "Tài liệu chưa đặt tên"),
-            subtitle: item.subtitle ? String(item.subtitle) : undefined,
-            author: String(item.author || "Nhiều tác giả"),
-            publisher: String(item.publisher || "NXB Tổng hợp"),
-            publicationYear: Number(item.publicationYear || 2024),
-            languageCode: String(item.languageCode || "VIE"),
-            category: String(item.category || "Văn học"),
-            description: String(item.description || "Tài liệu lưu hành nội bộ"),
-            pageCount: Number(item.pageCount || 200),
-            coverImageUrl: item.coverImageUrl
-              ? String(item.coverImageUrl)
-              : undefined,
-            bookStatus: "Active",
-            totalCopies: Number.isFinite(totalCopies)
-              ? totalCopies
-              : (localBook?.totalCopies ?? 1),
-            availableCopies: Number.isFinite(availableCopies)
-              ? availableCopies
-              : (localBook?.availableCopies ??
-                (item.available === false ? 0 : 1)),
-            borrowedCopies: Number.isFinite(borrowedCopies)
-              ? borrowedCopies
-              : (localBook?.borrowedCopies ?? 0),
-            color: "#e2ead9",
-            copies: localBook?.copies ?? [],
-          }
-        })
+  // Fetch all book titles from database, sorted by bookTitleId desc
+  getAll: async (keyword?: string): Promise<BookTitleItem[]> => {
+    let rawList: BackendBookTitle[] = []
+    let copyItems: BackendBookCopy[] = []
 
-        // Merge backend books with mock initial books
-        const merged = [...beBooks]
-        for (const localBook of booksStore) {
-          if (
-            !merged.some(
-              (b) =>
-                b.id === localBook.id ||
-                b.title.toLowerCase() === localBook.title.toLowerCase()
-            )
-          ) {
-            merged.push(localBook)
+    try {
+      // 1. Primary: Fetch both book titles and copies in parallel
+      const [titlesRes, copiesRes] = await Promise.allSettled([
+        managerBooksApi.getAll({
+          keyword,
+          pageNumber: 1,
+          pageSize: 200,
+          sortBy: "bookTitleId",
+          sortDirection: "desc",
+        }),
+        managerBooksApi.getCopies(),
+      ])
+
+      if (titlesRes.status === "fulfilled" && titlesRes.value) {
+        const response = titlesRes.value
+        if (Array.isArray(response)) {
+          rawList = response
+        } else if (response && "items" in response && Array.isArray(response.items)) {
+          rawList = response.items
+        } else if (
+          response &&
+          "data" in response &&
+          response.data &&
+          typeof response.data === "object"
+        ) {
+          if ("items" in response.data && Array.isArray((response.data as { items: BackendBookTitle[] }).items)) {
+            rawList = (response.data as { items: BackendBookTitle[] }).items
+          } else if ("data" in response.data && Array.isArray((response.data as { data: BackendBookTitle[] }).data)) {
+            rawList = (response.data as { data: BackendBookTitle[] }).data
+          } else if (Array.isArray(response.data)) {
+            rawList = response.data as BackendBookTitle[]
           }
         }
-        return merged
+      }
+
+      if (copiesRes.status === "fulfilled" && copiesRes.value) {
+        const cData = copiesRes.value
+        if (Array.isArray(cData)) {
+          copyItems = cData
+        } else if (cData && typeof cData === "object") {
+          if (
+            "data" in cData &&
+            cData.data &&
+            typeof cData.data === "object" &&
+            "items" in cData.data &&
+            Array.isArray(cData.data.items)
+          ) {
+            copyItems = cData.data.items
+          } else if ("items" in cData && Array.isArray(cData.items)) {
+            copyItems = cData.items
+          } else if ("data" in cData && Array.isArray(cData.data)) {
+            copyItems = cData.data
+          }
+        }
       }
     } catch {
-      // Fallback to in-memory store
+      // 2. Secondary fallback: Try search books endpoint
+      try {
+        const searchRes = await managerBooksApi.searchBooks({
+          keyword,
+          pageNumber: 1,
+          pageSize: 200,
+          sortDirection: "desc",
+        })
+        if (searchRes && "items" in searchRes && Array.isArray(searchRes.items)) {
+          rawList = searchRes.items
+        } else if (
+          searchRes &&
+          "data" in searchRes &&
+          searchRes.data &&
+          typeof searchRes.data === "object" &&
+          "items" in searchRes.data &&
+          Array.isArray((searchRes.data as { items: BackendBookTitle[] }).items)
+        ) {
+          rawList = (searchRes.data as { items: BackendBookTitle[] }).items
+        }
+      } catch {
+        rawList = []
+      }
     }
-    return booksStore
+
+    // Aggregate copy statistics by bookTitleId
+    const copiesMap = new Map<number, { total: number; available: number; borrowed: number }>()
+    for (const copy of copyItems) {
+      const tid = Number(copy.bookTitleId)
+      if (!tid) continue
+      const stat = copiesMap.get(tid) || { total: 0, available: 0, borrowed: 0 }
+      stat.total += 1
+      if (copy.copyStatus?.toUpperCase() === "BORROWED") {
+        stat.borrowed += 1
+      } else {
+        stat.available += 1
+      }
+      copiesMap.set(tid, stat)
+    }
+
+    // Map to BookTitleItem and attach real copy counts
+    const books = rawList.map((item) => {
+      const book = mapBackendToBookTitleItem(item)
+      const bId = book.bookTitleId ? Number(book.bookTitleId) : Number(book.id)
+      const stat = bId ? copiesMap.get(bId) : undefined
+      if (stat) {
+        book.totalCopies = stat.total
+        book.availableCopies = stat.available
+        book.borrowedCopies = stat.borrowed
+      }
+      return book
+    })
+
+    // Ensure sorting by ID descending so newly created book is ALWAYS at index 0 (Row 1)
+    books.sort((a, b) => {
+      const idA = Number(a.id) || 0
+      const idB = Number(b.id) || 0
+      return idB - idA
+    })
+
+    return books
   },
 
   // Create new book title
   create: async (input: CreateBookTitleInput): Promise<BookTitleItem> => {
-    let createdId: string | number = `book-${Date.now()}`
-    // Attempt backend API call
+    let createdId: number = Date.now()
+
     try {
       const res = await managerBooksApi.create(input)
-      if (res.success && res.data) {
-        if (typeof res.data === "string" || typeof res.data === "number") {
-          createdId = res.data
-        } else if (typeof res.data === "object") {
-          const result = res.data as Record<string, unknown>
-          const returnedId =
-            result.id ?? result.bookTitleId ?? result.book_title_id
-          if (
-            typeof returnedId === "string" ||
-            typeof returnedId === "number"
-          ) {
-            createdId = returnedId
+      if (typeof res === "number") {
+        createdId = res
+      } else if (typeof res === "string" && !isNaN(Number(res))) {
+        createdId = Number(res)
+      } else if (res && typeof res === "object") {
+        if ("data" in res) {
+          const data = (res as { data: unknown }).data
+          if (typeof data === "number") {
+            createdId = data
+          } else if (typeof data === "string" && !isNaN(Number(data))) {
+            createdId = Number(data)
+          } else if (data && typeof data === "object") {
+            const result = data as Record<string, unknown>
+            const returnedId =
+              result.id ?? result.bookTitleId ?? result.book_title_id
+            if (returnedId !== undefined && !isNaN(Number(returnedId))) {
+              createdId = Number(returnedId)
+            }
           }
         }
       }
-    } catch {
-      // Continue locally for smooth demonstration
+    } catch (err) {
+      console.error("Error creating book title:", err)
+      throw err
     }
 
-    const newId = String(createdId)
-
     const newBook: BookTitleItem = {
-      id: newId,
+      id: String(createdId),
+      bookTitleId: createdId,
       isbn: input.isbn,
       title: input.title,
       subtitle: input.subtitle,
       author: input.author,
-      publisher: input.publisher,
-      publicationYear: input.publicationYear,
+      publisher: input.publisher || "NXB Trẻ",
+      publicationYear: input.publicationYear || 2024,
       languageCode: input.languageCode || "VIE",
-      category: input.category,
+      categoryId: input.categoryId,
+      category: input.category || "Văn học",
       description: input.description,
-      pageCount: input.pageCount,
+      pageCount: input.pageCount || 200,
       coverImageUrl: input.coverImageUrl,
-      bookStatus: input.bookStatus || "Active",
-      totalCopies: 1,
-      availableCopies: 1,
+      bookStatus: "Active",
+      totalCopies: 0,
+      availableCopies: 0,
       borrowedCopies: 0,
-      color: "#e2ead9",
-      copies: [
-        {
-          id: `CP-${Date.now()}`,
-          bookTitleId: newId,
-          barcode: `893${Date.now().toString().slice(-10)}`,
-          acquisitionDate: new Date().toLocaleDateString("vi-VN"),
-          price: 90000,
-          location: "Khu A - Tầng 1",
-          shelfCode: "Kệ A-01",
-          copyStatus: "Available",
-          conditionStatus: "Good",
-        },
-      ],
+      color: getColorForTitle(input.title),
+      copies: [],
     }
 
-    booksStore = [newBook, ...booksStore]
     return newBook
   },
 
   // Update book title
   update: async (
-    id: string,
+    id: string | number,
     input: UpdateBookTitleInput
-  ): Promise<BookTitleItem> => {
-    try {
-      await managerBooksApi.update(id, input)
-    } catch {
-      // Fallback update in-memory
-    }
+  ): Promise<void> => {
+    await managerBooksApi.update(id, input)
+  },
 
-    booksStore = booksStore.map((book) => {
-      if (book.id === id) {
-        return {
-          ...book,
-          ...input,
-          bookStatus: input.bookStatus ?? book.bookStatus,
+  // Delete book title
+  delete: async (id: string | number): Promise<void> => {
+    await managerBooksApi.delete(id)
+  },
+
+  // Get physical copies of a book title from DB
+  getCopies: async (bookTitleId: string | number): Promise<BookCopyItem[]> => {
+    try {
+      const res = await managerBooksApi.getCopies(bookTitleId)
+      let copiesList: BackendBookCopy[] = []
+      if (Array.isArray(res)) {
+        copiesList = res
+      } else if (res && "items" in res && Array.isArray(res.items)) {
+        copiesList = res.items
+      } else if (res && "data" in res && res.data) {
+        if (Array.isArray(res.data)) {
+          copiesList = res.data
+        } else if (typeof res.data === "object" && "items" in res.data && Array.isArray((res.data as { items: BackendBookCopy[] }).items)) {
+          copiesList = (res.data as { items: BackendBookCopy[] }).items
         }
       }
-      return book
-    })
 
-    const updated = booksStore.find((b) => b.id === id)
-    if (!updated) throw new Error("Không tìm thấy đầu sách cần cập nhật.")
-    return updated
-  },
-
-  // Delete book title (checks integrity constraints)
-  delete: async (id: string): Promise<void> => {
-    const book = booksStore.find((b) => b.id === id)
-    if (!book) throw new Error("Đầu sách không tồn tại.")
-
-    // Check integrity: cannot delete if copies are currently borrowed
-    if (book.borrowedCopies > 0) {
-      throw new Error(
-        `Không thể xóa đầu sách "${book.title}" vì đang có ${book.borrowedCopies} bản sao đang được độc giả mượn.`
-      )
-    }
-
-    try {
-      await managerBooksApi.delete(id)
+      return copiesList.map((c) => ({
+        id: c.bookCopyId || String(c.barcode),
+        bookCopyId: c.bookCopyId,
+        bookTitleId: c.bookTitleId,
+        barcode: c.barcode,
+        acquisitionDate: c.acquisitionDate
+          ? new Date(c.acquisitionDate).toLocaleDateString("vi-VN")
+          : new Date().toLocaleDateString("vi-VN"),
+        price: c.price || 0,
+        location: c.location || "Khu A - Tầng 1",
+        shelfCode: c.shelfCode || "Kệ A-01",
+        copyStatus:
+          c.copyStatus?.toUpperCase() === "BORROWED"
+            ? "Borrowed"
+            : "Available",
+        conditionStatus:
+          c.conditionStatus?.toUpperCase() === "DAMAGED"
+            ? "Damaged"
+            : c.conditionStatus?.toUpperCase() === "SLIGHTLY_DAMAGED"
+              ? "SlightlyDamaged"
+              : "Good",
+        note: c.note,
+      }))
     } catch {
-      // Fallback delete
+      return []
     }
-
-    booksStore = booksStore.filter((b) => b.id !== id)
   },
 
-  // Add a physical copy to a book
+  // Add a physical copy to a book in DB
   addCopy: async (
-    bookTitleId: string,
+    bookTitleId: string | number,
     input: AddCopyInput
   ): Promise<BookCopyItem> => {
-    const book = booksStore.find((b) => b.id === bookTitleId)
-    if (!book) throw new Error("Không tìm thấy đầu sách.")
+    const res = await managerBooksApi.createCopy(bookTitleId, input)
+    let copyId: string | number = `CP-${Date.now()}`
+    if (typeof res === "number") {
+      copyId = res
+    } else if (typeof res === "string" && !isNaN(Number(res))) {
+      copyId = Number(res)
+    } else if (res && typeof res === "object") {
+      if ("data" in res) {
+        const dataVal = (res as { data: unknown }).data
+        if (typeof dataVal === "number") {
+          copyId = dataVal
+        } else if (typeof dataVal === "string" && !isNaN(Number(dataVal))) {
+          copyId = Number(dataVal)
+        } else if (dataVal && typeof dataVal === "object" && "bookCopyId" in dataVal) {
+          copyId = Number((dataVal as { bookCopyId: unknown }).bookCopyId)
+        }
+      } else if ("bookCopyId" in res) {
+        copyId = Number((res as BackendBookCopy).bookCopyId)
+      }
+    }
 
-    const newCopy: BookCopyItem = {
-      id: `CP-${Date.now()}`,
+    return {
+      id: copyId,
       bookTitleId,
       barcode: input.barcode,
       acquisitionDate: new Date().toLocaleDateString("vi-VN"),
       price: input.price,
-      location: input.location,
-      shelfCode: input.shelfCode,
+      location: input.location || "Khu A - Tầng 1",
+      shelfCode: input.shelfCode || "Kệ A-01",
       copyStatus: "Available",
       conditionStatus: input.conditionStatus,
+      note: input.note,
     }
+  },
 
-    const currentCopies = book.copies || []
-    const updatedCopies = [...currentCopies, newCopy]
-
-    booksStore = booksStore.map((b) => {
-      if (b.id === bookTitleId) {
-        return {
-          ...b,
-          copies: updatedCopies,
-          totalCopies: updatedCopies.length,
-          availableCopies: updatedCopies.filter(
-            (c) => c.copyStatus === "Available"
-          ).length,
-        }
-      }
-      return b
-    })
-
-    return newCopy
+  // Delete a physical copy from DB
+  deleteCopy: async (bookCopyId: string | number): Promise<void> => {
+    await managerBooksApi.deleteCopy(bookCopyId)
   },
 }

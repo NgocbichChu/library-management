@@ -51,6 +51,28 @@ type RequestOptions = Omit<RequestInit, "body" | "method"> & {
   skipAuth?: boolean
 }
 
+let isHandling401 = false
+
+function handle401Unauthorized() {
+  if (isHandling401) return
+  isHandling401 = true
+
+  setStoredToken(null)
+  try {
+    localStorage.removeItem("library_auth_session")
+  } catch {
+    // Ignore storage errors
+  }
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("auth:unauthorized"))
+  }
+
+  setTimeout(() => {
+    isHandling401 = false
+  }, 2000)
+}
+
 async function request<T>(
   method: string,
   path: string,
@@ -105,7 +127,13 @@ async function request<T>(
       data = text
     }
   }
-  if (!response.ok) throw new ApiError(response.status, data)
+
+  if (!response.ok) {
+    if (response.status === 401 && !cleanPath.includes("auth/login")) {
+      handle401Unauthorized()
+    }
+    throw new ApiError(response.status, data)
+  }
   return data as T
 }
 
