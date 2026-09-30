@@ -29,7 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { categoriesService } from "@/services/categories"
 import { managerBooksService } from "@/services/manager-books"
+import type { CategoryDto } from "@/api/categories"
 import type {
   BookCopyItem,
   BookTitleItem,
@@ -38,12 +40,13 @@ import type {
 
 export function BooksManagementPage() {
   const [books, setBooks] = useState<BookTitleItem[]>([])
+  const [categoriesList, setCategoriesList] = useState<CategoryDto[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("Tất cả")
   const [statusFilter, setStatusFilter] = useState("Tất cả")
   const [currentPage, setCurrentPage] = useState(1)
-  const pageSize = 5
+  const pageSize = 10
 
   // Modals state
   const [isAddEditOpen, setIsAddEditOpen] = useState(false)
@@ -51,6 +54,8 @@ export function BooksManagementPage() {
   const [isCopiesOpen, setIsCopiesOpen] = useState(false)
   const [selectedBookForCopies, setSelectedBookForCopies] =
     useState<BookTitleItem | null>(null)
+  const [copiesList, setCopiesList] = useState<BookCopyItem[]>([])
+  const [copiesLoading, setCopiesLoading] = useState(false)
 
   // Form state for Add/Edit
   const [formData, setFormData] = useState<CreateBookTitleInput>({
@@ -61,6 +66,7 @@ export function BooksManagementPage() {
     publisher: "NXB Trẻ",
     publicationYear: 2024,
     languageCode: "VIE",
+    categoryId: 1,
     category: "Văn học",
     description: "",
     pageCount: 200,
@@ -70,16 +76,17 @@ export function BooksManagementPage() {
   // Form state for Add Copy
   const [newBarcode, setNewBarcode] = useState("")
   const [newShelf, setNewShelf] = useState("Kệ A-01")
+  const [newLocation, setNewLocation] = useState("Khu A - Tầng 1")
   const [newPrice, setNewPrice] = useState(85000)
 
-  // Refresh books on user action
+  // Load books and categories
   const refreshBooks = async () => {
     setLoading(true)
     try {
-      const data = await managerBooksService.getAll()
+      const data = await managerBooksService.getAll(searchQuery || undefined)
       setBooks(data)
     } catch {
-      toast.error("Không thể tải danh sách sách.")
+      toast.error("Không thể tải danh sách sách từ cơ sở dữ liệu.")
     } finally {
       setLoading(false)
     }
@@ -87,6 +94,20 @@ export function BooksManagementPage() {
 
   useEffect(() => {
     let ignore = false
+
+    // Fetch categories
+    categoriesService
+      .getAll()
+      .then((cats) => {
+        if (!ignore && cats.length > 0) {
+          setCategoriesList(cats)
+        }
+      })
+      .catch(() => {
+        // Fallback default
+      })
+
+    // Fetch books
     managerBooksService
       .getAll()
       .then((data) => {
@@ -97,7 +118,7 @@ export function BooksManagementPage() {
       })
       .catch(() => {
         if (!ignore) {
-          toast.error("Không thể tải danh sách sách.")
+          toast.error("Không thể tải danh sách sách từ cơ sở dữ liệu.")
           setLoading(false)
         }
       })
@@ -119,10 +140,13 @@ export function BooksManagementPage() {
     0
   )
 
-  const categories = useMemo(() => {
-    const list = ["Tất cả", ...new Set(books.map((b) => b.category))]
-    return list
-  }, [books])
+  // Category filter options
+  const filterCategories = useMemo(() => {
+    const namesFromApi = categoriesList.map((c) => c.categoryName)
+    const namesFromBooks = books.map((b) => b.category)
+    const unique = Array.from(new Set([...namesFromApi, ...namesFromBooks]))
+    return ["Tất cả", ...unique]
+  }, [categoriesList, books])
 
   // Filtered books
   const filteredBooks = useMemo(() => {
@@ -134,7 +158,10 @@ export function BooksManagementPage() {
       const matchCat =
         categoryFilter === "Tất cả" || book.category === categoryFilter
       const matchStatus =
-        statusFilter === "Tất cả" || book.bookStatus === statusFilter
+        statusFilter === "Tất cả" ||
+        (statusFilter === "Active"
+          ? book.bookStatus === "Active" || book.bookStatus === "ACTIVE"
+          : book.bookStatus !== "Active" && book.bookStatus !== "ACTIVE")
       return matchQuery && matchCat && matchStatus
     })
   }, [books, searchQuery, categoryFilter, statusFilter])
@@ -142,6 +169,7 @@ export function BooksManagementPage() {
   // Open Add Dialog
   const handleOpenAdd = () => {
     setEditingBook(null)
+    const defaultCat = categoriesList[0]
     setFormData({
       title: "",
       subtitle: "",
@@ -150,7 +178,8 @@ export function BooksManagementPage() {
       publisher: "NXB Trẻ",
       publicationYear: 2024,
       languageCode: "VIE",
-      category: "Văn học",
+      categoryId: defaultCat ? defaultCat.categoryId : 1,
+      category: defaultCat ? defaultCat.categoryName : "Văn học",
       description: "",
       pageCount: 220,
       bookStatus: "Active",
@@ -160,6 +189,14 @@ export function BooksManagementPage() {
 
   // Open Edit Dialog
   const handleOpenEdit = (book: BookTitleItem) => {
+    const matchedCat =
+      categoriesList.find((c) => c.categoryId === book.categoryId) ||
+      categoriesList.find(
+        (c) =>
+          c.categoryName.toLowerCase() === (book.category || "").toLowerCase()
+      ) ||
+      categoriesList[0]
+
     setEditingBook(book)
     setFormData({
       title: book.title,
@@ -169,7 +206,8 @@ export function BooksManagementPage() {
       publisher: book.publisher,
       publicationYear: book.publicationYear,
       languageCode: book.languageCode,
-      category: book.category,
+      categoryId: matchedCat ? matchedCat.categoryId : book.categoryId || 1,
+      category: matchedCat ? matchedCat.categoryName : book.category,
       description: book.description,
       pageCount: book.pageCount,
       bookStatus: book.bookStatus,
@@ -189,12 +227,18 @@ export function BooksManagementPage() {
       if (editingBook) {
         await managerBooksService.update(editingBook.id, formData)
         toast.success(`Đã cập nhật đầu sách "${formData.title}"`)
+        setIsAddEditOpen(false)
+        await refreshBooks()
       } else {
-        await managerBooksService.create(formData)
-        toast.success(`Đã thêm mới đầu sách "${formData.title}"`)
+        const createdBook = await managerBooksService.create(formData)
+        toast.success(`Đã thêm mới đầu sách "${formData.title}" thành công`)
+        setIsAddEditOpen(false)
+        // Ensure new book is placed at ROW 1 (index 0) immediately!
+        setBooks((prev) => [createdBook, ...prev])
+        setCurrentPage(1)
+        // Also refresh background to synchronize with DB IDs
+        void managerBooksService.getAll().then((data) => setBooks(data))
       }
-      setIsAddEditOpen(false)
-      refreshBooks()
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Thao tác không thành công."
@@ -215,7 +259,7 @@ export function BooksManagementPage() {
     try {
       await managerBooksService.delete(book.id)
       toast.success(`Đã xóa đầu sách "${book.title}"`)
-      refreshBooks()
+      setBooks((prev) => prev.filter((b) => b.id !== book.id))
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Không thể xóa đầu sách này."
@@ -224,10 +268,23 @@ export function BooksManagementPage() {
   }
 
   // Open Copies Dialog
-  const handleOpenCopies = (book: BookTitleItem) => {
+  const handleOpenCopies = async (book: BookTitleItem) => {
     setSelectedBookForCopies(book)
     setNewBarcode(`893${Date.now().toString().slice(-9)}`)
+    setNewShelf("Kệ A-01")
+    setNewLocation("Khu A - Tầng 1")
+    setNewPrice(85000)
     setIsCopiesOpen(true)
+    setCopiesLoading(true)
+
+    try {
+      const copies = await managerBooksService.getCopies(book.id)
+      setCopiesList(copies)
+    } catch {
+      setCopiesList([])
+    } finally {
+      setCopiesLoading(false)
+    }
   }
 
   // Add Copy
@@ -236,25 +293,84 @@ export function BooksManagementPage() {
     if (!selectedBookForCopies || !newBarcode) return
 
     try {
-      await managerBooksService.addCopy(selectedBookForCopies.id, {
-        barcode: newBarcode,
-        location: "Khu A - Tầng 1",
-        shelfCode: newShelf,
-        price: newPrice,
-        conditionStatus: "Good",
-      })
-      toast.success("Đã thêm bản sao mới thành công.")
-      const updatedList = await managerBooksService.getAll()
-      setBooks(updatedList)
-      const freshBook = updatedList.find(
-        (b) => b.id === selectedBookForCopies.id
+      const addedCopy = await managerBooksService.addCopy(
+        selectedBookForCopies.id,
+        {
+          barcode: newBarcode,
+          location: newLocation,
+          shelfCode: newShelf,
+          price: newPrice,
+          copyStatus: "AVAILABLE",
+          conditionStatus: "Good",
+        }
       )
-      if (freshBook) setSelectedBookForCopies(freshBook)
+      toast.success("Đã thêm bản sao mới vào kho thành công.")
+      const updatedCopies = [addedCopy, ...copiesList]
+      setCopiesList(updatedCopies)
+
+      // Update book copies count in state
+      setBooks((prev) =>
+        prev.map((b) =>
+          b.id === selectedBookForCopies.id
+            ? {
+                ...b,
+                totalCopies: b.totalCopies + 1,
+                availableCopies: b.availableCopies + 1,
+              }
+            : b
+        )
+      )
+      setSelectedBookForCopies((prev) =>
+        prev
+          ? {
+              ...prev,
+              totalCopies: prev.totalCopies + 1,
+              availableCopies: prev.availableCopies + 1,
+            }
+          : null
+      )
+
       setNewBarcode(`893${Date.now().toString().slice(-9)}`)
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Không thể thêm bản sao."
       )
+    }
+  }
+
+  // Delete Copy
+  const handleDeleteCopy = async (copyId: string | number) => {
+    if (!selectedBookForCopies) return
+    if (!window.confirm("Bạn có chắc chắn muốn xóa bản sao này?")) return
+
+    try {
+      await managerBooksService.deleteCopy(copyId)
+      toast.success("Đã xóa bản sao thành công.")
+      const updated = copiesList.filter((c) => c.id !== copyId)
+      setCopiesList(updated)
+
+      setBooks((prev) =>
+        prev.map((b) =>
+          b.id === selectedBookForCopies.id
+            ? {
+                ...b,
+                totalCopies: Math.max(0, b.totalCopies - 1),
+                availableCopies: Math.max(0, b.availableCopies - 1),
+              }
+            : b
+        )
+      )
+      setSelectedBookForCopies((prev) =>
+        prev
+          ? {
+              ...prev,
+              totalCopies: Math.max(0, prev.totalCopies - 1),
+              availableCopies: Math.max(0, prev.availableCopies - 1),
+            }
+          : null
+      )
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Không thể xóa bản sao.")
     }
   }
 
@@ -307,18 +423,31 @@ export function BooksManagementPage() {
       header: "Bản sao trong kho",
       cell: (item) => (
         <div>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#1f3b2b] dark:text-foreground">
-              {item.availableCopies} / {item.totalCopies}
-            </span>
-            <span className="text-xs text-[#718077] dark:text-muted-foreground">
-              sẵn sàng
-            </span>
-          </div>
-          {item.borrowedCopies > 0 && (
-            <p className="text-xs font-medium text-[#c27652] dark:text-orange-400">
-              Đang mượn: {item.borrowedCopies} cuốn
-            </p>
+          {item.totalCopies === 0 ? (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-medium text-[#718077] dark:text-muted-foreground">
+                0 / 0 bản sao
+              </span>
+              <span className="text-[11px] text-amber-600 dark:text-amber-400">
+                (Chưa nhập kho)
+              </span>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#1f3b2b] dark:text-foreground">
+                  {item.availableCopies} / {item.totalCopies}
+                </span>
+                <span className="text-xs text-[#718077] dark:text-muted-foreground">
+                  sẵn sàng
+                </span>
+              </div>
+              {item.borrowedCopies > 0 && (
+                <p className="text-xs font-medium text-[#c27652] dark:text-orange-400">
+                  Đang mượn: {item.borrowedCopies} cuốn
+                </p>
+              )}
+            </div>
           )}
         </div>
       ),
@@ -327,7 +456,7 @@ export function BooksManagementPage() {
       id: "status",
       header: "Trạng thái",
       cell: (item) =>
-        item.bookStatus === "Active" ? (
+        item.bookStatus === "Active" || item.bookStatus === "ACTIVE" ? (
           <Badge
             variant="outline"
             className="border-[#cce1d2] bg-[#edf6ef] text-[#246237] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
@@ -386,14 +515,14 @@ export function BooksManagementPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold tracking-[0.16em] text-[#c27652] uppercase">
-            Nghiệp vụ Quản lý Thư viện
+            Nghiệp vụ Quản trị Thư viện
           </p>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#1f3b2b] dark:text-foreground">
             Quản lý Đầu sách &amp; Bản sao
           </h1>
           <p className="mt-1 text-sm text-[#718077] dark:text-muted-foreground">
-            Quản lý thông tin đầu sách, theo dõi mã vạch barcode và vị trí kệ
-            sách trong kho.
+            Quản lý thông tin đầu sách, danh mục thể loại, mã vạch barcode và vị trí
+            lưu trữ trong kho.
           </p>
         </div>
 
@@ -415,7 +544,7 @@ export function BooksManagementPage() {
             {totalTitles}
           </p>
           <p className="text-[11px] text-[#56675c] dark:text-muted-foreground">
-            Đầu mục đã đăng ký
+            Đầu mục đã đăng ký trong DB
           </p>
         </div>
         <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
@@ -426,7 +555,7 @@ export function BooksManagementPage() {
             {totalCopiesCount}
           </p>
           <p className="text-[11px] text-[#56675c] dark:text-muted-foreground">
-            Cuốn sách đang quản lý
+            Cuốn sách trong kho
           </p>
         </div>
         <div className="rounded-xl border border-[#dfe5dc] bg-white p-4 shadow-xs dark:border-border dark:bg-card">
@@ -466,16 +595,19 @@ export function BooksManagementPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Dynamic Category Filter */}
           <Select
             value={categoryFilter}
             onValueChange={(val) => setCategoryFilter(val ?? "Tất cả")}
           >
-            <SelectTrigger className="h-9 w-40 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
+            <SelectTrigger className="h-9 w-44 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
               <Filter className="mr-1 size-3.5 text-[#718077] dark:text-muted-foreground" />
-              <SelectValue placeholder="Thể loại" />
+              <SelectValue placeholder="Thể loại">
+                {categoryFilter === "Tất cả" ? "Tất cả thể loại" : categoryFilter}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {categories.map((cat) => (
+              {filterCategories.map((cat) => (
                 <SelectItem key={cat} value={cat}>
                   {cat}
                 </SelectItem>
@@ -483,12 +615,19 @@ export function BooksManagementPage() {
             </SelectContent>
           </Select>
 
+          {/* Status Filter */}
           <Select
             value={statusFilter}
             onValueChange={(val) => setStatusFilter(val ?? "Tất cả")}
           >
             <SelectTrigger className="h-9 w-36 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
-              <SelectValue placeholder="Trạng thái" />
+              <SelectValue placeholder="Trạng thái">
+                {statusFilter === "Active"
+                  ? "Đang phục vụ"
+                  : statusFilter === "Discontinued"
+                    ? "Ngừng lưu hành"
+                    : "Tất cả trạng thái"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Tất cả">Tất cả trạng thái</SelectItem>
@@ -499,7 +638,7 @@ export function BooksManagementPage() {
         </div>
       </div>
 
-      {/* Main Table */}
+      {/* Main Table: Newest books appear at Row 1 */}
       <CommonTable
         data={filteredBooks}
         columns={columns}
@@ -523,15 +662,17 @@ export function BooksManagementPage() {
         open={isAddEditOpen}
         onOpenChange={setIsAddEditOpen}
         title={
-          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
-            <BookOpen className="size-5 text-[#1f5a45] dark:text-emerald-400" />
-            {editingBook
-              ? "Cập nhật đầu sách"
-              : "Thêm mới đầu sách vào thư viện"}
+          <div className="flex items-center gap-2 pr-8 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
+            <BookOpen className="size-5 shrink-0 text-[#1f5a45] dark:text-emerald-400" />
+            <span>
+              {editingBook
+                ? "Cập nhật đầu sách"
+                : "Thêm mới đầu sách vào thư viện"}
+            </span>
           </div>
         }
-        description="Nhập thông tin chi tiết đầu mục sách theo chuẩn thư viện Mộc Miên."
-        className="max-w-2xl"
+        description="Nhập thông tin chi tiết đầu mục sách. Sách mới tạo sẽ xuất hiện ngay ở dòng đầu tiên."
+        className="w-full sm:max-w-3xl md:max-w-4xl max-h-[90vh] overflow-y-auto"
       >
         <form onSubmit={handleSubmitBook} className="mt-3 flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -580,18 +721,62 @@ export function BooksManagementPage() {
               />
             </div>
 
+            {/* Dynamic Dropdown for Category */}
             <div>
               <label className="text-xs font-semibold text-[#56675c]">
-                Thể loại
+                Thể loại sách <span className="text-[#b43428]">*</span>
               </label>
-              <Input
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                placeholder="Kỹ năng, Văn học..."
-                className="mt-1 border-[#cbd8ce]"
-              />
+              {(() => {
+                const currentCat =
+                  categoriesList.find(
+                    (c) => c.categoryId === formData.categoryId
+                  ) ||
+                  categoriesList.find(
+                    (c) =>
+                      c.categoryName.toLowerCase() ===
+                      (formData.category || "").toLowerCase()
+                  ) ||
+                  categoriesList[0]
+                const currentVal = currentCat
+                  ? String(currentCat.categoryId)
+                  : undefined
+                const displayLabel = currentCat
+                  ? `${currentCat.categoryName} (${currentCat.categoryCode})`
+                  : "Chọn thể loại sách..."
+
+                return (
+                  <Select
+                    value={currentVal}
+                    onValueChange={(val) => {
+                      const numVal = Number(val)
+                      const matched = categoriesList.find(
+                        (c) => c.categoryId === numVal
+                      )
+                      setFormData({
+                        ...formData,
+                        categoryId: numVal,
+                        category: matched ? matched.categoryName : "Văn học",
+                      })
+                    }}
+                  >
+                    <SelectTrigger className="mt-1 h-9 w-full border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground">
+                      <SelectValue placeholder="Chọn thể loại sách...">
+                        {displayLabel}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesList.map((cat) => (
+                        <SelectItem
+                          key={cat.categoryId}
+                          value={String(cat.categoryId)}
+                        >
+                          {cat.categoryName} ({cat.categoryCode})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )
+              })()}
             </div>
 
             <div>
@@ -682,13 +867,15 @@ export function BooksManagementPage() {
         open={isCopiesOpen}
         onOpenChange={setIsCopiesOpen}
         title={
-          <div className="flex items-center gap-2 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
-            <Layers className="size-5 text-[#1f5a45] dark:text-emerald-400" />
-            Bản sao cuốn sách: {selectedBookForCopies?.title}
+          <div className="flex items-center gap-2 pr-8 text-lg font-semibold text-[#1f3b2b] dark:text-foreground">
+            <Layers className="size-5 shrink-0 text-[#1f5a45] dark:text-emerald-400" />
+            <span className="truncate">
+              Bản sao cuốn sách: {selectedBookForCopies?.title}
+            </span>
           </div>
         }
-        description="Quản lý mã vạch barcode, giá trị và vị trí kệ sách của từng cuốn vật lý."
-        className="max-w-3xl"
+        description="Quản lý mã vạch barcode, giá trị và vị trí kệ sách của từng cuốn vật lý trong kho."
+        className="w-full sm:max-w-4xl md:max-w-5xl max-h-[92vh] overflow-y-auto"
       >
         <div className="mt-3 flex flex-col gap-6">
           {/* List of Copies */}
@@ -696,37 +883,50 @@ export function BooksManagementPage() {
             <table className="w-full text-left text-xs">
               <thead className="border-b border-[#edf0eb] bg-[#f7f9f6] font-semibold text-[#718077] dark:border-border dark:bg-muted/40 dark:text-muted-foreground">
                 <tr>
-                  <th className="p-2.5">Mã bản sao</th>
-                  <th className="p-2.5">Mã vạch Barcode</th>
-                  <th className="p-2.5">Vị trí lưu trữ</th>
-                  <th className="p-2.5">Giá nhập</th>
-                  <th className="p-2.5">Tình trạng</th>
-                  <th className="p-2.5">Trạng thái</th>
+                  <th className="p-3 whitespace-nowrap">Mã bản sao</th>
+                  <th className="p-3 whitespace-nowrap">Mã vạch Barcode</th>
+                  <th className="p-3 whitespace-nowrap">Vị trí lưu trữ</th>
+                  <th className="p-3 whitespace-nowrap">Giá nhập</th>
+                  <th className="p-3 whitespace-nowrap">Tình trạng</th>
+                  <th className="p-3 whitespace-nowrap">Trạng thái</th>
+                  <th className="p-3 text-right whitespace-nowrap">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f0f3ee] dark:divide-border/60">
-                {(selectedBookForCopies?.copies || []).map(
-                  (copy: BookCopyItem) => (
+                {copiesLoading ? (
+                  <tr>
+                    <td colSpan={7} className="p-4 text-center text-muted-foreground">
+                      Đang tải danh sách bản sao từ DB...
+                    </td>
+                  </tr>
+                ) : copiesList.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-4 text-center text-muted-foreground">
+                      Chưa có bản sao nào trong kho. Hãy nhập bản sao vật lý bên dưới.
+                    </td>
+                  </tr>
+                ) : (
+                  copiesList.map((copy: BookCopyItem) => (
                     <tr
                       key={copy.id}
                       className="hover:bg-[#fbfcfb] dark:hover:bg-muted/30"
                     >
-                      <td className="p-2.5 font-mono text-[11px] font-medium text-[#1f5a45] dark:text-emerald-400">
+                      <td className="p-3 font-mono text-[11px] font-medium text-[#1f5a45] dark:text-emerald-400 whitespace-nowrap">
                         {copy.id}
                       </td>
-                      <td className="p-2.5 font-mono text-[11px] text-[#17231d] dark:text-foreground">
+                      <td className="p-3 font-mono text-[11px] text-[#17231d] dark:text-foreground whitespace-nowrap">
                         {copy.barcode}
                       </td>
-                      <td className="p-2.5">
-                        <span className="flex items-center gap-1 text-[#385145] dark:text-muted-foreground">
-                          <MapPin className="size-3 text-[#c27652]" />
+                      <td className="p-3 whitespace-nowrap">
+                        <span className="flex items-center gap-1.5 text-[#385145] dark:text-muted-foreground">
+                          <MapPin className="size-3.5 text-[#c27652] shrink-0" />
                           {copy.shelfCode} ({copy.location})
                         </span>
                       </td>
-                      <td className="p-2.5 font-medium text-foreground">
+                      <td className="p-3 font-medium text-foreground whitespace-nowrap">
                         {copy.price.toLocaleString("vi-VN")} đ
                       </td>
-                      <td className="p-2.5">
+                      <td className="p-3 whitespace-nowrap">
                         {copy.conditionStatus === "Good" && (
                           <span className="text-[#246237] dark:text-emerald-400">
                             Tốt
@@ -743,25 +943,36 @@ export function BooksManagementPage() {
                           </span>
                         )}
                       </td>
-                      <td className="p-2.5">
+                      <td className="p-3 whitespace-nowrap">
                         {copy.copyStatus === "Available" ? (
                           <Badge
                             variant="outline"
-                            className="border-[#cce1d2] bg-[#edf6ef] text-[10px] text-[#246237] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
+                            className="border-[#cce1d2] bg-[#edf6ef] text-[11px] text-[#246237] dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300"
                           >
                             Có sẵn
                           </Badge>
                         ) : (
                           <Badge
                             variant="outline"
-                            className="border-[#f3d9ca] bg-[#fdf3ec] text-[10px] text-[#b05828] dark:border-orange-800/40 dark:bg-orange-950/40 dark:text-orange-300"
+                            className="border-[#f3d9ca] bg-[#fdf3ec] text-[11px] text-[#b05828] dark:border-orange-800/40 dark:bg-orange-950/40 dark:text-orange-300"
                           >
                             Đang mượn
                           </Badge>
                         )}
                       </td>
+                      <td className="p-3 text-right whitespace-nowrap">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteCopy(copy.id)}
+                          className="size-8 p-0 text-muted-foreground hover:text-rose-500"
+                          title="Xóa bản sao"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </td>
                     </tr>
-                  )
+                  ))
                 )}
               </tbody>
             </table>
@@ -774,12 +985,12 @@ export function BooksManagementPage() {
           >
             <div className="flex items-center gap-2 text-xs font-semibold text-[#1f3b2b] dark:text-foreground">
               <Plus className="size-4 text-[#1f5a45] dark:text-emerald-400" />{" "}
-              Thêm bản sao vật lý mới vào kho
+              Nhập bản sao vật lý mới vào kho SQL Server
             </div>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+            <div className="mt-3 grid gap-3 sm:grid-cols-4">
               <div>
                 <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
-                  Mã vạch
+                  Mã vạch Barcode *
                 </label>
                 <Input
                   required
@@ -790,12 +1001,23 @@ export function BooksManagementPage() {
               </div>
               <div>
                 <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
-                  Vị trí kệ
+                  Vị trí kệ sách
                 </label>
                 <Input
                   value={newShelf}
                   onChange={(e) => setNewShelf(e.target.value)}
                   placeholder="Kệ A-01..."
+                  className="h-8 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] text-[#718077] dark:text-muted-foreground">
+                  Khu vực lưu trữ
+                </label>
+                <Input
+                  value={newLocation}
+                  onChange={(e) => setNewLocation(e.target.value)}
+                  placeholder="Khu A - Tầng 1..."
                   className="h-8 border-[#cbd8ce] bg-white text-xs dark:border-border dark:bg-muted/20 dark:text-foreground"
                 />
               </div>
@@ -817,7 +1039,7 @@ export function BooksManagementPage() {
                 size="sm"
                 className="h-8 bg-[#1f5a45] text-xs text-white hover:bg-[#174735]"
               >
-                + Lưu bản sao
+                + Lưu bản sao vào kho
               </Button>
             </div>
           </form>
@@ -825,8 +1047,7 @@ export function BooksManagementPage() {
           <div className="flex items-center gap-2 rounded-lg border border-[#dfe5dc] bg-white p-3 text-xs text-[#718077] dark:border-border dark:bg-card dark:text-muted-foreground">
             <AlertCircle className="size-4 shrink-0 text-[#c27652]" />
             <span>
-              Theo quy định thư viện, mỗi cuốn sách vật lý khi nhập kho đều được
-              dán mã vạch barcode duy nhất để thủ thư quét khi mượn/trả.
+              Bản sao khi nhập kho thành công sẽ có trạng thái <strong>Sẵn sàng (AVAILABLE)</strong> và tăng ngay lập tức số lượng bản sao trong kho của đầu sách.
             </span>
           </div>
         </div>

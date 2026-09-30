@@ -1,4 +1,7 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router"
+import { useEffect } from "react"
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router"
+import { toast } from "sonner"
+import { useAuthStore } from "@/stores/use-auth-store"
 import {
   RequireAuth,
   RequireManager,
@@ -25,11 +28,37 @@ import { CategoriesPage } from "@/features/manager/categories-page"
 import { LoansPage } from "@/features/manager/loans-page"
 import { SettingsPage } from "@/features/manager/settings-page"
 
+function AuthListener() {
+  const navigate = useNavigate()
+  const logout = useAuthStore((s) => s.logout)
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      toast.error(
+        "Phiên đăng nhập đã hết hạn hoặc không có quyền. Vui lòng đăng nhập lại."
+      )
+      void logout()
+      navigate("/login", {
+        replace: true,
+        state: { from: window.location.pathname },
+      })
+    }
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized)
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized)
+    }
+  }, [navigate, logout])
+
+  return null
+}
+
 export function App() {
   return (
     <BrowserRouter>
       <GlobalLoading />
       <Toaster />
+      <AuthListener />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />

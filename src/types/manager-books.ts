@@ -1,13 +1,27 @@
-export type BookTitleStatus = "Active" | "Discontinued"
+export type BookTitleStatus = "Active" | "Discontinued" | "ACTIVE" | "DISCONTINUED"
 
 export type CopyStorageStatus =
-  "Available" | "Borrowed" | "Maintenance" | "Liquidated"
+  | "Available"
+  | "Borrowed"
+  | "Maintenance"
+  | "Liquidated"
+  | "AVAILABLE"
+  | "BORROWED"
+  | "MAINTENANCE"
+  | "LIQUIDATED"
 
-export type CopyConditionStatus = "Good" | "SlightlyDamaged" | "Damaged"
+export type CopyConditionStatus =
+  | "Good"
+  | "SlightlyDamaged"
+  | "Damaged"
+  | "GOOD"
+  | "SLIGHTLY_DAMAGED"
+  | "DAMAGED"
 
 export interface BookCopyItem {
-  id: string
-  bookTitleId: string
+  id: string | number
+  bookCopyId?: number
+  bookTitleId: string | number
   barcode: string
   acquisitionDate: string
   price: number
@@ -20,6 +34,7 @@ export interface BookCopyItem {
 
 export interface BookTitleItem {
   id: string
+  bookTitleId?: number
   isbn: string
   title: string
   subtitle?: string
@@ -27,6 +42,7 @@ export interface BookTitleItem {
   publisher: string
   publicationYear: number
   languageCode: string
+  categoryId?: number
   category: string
   description: string
   pageCount: number
@@ -47,7 +63,8 @@ export interface CreateBookTitleInput {
   publisher: string
   publicationYear: number
   languageCode: string
-  category: string
+  categoryId?: number
+  category?: string
   description: string
   pageCount: number
   coverImageUrl?: string
@@ -62,6 +79,7 @@ export interface UpdateBookTitleInput {
   publisher?: string
   publicationYear?: number
   languageCode?: string
+  categoryId?: number
   category?: string
   description?: string
   pageCount?: number
@@ -71,8 +89,10 @@ export interface UpdateBookTitleInput {
 
 export interface AddCopyInput {
   barcode: string
-  location: string
-  shelfCode: string
+  location?: string
+  shelfCode?: string
   price: number
+  copyStatus?: CopyStorageStatus
   conditionStatus: CopyConditionStatus
+  note?: string
 }

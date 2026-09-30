@@ -1,7 +1,6 @@
-import { useState } from "react"
-import { Plus, Edit2, Trash2, Tag, BookOpen } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Plus, Edit2, Trash2, Tag, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
-import { useLibraryStore } from "@/stores/use-library-store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -10,34 +9,72 @@ import {
 } from "@/components/common/common-table"
 import { AppDialog } from "@/components/common/app-dialog"
 import { Field, FieldLabel } from "@/components/ui/field"
-import type { CategoryItem } from "@/types/library"
+import { categoriesService } from "@/services/categories"
+import type { CategoryDto } from "@/api/categories"
 
 export const CategoriesPage = () => {
-  const { categories, createCategory, updateCategory, deleteCategory } =
-    useLibraryStore()
+  const [categories, setCategories] = useState<CategoryDto[]>([])
+  const [loading, setLoading] = useState(true)
 
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(
+  const [editingCategory, setEditingCategory] = useState<CategoryDto | null>(
     null
   )
-  const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(
+  const [deletingCategory, setDeletingCategory] = useState<CategoryDto | null>(
     null
   )
 
+  const [code, setCode] = useState("")
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [page, setPage] = useState(1)
 
+  const loadCategories = async () => {
+    setLoading(true)
+    try {
+      const data = await categoriesService.getAll()
+      setCategories(data)
+    } catch {
+      toast.error("Không thể tải danh mục từ cơ sở dữ liệu.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    let ignore = false
+    categoriesService
+      .getAll()
+      .then((data) => {
+        if (!ignore) {
+          setCategories(data)
+          setLoading(false)
+        }
+      })
+      .catch(() => {
+        if (!ignore) {
+          toast.error("Không thể tải danh mục từ cơ sở dữ liệu.")
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [])
+
   const handleOpenAdd = () => {
+    setCode(`CAT-${Math.floor(100 + Math.random() * 900)}`)
     setName("")
     setDescription("")
     setIsAddOpen(true)
   }
 
-  const handleOpenEdit = (cat: CategoryItem) => {
+  const handleOpenEdit = (cat: CategoryDto) => {
     setEditingCategory(cat)
-    setName(cat.name)
-    setDescription(cat.description)
+    setCode(cat.categoryCode || "")
+    setName(cat.categoryName)
+    setDescription(cat.description || "")
   }
 
   const handleSubmitAdd = async (e: React.FormEvent) => {
@@ -48,9 +85,14 @@ export const CategoriesPage = () => {
     }
 
     try {
-      await createCategory(name.trim(), description.trim())
+      await categoriesService.create({
+        categoryCode: code.trim() || undefined,
+        categoryName: name.trim(),
+        description: description.trim() || undefined,
+      })
       toast.success(`Đã tạo danh mục: ${name}`)
       setIsAddOpen(false)
+      await loadCategories()
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Thêm danh mục thất bại")
     }
@@ -61,9 +103,14 @@ export const CategoriesPage = () => {
     if (!editingCategory) return
 
     try {
-      await updateCategory(editingCategory.id, name.trim(), description.trim())
+      await categoriesService.update(editingCategory.categoryId, {
+        categoryCode: code.trim() || undefined,
+        categoryName: name.trim(),
+        description: description.trim() || undefined,
+      })
       toast.success("Đã cập nhật danh mục thành công.")
       setEditingCategory(null)
+      await loadCategories()
     } catch (err: unknown) {
       toast.error(
         err instanceof Error ? err.message : "Cập nhật danh mục thất bại"
@@ -74,9 +121,10 @@ export const CategoriesPage = () => {
   const handleDelete = async () => {
     if (!deletingCategory) return
     try {
-      await deleteCategory(deletingCategory.id)
-      toast.success(`Đã xóa danh mục: ${deletingCategory.name}`)
+      await categoriesService.delete(deletingCategory.categoryId)
+      toast.success(`Đã xóa danh mục: ${deletingCategory.categoryName}`)
       setDeletingCategory(null)
+      await loadCategories()
     } catch (err: unknown) {
       toast.error(
         err instanceof Error ? err.message : "Không thể xóa danh mục."
@@ -84,14 +132,23 @@ export const CategoriesPage = () => {
     }
   }
 
-  const columns: CommonTableColumn<CategoryItem>[] = [
+  const columns: CommonTableColumn<CategoryDto>[] = [
+    {
+      id: "code",
+      header: "Mã thể loại",
+      cell: (cat) => (
+        <span className="font-mono text-xs font-semibold text-[#1f5a45] dark:text-emerald-400">
+          {cat.categoryCode || `CAT-${cat.categoryId}`}
+        </span>
+      ),
+    },
     {
       id: "name",
-      header: "Tên danh mục",
+      header: "Tên thể loại",
       cell: (cat) => (
         <div className="flex items-center gap-2.5">
           <Tag className="size-4 text-primary" />
-          <span className="font-semibold text-foreground">{cat.name}</span>
+          <span className="font-semibold text-foreground">{cat.categoryName}</span>
         </div>
       ),
     },
@@ -105,13 +162,12 @@ export const CategoriesPage = () => {
       ),
     },
     {
-      id: "bookCount",
-      header: "Số lượng đầu sách",
+      id: "status",
+      header: "Trạng thái",
       cell: (cat) => (
-        <div className="flex items-center gap-1.5 text-sm font-medium">
-          <BookOpen className="size-3.5 text-muted-foreground" />
-          <span>{cat.bookCount} đầu sách</span>
-        </div>
+        <span className="text-xs text-muted-foreground">
+          {cat.categoryStatus || "ACTIVE"}
+        </span>
       ),
     },
     {
@@ -142,28 +198,38 @@ export const CategoriesPage = () => {
   ]
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 lg:p-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Danh mục sách</h1>
+          <p className="text-xs font-semibold tracking-[0.16em] text-[#c27652] uppercase">
+            Quản trị Thư viện
+          </p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#1f3b2b] dark:text-foreground">
+            Danh mục &amp; Thể loại sách
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Phân loại các đầu sách theo từng thể loại và chuyên ngành trong thư
-            viện.
+            Quản lý các thể loại sách lưu hành trong thư viện từ cơ sở dữ liệu SQL Server.
           </p>
         </div>
-        <Button onClick={handleOpenAdd} className="gap-2">
-          <Plus className="size-4" /> Thêm danh mục mới
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={loadCategories} className="gap-1.5 text-xs">
+            <RefreshCw className="size-3.5" /> Tải lại
+          </Button>
+          <Button onClick={handleOpenAdd} className="gap-2 bg-[#1f5a45] text-white hover:bg-[#174735]">
+            <Plus className="size-4" /> Thêm thể loại mới
+          </Button>
+        </div>
       </div>
 
       <CommonTable
         data={categories}
         columns={columns}
-        getRowId={(c) => c.id}
-        emptyMessage="Chưa có danh mục nào."
+        loading={loading}
+        getRowId={(c) => String(c.categoryId)}
+        emptyMessage="Chưa có danh mục nào trong database."
         summary={
           <span>
-            Tổng cộng <strong>{categories.length}</strong> danh mục
+            Tổng cộng <strong>{categories.length}</strong> thể loại trong hệ thống
           </span>
         }
         pagination={{
@@ -178,15 +244,24 @@ export const CategoriesPage = () => {
       <AppDialog
         open={isAddOpen}
         onOpenChange={setIsAddOpen}
-        title="Thêm danh mục thể loại mới"
-        description="Nhập tên danh mục và ghi chú mục đích phân loại."
+        title="Thêm thể loại sách mới"
+        description="Nhập mã thể loại, tên thể loại và ghi chú phân loại vào database."
       >
         <form onSubmit={handleSubmitAdd} className="space-y-4">
           <Field>
-            <FieldLabel>Tên danh mục *</FieldLabel>
+            <FieldLabel>Mã thể loại</FieldLabel>
+            <Input
+              placeholder="VD: CAT-001"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel>Tên thể loại *</FieldLabel>
             <Input
               required
-              placeholder="VD: Trí Tuệ Nhân Tạo & Khoa Học Dữ Liệu"
+              placeholder="VD: Khoa học công nghệ, Kinh tế..."
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -195,7 +270,7 @@ export const CategoriesPage = () => {
           <Field>
             <FieldLabel>Mô tả</FieldLabel>
             <Input
-              placeholder="Mô tả nhóm sách thuộc danh mục này..."
+              placeholder="Mô tả nhóm sách thuộc thể loại này..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -209,7 +284,9 @@ export const CategoriesPage = () => {
             >
               Hủy
             </Button>
-            <Button type="submit">Lưu danh mục</Button>
+            <Button type="submit" className="bg-[#1f5a45] text-white hover:bg-[#174735]">
+              Lưu thể loại
+            </Button>
           </div>
         </form>
       </AppDialog>
@@ -218,12 +295,20 @@ export const CategoriesPage = () => {
       <AppDialog
         open={Boolean(editingCategory)}
         onOpenChange={(open) => !open && setEditingCategory(null)}
-        title="Chỉnh sửa danh mục"
-        description={`Cập nhật thông tin cho danh mục: ${editingCategory?.name ?? ""}`}
+        title="Chỉnh sửa thể loại sách"
+        description={`Cập nhật thông tin cho thể loại: ${editingCategory?.categoryName ?? ""}`}
       >
         <form onSubmit={handleSubmitEdit} className="space-y-4">
           <Field>
-            <FieldLabel>Tên danh mục *</FieldLabel>
+            <FieldLabel>Mã thể loại</FieldLabel>
+            <Input
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel>Tên thể loại *</FieldLabel>
             <Input
               required
               value={name}
@@ -247,7 +332,9 @@ export const CategoriesPage = () => {
             >
               Hủy
             </Button>
-            <Button type="submit">Cập nhật thay đổi</Button>
+            <Button type="submit" className="bg-[#1f5a45] text-white hover:bg-[#174735]">
+              Cập nhật thay đổi
+            </Button>
           </div>
         </form>
       </AppDialog>
@@ -256,18 +343,20 @@ export const CategoriesPage = () => {
       <AppDialog
         open={Boolean(deletingCategory)}
         onOpenChange={(open) => !open && setDeletingCategory(null)}
-        title="Xác nhận xóa danh mục"
-        description={`Bạn có chắc muốn xóa danh mục "${deletingCategory?.name}"? Lưu ý rằng không thể xóa nếu danh mục đang chứa sách.`}
+        title="Xác nhận xóa thể loại"
+        description={`Bạn có chắc muốn xóa thể loại "${deletingCategory?.categoryName}" khỏi cơ sở dữ liệu?`}
       >
         <div className="flex justify-end gap-2 pt-4">
           <Button variant="outline" onClick={() => setDeletingCategory(null)}>
             Hủy
           </Button>
           <Button variant="destructive" onClick={handleDelete}>
-            Xóa danh mục
+            Xóa thể loại
           </Button>
         </div>
       </AppDialog>
     </div>
   )
 }
+
+export default CategoriesPage

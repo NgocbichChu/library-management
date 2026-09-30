@@ -5,6 +5,7 @@ export type UserStatus = "Active" | "Locked" | "Pending"
 export interface AdminUserItem {
   accountId: number
   employeeId?: number
+  readerId?: number
   username: string
   fullName: string | null
   email: string | null
